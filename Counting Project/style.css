@@ -1,0 +1,177 @@
+/* Counter Project Styles */
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Counter Container */
+#btnContainer {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Counter Label - Centered */
+#countLabel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 120px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+    min-width: 200px;
+    min-height: 200px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    margin: 0 auto;
+}
+
+/* Centering the label as a block element */
+label {
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* Buttons */
+button {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* Decrease Button */
+#decreaseBtn {
+    background: linear-gradient(135deg, #ff6b6b, #ff4757);
+    color: white;
+}
+
+#decreaseBtn:hover {
+    background: linear-gradient(135deg, #ff4757, #ff3838);
+}
+
+/* Reset Button */
+#resetBtn {
+    background: linear-gradient(135deg, #2ed573, #1dd1a1);
+    color: white;
+}
+
+#resetBtn:hover {
+    background: linear-gradient(135deg, #1dd1a1, #10ac84);
+}
+
+/* Increase Button */
+#increaseBtn {
+    background: linear-gradient(135deg, #3742fa, #5352ed);
+    color: white;
+}
+
+#increaseBtn:hover {
+    background: linear-gradient(135deg, #5352ed, #2f3542);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #countLabel {
+        font-size: 80px;
+        min-width: 150px;
+        min-height: 150px;
+    }
+    
+    button {
+        padding: 12px 25px;
+        font-size: 16px;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    #countLabel {
+        font-size: 60px;
+        min-width: 120px;
+        min-height: 120px;
+        padding: 15px;
+    }
+    
+    #btnContainer {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 250px;
+    }
+    
+    button {
+        width: 100%;
+        padding: 15px 20px;
+    }
+}
+
+/* Animation for counter changes */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.animate-pulse {
+    animation: pulse 0.3s ease-in-out;
+}
+
+/* Button icons */
+button::before {
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+#decreaseBtn::before {
+    content: "−";
+}
+
+#increaseBtn::before {
+    content: "+";
+}
+
+#resetBtn::before {
+    content: "↺";
+}
