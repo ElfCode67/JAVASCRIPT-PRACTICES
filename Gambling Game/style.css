@@ -16,19 +16,21 @@ body {
 }
 
 /* ============================================
-   RULES PANEL - FIXED TOP RIGHT
+   RULES PANEL - FIXED TOP RIGHT - NO SCROLLING
    ============================================ */
 .rules-panel {
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 320px;
-    background: rgba(0, 0, 0, 0.95);
+    width: 360px;
+    background: rgba(0, 0, 0, 0.97);
     border: 3px solid #00b894;
     border-radius: 15px;
     z-index: 1000;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(10px);
+    max-height: 85vh;
+    overflow: visible;
 }
 
 .rules-header {
@@ -69,8 +71,11 @@ body {
 
 .rules-content {
     padding: 20px;
-    max-height: 450px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: none;
+    overflow: visible;
     transition: all 0.3s ease;
 }
 
@@ -80,16 +85,44 @@ body {
     overflow: hidden;
 }
 
+/* Rule Sections Layout */
+.rule-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    border-left: 4px solid;
+}
+
+.rule-section:nth-child(1) { border-left-color: #6c5ce7; }
+.rule-section:nth-child(2) { border-left-color: #fdcb6e; }
+.rule-section:nth-child(3) { border-left-color: #00b894; }
+
+.rule-section h4 {
+    color: #4cc9f0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+/* Game Steps */
 .step {
     display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 15px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.step:last-child {
+    margin-bottom: 0;
 }
 
 .step-number {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     background: #6c5ce7;
     color: white;
     border-radius: 50%;
@@ -97,44 +130,42 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
 }
 
 .step p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     line-height: 1.4;
+    margin: 0;
 }
 
 .step strong {
     color: #00b894;
 }
 
-.win-conditions {
-    background: rgba(255, 255, 255, 0.07);
-    border-radius: 10px;
-    padding: 15px;
-    margin: 20px 0;
+/* Win Conditions */
+.condition-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 5px 0;
 }
 
-.win-conditions h4 {
-    color: #fdcb6e;
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-    border-bottom: 2px solid rgba(253, 203, 110, 0.3);
-    padding-bottom: 5px;
+.condition-row:last-child {
+    margin-bottom: 0;
 }
 
 .win-type {
     display: inline-block;
-    padding: 5px 12px;
+    padding: 6px 12px;
     border-radius: 6px;
     font-weight: bold;
-    font-size: 0.85rem;
-    margin-right: 8px;
-    min-width: 90px;
+    font-size: 0.8rem;
+    min-width: 100px;
     text-align: center;
-    margin-bottom: 8px;
+    margin: 0;
 }
 
 .double { 
@@ -155,24 +186,37 @@ body {
     border: 2px solid #e55c5c;
 }
 
-.game-tips {
-    background: rgba(108, 92, 231, 0.1);
-    border-radius: 10px;
-    padding: 15px;
-    border-left: 4px solid #6c5ce7;
+.condition-row p {
+    margin: 0;
+    font-size: 0.85rem;
+    flex: 1;
 }
 
-.game-tips p {
-    font-size: 0.85rem;
-    margin-bottom: 8px;
+/* Game Tips */
+.tip {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
 }
 
-.game-tips i {
+.tip:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.tip i {
     color: #fdcb6e;
     width: 16px;
+    text-align: center;
+}
+
+.tip p {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
 }
 
 /* ============================================
@@ -185,7 +229,7 @@ body {
     padding: 20px;
     gap: 25px;
     min-height: 100vh;
-    padding-right: 350px;
+    padding-right: 400px;
 }
 
 /* ============================================
@@ -917,6 +961,7 @@ body {
         width: 100%;
         max-height: none;
         margin-bottom: 20px;
+        order: -1;
     }
 }
 
@@ -997,6 +1042,18 @@ body {
         font-size: 0.8rem;
         padding: 6px 12px;
     }
+    
+    /* Adjust rules panel for mobile */
+    .condition-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .win-type {
+        min-width: auto;
+        width: 100%;
+    }
 }
 
 /* ============================================
@@ -1010,22 +1067,3 @@ body {
 .fade-in {
     animation: fadeIn 0.5s ease-out;
 }
-
-.difficulty-multipliers {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.multiplier {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin: 2px;
-}
-
-.multiplier.easy { background: #00b894; color: white; }
-.multiplier.medium { background: #fdcb6e; color: #000; }
-.multiplier.hard { background: #ff6b6b; color: white; }

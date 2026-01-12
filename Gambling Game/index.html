@@ -14,63 +14,81 @@
 </head>
 <body>
     <!-- Debug -->
-    
 
-    <!-- Rules Panel -->
-     <div class="win-conditions">
-    <h4>WIN CONDITIONS & MULTIPLIERS</h4>
-    <p><span class="win-type double">×2 WIN</span> Prediction matches Dice</p>
-    <p><span class="win-type double">×2 WIN</span> Prediction matches Card</p>
-    <p><span class="win-type quadruple">×4 JACKPOT</span> Prediction matches BOTH</p>
-    <div class="difficulty-multipliers">
-        <p><strong>Difficulty Multipliers:</strong></p>
-        <p><span class="multiplier easy">EASY (3 cards): ×1</span></p>
-        <p><span class="multiplier medium">MEDIUM (5 cards): ×2</span></p>
-        <p><span class="multiplier hard">HARD (7 cards): ×3</span></p>
-    </div>
-    <p><small>Example: ×2 win on HARD = Bet ×2 ×3 = ×6 total!</small></p>
-</div>
+    <!-- Rules Panel - NO SCROLLING -->
     <div class="rules-panel">
         <div class="rules-header">
             <h3><i class="fas fa-scroll"></i> HOW TO PLAY</h3>
             <button class="rules-toggle" id="rulesToggle">
-                <i class="fas fa-chevron-down"></i>
+                <i class="fas fa-chevron-up"></i>
             </button>
         </div>
         <div class="rules-content" id="rulesContent">
-            <div class="step">
-                <span class="step-number">1</span>
-                <p><strong>Choose Difficulty</strong> (3, 5, or 7 cards)</p>
-            </div>
-            <div class="step">
-                <span class="step-number">2</span>
-                <p><strong>Set Your Bet</strong> (10, 50, 100, or 500 coins)</p>
-            </div>
-            <div class="step">
-                <span class="step-number">3</span>
-                <p><strong>Predict a Number</strong> (Pick 1-6 you think will match)</p>
-            </div>
-            <div class="step">
-                <span class="step-number">4</span>
-                <p><strong>Select a Card</strong> (Each card has a hidden number 1-6)</p>
-            </div>
-            <div class="step">
-                <span class="step-number">5</span>
-                <p><strong>Roll the Dice</strong> (Click PLAY to roll 1-6)</p>
-            </div>
-            
-            <div class="win-conditions">
-                <h4>WIN CONDITIONS</h4>
-                <p><span class="win-type double">×2 WIN</span> Prediction matches Dice</p>
-                <p><span class="win-type double">×2 WIN</span> Prediction matches Card</p>
-                <p><span class="win-type quadruple">×4 JACKPOT</span> Prediction matches BOTH Card & Dice</p>
-                <p><span class="win-type lose">LOSE</span> No matches (lose bet)</p>
+            <!-- Game Steps Section -->
+            <div class="rule-section">
+                <h4><i class="fas fa-gamepad"></i> GAME STEPS</h4>
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <p><strong>Choose Difficulty</strong> (3, 5, or 7 cards)</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <p><strong>Set Your Bet</strong> (10, 50, 100, or 500 coins)</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <p><strong>Predict a Number</strong> (Pick 1-6 you think will match)</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <p><strong>Select a Card</strong> (Each card has a hidden number 1-6)</p>
+                </div>
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <p><strong>Roll the Dice</strong> (Click PLAY to roll 1-6)</p>
+                </div>
             </div>
             
-            <div class="game-tips">
-                <p><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Each card shows its number when flipped!</p>
-                <p><i class="fas fa-redo"></i> <strong>Double or Nothing:</strong> Available after any win!</p>
-                <p><i class="fas fa-flag-checkered"></i> <strong>3 Rounds</strong> per game</p>
+            <!-- Win Conditions Section -->
+            <div class="rule-section win-conditions">
+                <h4><i class="fas fa-trophy"></i> WIN CONDITIONS</h4>
+                <div class="condition-row">
+                    <span class="win-type double">×2 WIN</span>
+                    <p>Prediction matches Dice</p>
+                </div>
+                <div class="condition-row">
+                    <span class="win-type double">×2 WIN</span>
+                    <p>Prediction matches Card</p>
+                </div>
+                <div class="condition-row">
+                    <span class="win-type quadruple">×4 JACKPOT</span>
+                    <p>Prediction matches BOTH Card & Dice</p>
+                </div>
+                <div class="condition-row">
+                    <span class="win-type lose">LOSE</span>
+                    <p>No matches (lose bet)</p>
+                </div>
+            </div>
+            
+            <!-- Game Tips Section -->
+            <div class="rule-section game-tips">
+                <h4><i class="fas fa-lightbulb"></i> PRO TIPS</h4>
+                <div class="tip">
+                    <i class="fas fa-search"></i>
+                    <p><strong>Card Strategy:</strong> Each card shows its number when flipped!</p>
+                </div>
+                <div class="tip">
+                    <i class="fas fa-redo"></i>
+                    <p><strong>Double Chance:</strong> Available after any win!</p>
+                </div>
+                <div class="tip">
+                    <i class="fas fa-flag-checkered"></i>
+                    <p><strong>Game Length:</strong> 3 Rounds per game</p>
+                </div>
+                <div class="tip">
+                    <i class="fas fa-chart-pie"></i>
+                    <p><strong>Odds:</strong> 3 cards = easier, 7 cards = bigger challenge!</p>
+                </div>
             </div>
         </div>
     </div>
@@ -97,26 +115,6 @@
                         <button class="difficulty-btn" data-cards="7">HARD (7)</button>
                     </div>
                 </div>
-                        <!-- Difficulty Section -->
-                <div class="control-group">
-                     <h3><i class="fas fa-chart-line"></i> DIFFICULTY & MULTIPLIER</h3>
-                        <div class="button-group">
-                             <button class="difficulty-btn active" data-cards="3">
-                                EASY (3)<br><small>×1 multiplier</small>
-                             </button>
-                             <button class="difficulty-btn" data-cards="5">
-                              MEDIUM (5)<br><small>×2 multiplier</small>
-                             </button>
-                                <button class="difficulty-btn" data-cards="7">
-                                 HARD (7)<br><small>×3 multiplier</small>
-                            </button>
-             </div>
-             <div class="current-selection">
-                 Current Multiplier: <span id="currentMultiplier">×1</span>
-                </div>
-            </div>
-
-                
                 
                 <!-- Bet -->
                 <div class="control-group">
