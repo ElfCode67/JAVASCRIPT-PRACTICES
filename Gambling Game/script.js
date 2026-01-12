@@ -1,5 +1,5 @@
 // ============================================
-// DICE MATCH GAMBLER - COMPLETE GAME
+// DICE MATCH GAMBLER - UPDATED WIN CONDITIONS
 // ============================================
 
 console.log("Starting Dice Match Gambler game...");
@@ -57,7 +57,11 @@ const elements = {
     gameOverModal: document.getElementById('gameOverModal'),
     finalScore: document.getElementById('finalScore'),
     gameStats: document.getElementById('gameStats'),
-    playAgainBtn: document.getElementById('playAgainBtn')
+    playAgainBtn: document.getElementById('playAgainBtn'),
+    
+    // Rules
+    rulesToggle: document.getElementById('rulesToggle'),
+    rulesContent: document.getElementById('rulesContent')
 };
 
 console.log("DOM elements loaded:", Object.keys(elements).length);
@@ -129,22 +133,10 @@ function generateCards() {
     elements.cardsContainer.innerHTML = '';
     gameState.selectedCard = null;
     
-    // Generate unique numbers for cards (1-6)
+    // Generate numbers for cards (1-6, can repeat)
     const cardNumbers = [];
     
-    // Try to get unique numbers
-    while (cardNumbers.length < gameState.cardsCount) {
-        const randomNum = Math.floor(Math.random() * 6) + 1;
-        if (!cardNumbers.includes(randomNum)) {
-            cardNumbers.push(randomNum);
-        }
-        
-        // Safety break
-        if (cardNumbers.length >= 6) break;
-    }
-    
-    // Fill remaining with random numbers if needed
-    while (cardNumbers.length < gameState.cardsCount) {
+    for (let i = 0; i < gameState.cardsCount; i++) {
         cardNumbers.push(Math.floor(Math.random() * 6) + 1);
     }
     
@@ -165,12 +157,12 @@ function generateCards() {
         front.className = 'card-front';
         front.innerHTML = '<i class="fas fa-question"></i>';
         
-        // Back face (number and dice symbol)
+        // Back face (BIG NUMBER and dice symbol)
         const back = document.createElement('div');
         back.className = 'card-back';
         back.innerHTML = `
             <div class="card-number">${number}</div>
-            <div class="dice-symbol">${getDiceSymbol(number)}</div>
+            <div class="card-symbol">${getDiceSymbol(number)}</div>
         `;
         
         card.appendChild(front);
@@ -194,7 +186,7 @@ function generateCards() {
 }
 
 function getDiceSymbol(number) {
-    // Simple dice face representation
+    // Dice face symbols
     const symbols = {
         1: '⚀',
         2: '⚁',
@@ -236,35 +228,64 @@ function selectCard(cardElement) {
         return;
     }
     
-    console.log(`Card selected: ${cardElement.dataset.number}`);
+    console.log(`Card selected (number hidden)`);
     
     // Remove selection from previous card
     if (gameState.selectedCard) {
         gameState.selectedCard.classList.remove('selected');
     }
     
-    // Select new card
+    // Select new card (but DON'T show the number yet)
     gameState.selectedCard = cardElement;
     cardElement.classList.add('selected');
     
+    // Update display to show "?" instead of the actual number
     updateSelectedCardDisplay();
     updateUI();
     updateGameStatus('Card selected! Ready to roll dice!');
 }
+
 
 function updateSelectedCardDisplay() {
     const preview = elements.selectedCardDisplay.querySelector('.card-preview');
     const info = elements.selectedCardDisplay.querySelector('.card-info');
     
     if (gameState.selectedCard) {
-        const number = gameState.selectedCard.dataset.number;
-        preview.textContent = number;
-        preview.style.backgroundColor = getCardColor(gameState.selectedCard);
-        info.textContent = `Card #${parseInt(gameState.selectedCard.dataset.index) + 1} (${number})`;
+        // Show question mark before dice roll, actual number after
+        const cardElement = gameState.selectedCard;
+        const isFlipped = cardElement.classList.contains('flipped');
+        
+        if (isFlipped && gameState.diceResult !== null) {
+            // After dice roll - show actual number
+            const number = cardElement.dataset.number;
+            preview.textContent = number;
+            preview.style.backgroundColor = getCardColor(cardElement);
+            preview.style.color = getCardColor(cardElement);
+            info.innerHTML = `
+                <p>Card #${parseInt(cardElement.dataset.index) + 1}</p>
+                <p>Number: <strong>${number}</strong></p>
+                <p class="hint">Card flipped after dice roll</p>
+            `;
+        } else {
+            // Before dice roll - show question mark
+            preview.textContent = '?';
+            preview.style.backgroundColor = '#2d4263';
+            preview.style.color = '#4cc9f0';
+            info.innerHTML = `
+                <p>Card #${parseInt(cardElement.dataset.index) + 1} selected</p>
+                <p>Number: <strong>?</strong> (hidden)</p>
+                <p class="hint">Will be revealed after dice roll</p>
+            `;
+        }
     } else {
+        // No card selected
         preview.textContent = '?';
         preview.style.backgroundColor = '#2d4263';
-        info.textContent = 'No card selected';
+        preview.style.color = '#4cc9f0';
+        info.innerHTML = `
+            <p>No card selected</p>
+            <p class="hint">Click a card to select it</p>
+        `;
     }
 }
 
@@ -336,23 +357,17 @@ function rollDice() {
         drawDiceFace(gameState.diceResult);
         elements.diceResult.textContent = gameState.diceResult;
         
-        // Flip selected card
+        // FLIP THE CARD - this is when it reveals
         if (gameState.selectedCard) {
             gameState.selectedCard.classList.add('flipped');
         }
         
-        // Calculate win
+        // Calculate win with NEW rules
         setTimeout(calculateWin, 500);
         
     }, 1500);
 }
 
-function animateDice() {
-    console.log("Animating dice...");
-    
-    elements.dice.classList.add('rolling');
-    updateGameStatus('Rolling dice...');
-}
 
 function drawDiceFace(number) {
     console.log(`Drawing dice face for number: ${number}`);
@@ -404,11 +419,11 @@ function drawDiceFace(number) {
 }
 
 // ============================================
-// WIN CALCULATION
+// WIN CALCULATION - NEW RULES
 // ============================================
 
 function calculateWin() {
-    console.log("Calculating win...");
+    console.log("Calculating win with NEW rules...");
     
     const cardNumber = parseInt(gameState.selectedCard.dataset.number);
     const bet = gameState.currentBet;
@@ -418,27 +433,30 @@ function calculateWin() {
     
     console.log(`Card: ${cardNumber}, Dice: ${gameState.diceResult}, Prediction: ${gameState.currentPrediction}`);
     
-    // Check win conditions
-    if (cardNumber === gameState.diceResult && cardNumber === gameState.currentPrediction) {
-        // JACKPOT
-        winAmount = bet * 10;
-        winType = 'jackpot';
-        message = `🎰 JACKPOT! ${bet} × 10 = ${winAmount}!`;
-    } else if (cardNumber === gameState.diceResult) {
-        // WIN
+    // NEW WIN CONDITIONS:
+    const predictionMatchesDice = gameState.currentPrediction === gameState.diceResult;
+    const predictionMatchesCard = gameState.currentPrediction === cardNumber;
+    
+    if (predictionMatchesDice && predictionMatchesCard) {
+        // ×4 JACKPOT: Prediction matches BOTH card and dice
+        winAmount = bet * 4;
+        winType = 'quadruple';
+        message = `🎰 JACKPOT! Prediction matched BOTH card and dice! ${bet} × 4 = ${winAmount}!`;
+    } else if (predictionMatchesDice) {
+        // ×2 WIN: Prediction matches dice
         winAmount = bet * 2;
-        winType = 'win';
-        message = `🎉 WIN! Card matched dice! ${bet} × 2 = ${winAmount}`;
-    } else if (cardNumber === gameState.currentPrediction) {
-        // BREAK EVEN
-        winAmount = bet;
-        winType = 'even';
-        message = `🔄 Break even! Got your ${bet} back`;
+        winType = 'double';
+        message = `🎉 WIN! Prediction matched dice! ${bet} × 2 = ${winAmount}`;
+    } else if (predictionMatchesCard) {
+        // ×2 WIN: Prediction matches card
+        winAmount = bet * 2;
+        winType = 'double';
+        message = `🎉 WIN! Prediction matched card! ${bet} × 2 = ${winAmount}`;
     } else {
-        // LOSE
+        // LOSE: No matches
         winAmount = 0;
         winType = 'lose';
-        message = `💸 Lost ${bet}!`;
+        message = `💸 Lost ${bet}! No matches.`;
     }
     
     // Update money
@@ -452,7 +470,11 @@ function calculateWin() {
         card: cardNumber,
         dice: gameState.diceResult,
         win: winAmount,
-        type: winType
+        type: winType,
+        matches: {
+            dice: predictionMatchesDice,
+            card: predictionMatchesCard
+        }
     };
     
     gameState.roundHistory.push(roundRecord);
@@ -466,6 +488,9 @@ function calculateWin() {
         gameState.selectedCard.classList.add('winning');
     }
     
+    // UPDATE: Now update the selected card display to show the actual number
+    updateSelectedCardDisplay();
+    
     // Show result
     showResult(roundRecord);
     updateHistory();
@@ -478,14 +503,29 @@ function calculateWin() {
     console.log(`Win calculation complete: ${winType}, Amount: ${winAmount}`);
 }
 
+
 function showResult(record) {
+    let matchesText = '';
+    if (record.type === 'quadruple') {
+        matchesText = 'Matched BOTH card and dice!';
+    } else if (record.type === 'double') {
+        if (record.matches.dice) {
+            matchesText = 'Matched dice!';
+        } else {
+            matchesText = 'Matched card!';
+        }
+    } else {
+        matchesText = 'No matches';
+    }
+    
     let resultHTML = `
         <div class="result-details">
             <p><strong>Round ${record.round}</strong></p>
             <p>Bet: ${record.bet}</p>
-            <p>Prediction: ${record.prediction}</p>
-            <p>Card: ${record.card}</p>
-            <p>Dice: ${record.dice}</p>
+            <p>Your Prediction: ${record.prediction}</p>
+            <p>Card Number: ${record.card}</p>
+            <p>Dice Roll: ${record.dice}</p>
+            <p>${matchesText}</p>
             <p class="result-${record.type}">
                 ${record.type.toUpperCase()}: ${record.win > 0 ? '+' : ''}${record.win}
             </p>
@@ -503,15 +543,22 @@ function updateHistory() {
     
     let historyHTML = '';
     gameState.roundHistory.forEach(record => {
+        let matchInfo = '';
+        if (record.type === 'quadruple') {
+            matchInfo = ' (BOTH)';
+        } else if (record.type === 'double') {
+            matchInfo = record.matches.dice ? ' (Dice)' : ' (Card)';
+        }
+        
         historyHTML += `
             <div class="history-item">
                 Round ${record.round}: 
                 Bet ${record.bet} → 
+                Pred:${record.prediction} | 
                 Card:${record.card} | 
-                Dice:${record.dice} | 
-                Pred:${record.prediction}
+                Dice:${record.dice}
                 <span class="history-result ${record.type}">
-                    ${record.win > 0 ? '+' : ''}${record.win}
+                    ${record.win > 0 ? '+' : ''}${record.win}${matchInfo}
                 </span>
             </div>
         `;
@@ -587,6 +634,9 @@ function nextRound() {
     // Reset result display
     elements.resultDisplay.textContent = 'Roll dice to see results';
     
+    // Reset card display to show "?" again
+    updateSelectedCardDisplay();
+    
     // Update buttons
     elements.playButton.disabled = false;
     elements.doubleButton.disabled = true;
@@ -598,7 +648,6 @@ function nextRound() {
     
     console.log(`Next round: ${gameState.currentRound}`);
 }
-
 // ============================================
 // GAME END
 // ============================================
@@ -615,7 +664,8 @@ function endGame() {
     const totalBet = gameState.roundHistory.reduce((sum, round) => sum + round.bet, 0);
     const totalWon = gameState.roundHistory.reduce((sum, round) => sum + round.win, 0);
     const wins = gameState.roundHistory.filter(round => round.win > 0).length;
-    const jackpots = gameState.roundHistory.filter(round => round.type === 'jackpot').length;
+    const doubleWins = gameState.roundHistory.filter(round => round.type === 'double').length;
+    const quadrupleWins = gameState.roundHistory.filter(round => round.type === 'quadruple').length;
     
     // Update final score
     elements.finalScore.textContent = gameState.money;
@@ -626,7 +676,8 @@ function endGame() {
         <p>Total Bet: ${totalBet}</p>
         <p>Total Won: ${totalWon}</p>
         <p>Winning Rounds: ${wins}</p>
-        <p>Jackpots: ${jackpots}</p>
+        <p>×2 Wins: ${doubleWins}</p>
+        <p>×4 Jackpots: ${quadrupleWins}</p>
         <p>Final Balance: <strong>${gameState.money}</strong></p>
     `;
     
@@ -768,14 +819,11 @@ function setupEventListeners() {
     elements.resetButton.addEventListener('click', resetGame);
     
     // Rules toggle
-    const rulesToggle = document.getElementById('rulesToggle');
-    const rulesContent = document.getElementById('rulesContent');
-    
-    if (rulesToggle && rulesContent) {
-        rulesToggle.addEventListener('click', () => {
-            rulesContent.classList.toggle('collapsed');
-            const icon = rulesToggle.querySelector('i');
-            icon.className = rulesContent.classList.contains('collapsed') 
+    if (elements.rulesToggle && elements.rulesContent) {
+        elements.rulesToggle.addEventListener('click', () => {
+            elements.rulesContent.classList.toggle('collapsed');
+            const icon = elements.rulesToggle.querySelector('i');
+            icon.className = elements.rulesContent.classList.contains('collapsed') 
                 ? 'fas fa-chevron-up' 
                 : 'fas fa-chevron-down';
         });
@@ -787,6 +835,13 @@ function setupEventListeners() {
     });
     
     elements.playAgainBtn.addEventListener('click', resetGame);
+    
+    // Close modal when clicking outside
+    elements.gameOverModal.addEventListener('click', (e) => {
+        if (e.target === elements.gameOverModal) {
+            elements.gameOverModal.style.display = 'none';
+        }
+    });
     
     console.log("Event listeners setup complete");
 }

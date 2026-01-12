@@ -7,16 +7,14 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Simple fallback styles in case CSS doesn't load */
-        body { margin: 0; font-family: Arial, sans-serif; background: #1a1a2e; color: white; }
-        .container { display: flex; min-height: 100vh; }
-        button { cursor: pointer; }
-        .debug { position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 10px; }
+        /* Simple fallback */
+        body { margin: 0; font-family: Arial; background: #1a1a2e; color: white; }
+        .debug { position: fixed; top: 10px; left: 10px; background: lime; color: black; padding: 5px; z-index: 9999; display: none; }
     </style>
 </head>
 <body>
-    <!-- Debug element (remove in production) -->
-    <div id="debug" style="display: none; position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 9999;"></div>
+    <!-- Debug -->
+    
 
     <!-- Rules Panel -->
     <div class="rules-panel">
@@ -29,7 +27,7 @@
         <div class="rules-content" id="rulesContent">
             <div class="step">
                 <span class="step-number">1</span>
-                <p><strong>Choose Difficulty</strong> (Easy: 3 cards, Medium: 5 cards, Hard: 7 cards)</p>
+                <p><strong>Choose Difficulty</strong> (3, 5, or 7 cards)</p>
             </div>
             <div class="step">
                 <span class="step-number">2</span>
@@ -41,7 +39,7 @@
             </div>
             <div class="step">
                 <span class="step-number">4</span>
-                <p><strong>Select a Card</strong> (Click any face-down card)</p>
+                <p><strong>Select a Card</strong> (Each card has a hidden number 1-6)</p>
             </div>
             <div class="step">
                 <span class="step-number">5</span>
@@ -50,14 +48,17 @@
             
             <div class="win-conditions">
                 <h4>WIN CONDITIONS</h4>
-                <p><span class="win-type jackpot">JACKPOT</span> Card = Prediction = Dice (×10)</p>
-                <p><span class="win-type win">WIN</span> Card = Dice (×2)</p>
-                <p><span class="win-type even">BREAK EVEN</span> Card = Prediction (×1)</p>
-                <p><span class="win-type lose">LOSE</span> No matches (0×)</p>
+                <p><span class="win-type double">×2 WIN</span> Prediction matches Dice</p>
+                <p><span class="win-type double">×2 WIN</span> Prediction matches Card</p>
+                <p><span class="win-type quadruple">×4 JACKPOT</span> Prediction matches BOTH Card & Dice</p>
+                <p><span class="win-type lose">LOSE</span> No matches (lose bet)</p>
             </div>
             
-            <p><i class="fas fa-redo"></i> <strong>Double or Nothing:</strong> After any win!</p>
-            <p><i class="fas fa-flag-checkered"></i> <strong>3 Rounds</strong> per game</p>
+            <div class="game-tips">
+                <p><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Each card shows its number when flipped!</p>
+                <p><i class="fas fa-redo"></i> <strong>Double or Nothing:</strong> Available after any win!</p>
+                <p><i class="fas fa-flag-checkered"></i> <strong>3 Rounds</strong> per game</p>
+            </div>
         </div>
     </div>
 
@@ -105,7 +106,7 @@
                         <!-- Numbers 1-6 will be added by JavaScript -->
                     </div>
                     <div class="current-selection">
-                        Prediction: <span id="currentPrediction">?</span>
+                        Your Prediction: <span id="currentPrediction">?</span>
                     </div>
                 </div>
                 
@@ -114,7 +115,10 @@
                     <h3><i class="fas fa-club"></i> SELECTED CARD</h3>
                     <div class="selected-card-display" id="selectedCardDisplay">
                         <div class="card-preview">?</div>
-                        <div class="card-info">No card selected</div>
+                        <div class="card-info">
+                            <p>No card selected</p>
+                            <p class="hint">Card number revealed when flipped</p>
+                        </div>
                     </div>
                 </div>
                 
@@ -155,7 +159,7 @@
                             <!-- Dice face will be drawn by JavaScript -->
                         </div>
                         <div class="dice-result">
-                            Result: <span id="diceResult">-</span>
+                            Dice Result: <span id="diceResult">-</span>
                         </div>
                     </div>
                 </div>
@@ -171,7 +175,10 @@
             <!-- Cards Area -->
             <div class="cards-area">
                 <div class="cards-header">
-                    <h3>SELECT A CARD (<span id="cardsCount">3</span> CARDS)</h3>
+                    <h3>SELECT A CARD (<span id="cardsCount">3</span> CARDS TOTAL)</h3>
+                    <div class="cards-hint">
+                        <i class="fas fa-info-circle"></i> Cards show numbers when flipped
+                    </div>
                 </div>
                 <div class="cards-container" id="cardsContainer">
                     <!-- Cards will be generated by JavaScript -->
@@ -207,12 +214,10 @@
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script>
-        // Simple test to verify JavaScript is running
-        console.log("JavaScript is running!");
-        document.getElementById('debug').textContent = "JS loaded";
+        // Quick test
         document.getElementById('debug').style.display = 'block';
+        console.log("HTML loaded");
     </script>
     <script src="script.js"></script>
 </body>
