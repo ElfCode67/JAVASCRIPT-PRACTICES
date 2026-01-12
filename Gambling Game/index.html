@@ -3,12 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Match - Gambling Game</title>
+    <title>Dice Match Gambler</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Simple fallback styles in case CSS doesn't load */
+        body { margin: 0; font-family: Arial, sans-serif; background: #1a1a2e; color: white; }
+        .container { display: flex; min-height: 100vh; }
+        button { cursor: pointer; }
+        .debug { position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 10px; }
+    </style>
 </head>
 <body>
-    <!-- Rules Panel - Fixed to Top Right -->
+    <!-- Debug element (remove in production) -->
+    <div id="debug" style="display: none; position: fixed; top: 10px; left: 10px; background: red; color: white; padding: 10px; z-index: 9999;"></div>
+
+    <!-- Rules Panel -->
     <div class="rules-panel">
         <div class="rules-header">
             <h3><i class="fas fa-scroll"></i> HOW TO PLAY</h3>
@@ -17,174 +27,119 @@
             </button>
         </div>
         <div class="rules-content" id="rulesContent">
-            <div class="game-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <p><strong>CHOOSE DIFFICULTY</strong><br>Easy (3 cards), Medium (5 cards), Hard (7 cards)</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <p><strong>SET YOUR BET</strong><br>Click bet amount (10, 50, 100, 500)</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <p><strong>PREDICT A NUMBER</strong><br>Pick number 1-6 you think will match</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <p><strong>SELECT A CARD</strong><br>Click any card - each has a hidden number</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <p><strong>ROLL THE DICE</strong><br>Click PLAY to roll dice (1-6)</p>
-                </div>
+            <div class="step">
+                <span class="step-number">1</span>
+                <p><strong>Choose Difficulty</strong> (Easy: 3 cards, Medium: 5 cards, Hard: 7 cards)</p>
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                <p><strong>Set Your Bet</strong> (10, 50, 100, or 500 coins)</p>
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <p><strong>Predict a Number</strong> (Pick 1-6 you think will match)</p>
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                <p><strong>Select a Card</strong> (Click any face-down card)</p>
+            </div>
+            <div class="step">
+                <span class="step-number">5</span>
+                <p><strong>Roll the Dice</strong> (Click PLAY to roll 1-6)</p>
             </div>
             
             <div class="win-conditions">
-                <h4>WIN CONDITIONS:</h4>
-                <div class="win-condition">
-                    <span class="win-label jackpot">JACKPOT!</span>
-                    <span class="win-desc">Card = Prediction = Dice (×10 bet)</span>
-                </div>
-                <div class="win-condition">
-                    <span class="win-label win">WIN</span>
-                    <span class="win-desc">Card matches Dice (×2 bet)</span>
-                </div>
-                <div class="win-condition">
-                    <span class="win-label even">BREAK EVEN</span>
-                    <span class="win-desc">Card matches Prediction (get bet back)</span>
-                </div>
-                <div class="win-condition">
-                    <span class="win-label lose">LOSE</span>
-                    <span class="win-desc">No matches (lose bet)</span>
-                </div>
+                <h4>WIN CONDITIONS</h4>
+                <p><span class="win-type jackpot">JACKPOT</span> Card = Prediction = Dice (×10)</p>
+                <p><span class="win-type win">WIN</span> Card = Dice (×2)</p>
+                <p><span class="win-type even">BREAK EVEN</span> Card = Prediction (×1)</p>
+                <p><span class="win-type lose">LOSE</span> No matches (0×)</p>
             </div>
             
-            <div class="game-info">
-                <p><i class="fas fa-redo"></i> <strong>DOUBLE OR NOTHING:</strong> Available after any win!</p>
-                <p><i class="fas fa-flag-checkered"></i> <strong>ROUNDS:</strong> 3 rounds per game</p>
-                <p><i class="fas fa-lightbulb"></i> <strong>TIP:</strong> More cards = harder to match!</p>
-            </div>
+            <p><i class="fas fa-redo"></i> <strong>Double or Nothing:</strong> After any win!</p>
+            <p><i class="fas fa-flag-checkered"></i> <strong>3 Rounds</strong> per game</p>
         </div>
     </div>
 
-    <!-- Game Progress Indicator -->
-    <div class="progress-container">
-        <div class="step-indicator">
-            <div class="step-circle active" id="step1">
-                <i class="fas fa-sliders-h"></i>
-                <span>SETUP</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step-circle" id="step2">
-                <i class="fas fa-bullseye"></i>
-                <span>BET & PREDICT</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step-circle" id="step3">
-                <i class="fas fa-club"></i>
-                <span>CHOOSE CARD</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step-circle" id="step4">
-                <i class="fas fa-dice"></i>
-                <span>ROLL</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step-circle" id="step5">
-                <i class="fas fa-trophy"></i>
-                <span>RESULT</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Container -->
+    <!-- Main Game Container -->
     <div class="container">
-        <!-- Left Panel: Money & Controls -->
+        <!-- Left Panel - Controls -->
         <div class="left-panel">
-            <div class="money-display">
+            <div class="money-section">
                 <h2><i class="fas fa-coins"></i> BANKROLL</h2>
-                <div class="money-amount" id="money">1000</div>
+                <div class="money-display" id="moneyDisplay">1000</div>
                 <div class="round-info">
                     Round: <span id="currentRound">1</span>/3
                 </div>
             </div>
             
             <div class="controls">
-                <!-- Difficulty Selection -->
-                <div class="control-section">
+                <!-- Difficulty -->
+                <div class="control-group">
                     <h3><i class="fas fa-chart-line"></i> DIFFICULTY</h3>
-                    <div class="difficulty-control">
-                        <button class="diff-btn active" data-cards="3">
-                            <i class="fas fa-star"></i> EASY<br><small>3 Cards</small>
-                        </button>
-                        <button class="diff-btn" data-cards="5">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i> MEDIUM<br><small>5 Cards</small>
-                        </button>
-                        <button class="diff-btn" data-cards="7">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i> HARD<br><small>7 Cards</small>
-                        </button>
+                    <div class="button-group">
+                        <button class="difficulty-btn active" data-cards="3">EASY (3)</button>
+                        <button class="difficulty-btn" data-cards="5">MEDIUM (5)</button>
+                        <button class="difficulty-btn" data-cards="7">HARD (7)</button>
                     </div>
                 </div>
                 
-                <!-- Bet Selection -->
-                <div class="control-section">
+                <!-- Bet -->
+                <div class="control-group">
                     <h3><i class="fas fa-dice"></i> BET AMOUNT</h3>
-                    <div class="bet-control">
+                    <div class="button-group">
                         <button class="bet-btn active" data-bet="10">10</button>
                         <button class="bet-btn" data-bet="50">50</button>
                         <button class="bet-btn" data-bet="100">100</button>
                         <button class="bet-btn" data-bet="500">500</button>
                     </div>
                     <div class="current-selection">
-                        Current Bet: <span class="selection-value" id="currentBet">50</span>
+                        Current Bet: <span id="currentBet">10</span>
                     </div>
                 </div>
                 
-                <!-- Number Prediction -->
-                <div class="control-section">
+                <!-- Prediction -->
+                <div class="control-group">
                     <h3><i class="fas fa-bullseye"></i> PREDICT NUMBER</h3>
-                    <div class="prediction-control" id="numberButtons">
-                        <!-- Generated by JS -->
+                    <div class="prediction-buttons" id="predictionButtons">
+                        <!-- Numbers 1-6 will be added by JavaScript -->
                     </div>
                     <div class="current-selection">
-                        Your Prediction: <span class="selection-value" id="currentPrediction">?</span>
+                        Prediction: <span id="currentPrediction">?</span>
                     </div>
                 </div>
                 
-                <!-- Selected Card Info -->
-                <div class="control-section">
+                <!-- Selected Card -->
+                <div class="control-group">
                     <h3><i class="fas fa-club"></i> SELECTED CARD</h3>
-                    <div class="card-info" id="selectedCardInfo">
-                        <div class="card-preview"></div>
-                        <div class="card-details">
-                            <p>No card selected</p>
-                            <p class="card-hint">Click a card from the game area</p>
-                        </div>
+                    <div class="selected-card-display" id="selectedCardDisplay">
+                        <div class="card-preview">?</div>
+                        <div class="card-info">No card selected</div>
                     </div>
                 </div>
                 
                 <!-- Game Controls -->
-                <div class="game-controls">
-                    <button id="playBtn" class="play-btn" disabled>
+                <div class="game-buttons">
+                    <button id="playButton" class="game-btn play-btn" disabled>
                         <i class="fas fa-play"></i> ROLL DICE
                     </button>
-                    <button id="doubleBtn" class="double-btn" disabled>
+                    <button id="doubleButton" class="game-btn double-btn" disabled>
                         <i class="fas fa-redo"></i> DOUBLE OR NOTHING
                     </button>
-                    <button id="nextBtn" class="next-btn" disabled>
+                    <button id="nextButton" class="game-btn next-btn" disabled>
                         <i class="fas fa-forward"></i> NEXT ROUND
                     </button>
-                    <button id="resetBtn" class="reset-btn">
+                    <button id="resetButton" class="game-btn reset-btn">
                         <i class="fas fa-sync-alt"></i> NEW GAME
                     </button>
                 </div>
             </div>
         </div>
         
-        <!-- Main Game Area -->
-        <div class="game-area">
-            <div class="header">
+        <!-- Right Panel - Game Area -->
+        <div class="right-panel">
+            <!-- Game Header -->
+            <div class="game-header">
                 <h1><i class="fas fa-dice"></i> DICE MATCH GAMBLER</h1>
                 <div class="game-status" id="gameStatus">
                     Welcome! Choose difficulty and place your bet.
@@ -192,14 +147,12 @@
             </div>
             
             <!-- Dice Area -->
-            <div class="dice-section">
+            <div class="dice-area">
                 <div class="dice-container">
-                    <div class="dice-label">DICE ROLL:</div>
+                    <h3>DICE ROLL</h3>
                     <div class="dice-wrapper">
                         <div class="dice" id="dice">
-                            <div class="dice-face">
-                                <!-- Dice dots will be generated by JS -->
-                            </div>
+                            <!-- Dice face will be drawn by JavaScript -->
                         </div>
                         <div class="dice-result">
                             Result: <span id="diceResult">-</span>
@@ -207,56 +160,60 @@
                     </div>
                 </div>
                 
-                <div class="result-display" id="resultDisplay">
-                    <div class="result-title">ROUND RESULT</div>
-                    <div class="result-details" id="resultDetails">
+                <div class="result-container">
+                    <h3>ROUND RESULT</h3>
+                    <div class="result-display" id="resultDisplay">
                         Roll dice to see results
                     </div>
                 </div>
             </div>
             
             <!-- Cards Area -->
-            <div class="cards-section">
-                <div class="section-header">
-                    <h3><i class="fas fa-cards"></i> SELECT A CARD</h3>
-                    <div class="cards-count" id="cardsCount">3 cards total</div>
+            <div class="cards-area">
+                <div class="cards-header">
+                    <h3>SELECT A CARD (<span id="cardsCount">3</span> CARDS)</h3>
                 </div>
                 <div class="cards-container" id="cardsContainer">
-                    <!-- Cards will be generated by JS -->
+                    <!-- Cards will be generated by JavaScript -->
                 </div>
             </div>
             
-            <!-- Round Summary -->
-            <div class="round-summary" id="roundSummary">
-                <h3><i class="fas fa-history"></i> ROUND HISTORY</h3>
-                <div class="summary-content" id="summaryContent">
+            <!-- Round History -->
+            <div class="history-area">
+                <h3>ROUND HISTORY</h3>
+                <div class="history-list" id="historyList">
                     No rounds played yet
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Game Over Modal -->
-    <div class="modal-overlay" id="gameOverModal">
+    <div class="modal" id="gameOverModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2><i class="fas fa-trophy"></i> GAME OVER</h2>
-                <button class="modal-close" id="modalClose">&times;</button>
+                <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="final-score" id="finalScore">
-                    Final Bankroll: <span>1000</span>
+                <div class="final-score">
+                    Final Bankroll: <span id="finalScore">1000</span>
                 </div>
                 <div class="game-stats" id="gameStats">
-                    <!-- Stats will be generated by JS -->
+                    <!-- Stats will be filled by JavaScript -->
                 </div>
-                <button class="modal-btn" id="playAgainBtn">
-                    <i class="fas fa-play-circle"></i> PLAY AGAIN
-                </button>
+                <button class="modal-btn" id="playAgainBtn">PLAY AGAIN</button>
             </div>
         </div>
     </div>
-    
+
+    <!-- JavaScript -->
+    <script>
+        // Simple test to verify JavaScript is running
+        console.log("JavaScript is running!");
+        document.getElementById('debug').textContent = "JS loaded";
+        document.getElementById('debug').style.display = 'block';
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

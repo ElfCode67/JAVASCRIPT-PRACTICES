@@ -1,262 +1,841 @@
 // ============================================
-// FIXED VERSION - Difficulty Button Handler
+// DICE MATCH GAMBLER - COMPLETE GAME
+// ============================================
+
+console.log("Starting Dice Match Gambler game...");
+
+// ============================================
+// GAME STATE
+// ============================================
+
+const gameState = {
+    money: 1000,
+    currentBet: 10,
+    currentPrediction: null,
+    selectedCard: null,
+    diceResult: null,
+    currentRound: 1,
+    totalRounds: 3,
+    cardsCount: 3,
+    gameActive: true,
+    canDouble: false,
+    roundHistory: [],
+    cardColors: ['red', 'blue', 'green', 'yellow']
+};
+
+// ============================================
+// DOM ELEMENTS
+// ============================================
+
+const elements = {
+    // Money & Round
+    moneyDisplay: document.getElementById('moneyDisplay'),
+    currentRound: document.getElementById('currentRound'),
+    
+    // Controls
+    currentBet: document.getElementById('currentBet'),
+    currentPrediction: document.getElementById('currentPrediction'),
+    predictionButtons: document.getElementById('predictionButtons'),
+    
+    // Game Area
+    dice: document.getElementById('dice'),
+    diceResult: document.getElementById('diceResult'),
+    gameStatus: document.getElementById('gameStatus'),
+    resultDisplay: document.getElementById('resultDisplay'),
+    cardsContainer: document.getElementById('cardsContainer'),
+    cardsCount: document.getElementById('cardsCount'),
+    selectedCardDisplay: document.getElementById('selectedCardDisplay'),
+    historyList: document.getElementById('historyList'),
+    
+    // Buttons
+    playButton: document.getElementById('playButton'),
+    doubleButton: document.getElementById('doubleButton'),
+    nextButton: document.getElementById('nextButton'),
+    resetButton: document.getElementById('resetButton'),
+    
+    // Modal
+    gameOverModal: document.getElementById('gameOverModal'),
+    finalScore: document.getElementById('finalScore'),
+    gameStats: document.getElementById('gameStats'),
+    playAgainBtn: document.getElementById('playAgainBtn')
+};
+
+console.log("DOM elements loaded:", Object.keys(elements).length);
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+function initGame() {
+    console.log("Initializing game...");
+    
+    try {
+        // Create prediction buttons (1-6)
+        createPredictionButtons();
+        
+        // Generate initial cards
+        generateCards();
+        
+        // Setup event listeners
+        setupEventListeners();
+        
+        // Update UI
+        updateUI();
+        
+        // Update game status
+        updateGameStatus('Choose difficulty and place your bet!');
+        
+        console.log("Game initialized successfully!");
+        
+    } catch (error) {
+        console.error("Error initializing game:", error);
+        updateGameStatus('Error loading game. Please refresh.');
+    }
+}
+
+// ============================================
+// PREDICTION BUTTONS
+// ============================================
+
+function createPredictionButtons() {
+    console.log("Creating prediction buttons...");
+    
+    elements.predictionButtons.innerHTML = '';
+    
+    for (let i = 1; i <= 6; i++) {
+        const button = document.createElement('button');
+        button.className = 'prediction-btn';
+        button.textContent = i;
+        button.dataset.number = i;
+        
+        button.addEventListener('click', () => {
+            selectPrediction(i);
+        });
+        
+        elements.predictionButtons.appendChild(button);
+    }
+    
+    console.log("Prediction buttons created:", elements.predictionButtons.children.length);
+}
+
+// ============================================
+// CARD GENERATION
+// ============================================
+
+function generateCards() {
+    console.log(`Generating ${gameState.cardsCount} cards...`);
+    
+    // Clear container
+    elements.cardsContainer.innerHTML = '';
+    gameState.selectedCard = null;
+    
+    // Generate unique numbers for cards (1-6)
+    const cardNumbers = [];
+    
+    // Try to get unique numbers
+    while (cardNumbers.length < gameState.cardsCount) {
+        const randomNum = Math.floor(Math.random() * 6) + 1;
+        if (!cardNumbers.includes(randomNum)) {
+            cardNumbers.push(randomNum);
+        }
+        
+        // Safety break
+        if (cardNumbers.length >= 6) break;
+    }
+    
+    // Fill remaining with random numbers if needed
+    while (cardNumbers.length < gameState.cardsCount) {
+        cardNumbers.push(Math.floor(Math.random() * 6) + 1);
+    }
+    
+    console.log("Card numbers generated:", cardNumbers);
+    
+    // Create card elements
+    for (let i = 0; i < gameState.cardsCount; i++) {
+        const card = document.createElement('div');
+        const color = gameState.cardColors[i % gameState.cardColors.length];
+        const number = cardNumbers[i];
+        
+        card.className = `card ${color}`;
+        card.dataset.number = number;
+        card.dataset.index = i;
+        
+        // Front face (question mark)
+        const front = document.createElement('div');
+        front.className = 'card-front';
+        front.innerHTML = '<i class="fas fa-question"></i>';
+        
+        // Back face (number and dice symbol)
+        const back = document.createElement('div');
+        back.className = 'card-back';
+        back.innerHTML = `
+            <div class="card-number">${number}</div>
+            <div class="dice-symbol">${getDiceSymbol(number)}</div>
+        `;
+        
+        card.appendChild(front);
+        card.appendChild(back);
+        
+        // Click event
+        card.addEventListener('click', () => {
+            selectCard(card);
+        });
+        
+        elements.cardsContainer.appendChild(card);
+    }
+    
+    // Update cards count display
+    elements.cardsCount.textContent = gameState.cardsCount;
+    
+    // Update selected card display
+    updateSelectedCardDisplay();
+    
+    console.log("Cards generated successfully");
+}
+
+function getDiceSymbol(number) {
+    // Simple dice face representation
+    const symbols = {
+        1: '⚀',
+        2: '⚁',
+        3: '⚂',
+        4: '⚃',
+        5: '⚄',
+        6: '⚅'
+    };
+    return symbols[number] || '•';
+}
+
+// ============================================
+// GAME ACTIONS
+// ============================================
+
+function selectPrediction(number) {
+    if (!gameState.gameActive) return;
+    
+    console.log(`Prediction selected: ${number}`);
+    
+    gameState.currentPrediction = number;
+    
+    // Update button states
+    document.querySelectorAll('.prediction-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.dataset.number) === number) {
+            btn.classList.add('active');
+        }
+    });
+    
+    updateUI();
+    updateGameStatus(`Predicted ${number}! Now select a card.`);
+}
+
+function selectCard(cardElement) {
+    if (!gameState.gameActive) return;
+    if (!gameState.currentPrediction) {
+        updateGameStatus('Please predict a number first!');
+        return;
+    }
+    
+    console.log(`Card selected: ${cardElement.dataset.number}`);
+    
+    // Remove selection from previous card
+    if (gameState.selectedCard) {
+        gameState.selectedCard.classList.remove('selected');
+    }
+    
+    // Select new card
+    gameState.selectedCard = cardElement;
+    cardElement.classList.add('selected');
+    
+    updateSelectedCardDisplay();
+    updateUI();
+    updateGameStatus('Card selected! Ready to roll dice!');
+}
+
+function updateSelectedCardDisplay() {
+    const preview = elements.selectedCardDisplay.querySelector('.card-preview');
+    const info = elements.selectedCardDisplay.querySelector('.card-info');
+    
+    if (gameState.selectedCard) {
+        const number = gameState.selectedCard.dataset.number;
+        preview.textContent = number;
+        preview.style.backgroundColor = getCardColor(gameState.selectedCard);
+        info.textContent = `Card #${parseInt(gameState.selectedCard.dataset.index) + 1} (${number})`;
+    } else {
+        preview.textContent = '?';
+        preview.style.backgroundColor = '#2d4263';
+        info.textContent = 'No card selected';
+    }
+}
+
+function getCardColor(cardElement) {
+    const colorClasses = ['red', 'blue', 'green', 'yellow'];
+    for (const color of colorClasses) {
+        if (cardElement.classList.contains(color)) {
+            return getColorCode(color);
+        }
+    }
+    return '#2d4263';
+}
+
+function getColorCode(color) {
+    const colors = {
+        'red': '#ff6b6b',
+        'blue': '#4cc9f0',
+        'green': '#00b894',
+        'yellow': '#fdcb6e'
+    };
+    return colors[color] || '#2d4263';
+}
+
+// ============================================
+// DICE ROLL
+// ============================================
+
+function rollDice() {
+    console.log("Rolling dice...");
+    
+    // Validation
+    if (!gameState.gameActive) {
+        updateGameStatus('Game is not active!');
+        return;
+    }
+    
+    if (!gameState.currentPrediction) {
+        updateGameStatus('Please predict a number first!');
+        return;
+    }
+    
+    if (!gameState.selectedCard) {
+        updateGameStatus('Please select a card first!');
+        return;
+    }
+    
+    if (gameState.money < gameState.currentBet) {
+        updateGameStatus('Not enough money!');
+        return;
+    }
+    
+    // Deduct bet
+    gameState.money -= gameState.currentBet;
+    
+    // Disable controls during roll
+    gameState.gameActive = false;
+    elements.playButton.disabled = true;
+    
+    // Animate dice
+    animateDice();
+    
+    // Generate result after animation
+    setTimeout(() => {
+        // Random dice result 1-6
+        gameState.diceResult = Math.floor(Math.random() * 6) + 1;
+        
+        // Stop animation and show result
+        elements.dice.classList.remove('rolling');
+        drawDiceFace(gameState.diceResult);
+        elements.diceResult.textContent = gameState.diceResult;
+        
+        // Flip selected card
+        if (gameState.selectedCard) {
+            gameState.selectedCard.classList.add('flipped');
+        }
+        
+        // Calculate win
+        setTimeout(calculateWin, 500);
+        
+    }, 1500);
+}
+
+function animateDice() {
+    console.log("Animating dice...");
+    
+    elements.dice.classList.add('rolling');
+    updateGameStatus('Rolling dice...');
+}
+
+function drawDiceFace(number) {
+    console.log(`Drawing dice face for number: ${number}`);
+    
+    // Clear dice
+    elements.dice.innerHTML = '';
+    
+    // Create dice face container
+    const face = document.createElement('div');
+    face.className = 'dice-face';
+    
+    // Dice dot patterns (positions in 3x3 grid)
+    const patterns = {
+        1: ['center'],
+        2: ['top-left', 'bottom-right'],
+        3: ['top-left', 'center', 'bottom-right'],
+        4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+        5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+        6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right']
+    };
+    
+    const positions = patterns[number] || [];
+    
+    // Create dots
+    for (let i = 0; i < 9; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dice-dot';
+        
+        // Position the dot
+        const gridPositions = [
+            'top-left', 'top-center', 'top-right',
+            'middle-left', 'center', 'middle-right',
+            'bottom-left', 'bottom-center', 'bottom-right'
+        ];
+        
+        dot.classList.add(gridPositions[i]);
+        
+        // Show dot if in positions array
+        if (positions.includes(gridPositions[i])) {
+            dot.style.opacity = '1';
+        } else {
+            dot.style.opacity = '0';
+        }
+        
+        face.appendChild(dot);
+    }
+    
+    elements.dice.appendChild(face);
+}
+
+// ============================================
+// WIN CALCULATION
+// ============================================
+
+function calculateWin() {
+    console.log("Calculating win...");
+    
+    const cardNumber = parseInt(gameState.selectedCard.dataset.number);
+    const bet = gameState.currentBet;
+    let winAmount = 0;
+    let winType = '';
+    let message = '';
+    
+    console.log(`Card: ${cardNumber}, Dice: ${gameState.diceResult}, Prediction: ${gameState.currentPrediction}`);
+    
+    // Check win conditions
+    if (cardNumber === gameState.diceResult && cardNumber === gameState.currentPrediction) {
+        // JACKPOT
+        winAmount = bet * 10;
+        winType = 'jackpot';
+        message = `🎰 JACKPOT! ${bet} × 10 = ${winAmount}!`;
+    } else if (cardNumber === gameState.diceResult) {
+        // WIN
+        winAmount = bet * 2;
+        winType = 'win';
+        message = `🎉 WIN! Card matched dice! ${bet} × 2 = ${winAmount}`;
+    } else if (cardNumber === gameState.currentPrediction) {
+        // BREAK EVEN
+        winAmount = bet;
+        winType = 'even';
+        message = `🔄 Break even! Got your ${bet} back`;
+    } else {
+        // LOSE
+        winAmount = 0;
+        winType = 'lose';
+        message = `💸 Lost ${bet}!`;
+    }
+    
+    // Update money
+    gameState.money += winAmount;
+    
+    // Record round
+    const roundRecord = {
+        round: gameState.currentRound,
+        bet: bet,
+        prediction: gameState.currentPrediction,
+        card: cardNumber,
+        dice: gameState.diceResult,
+        win: winAmount,
+        type: winType
+    };
+    
+    gameState.roundHistory.push(roundRecord);
+    
+    // Enable double or nothing if won
+    if (winAmount > 0) {
+        gameState.canDouble = true;
+        elements.doubleButton.disabled = false;
+        
+        // Animate winning card
+        gameState.selectedCard.classList.add('winning');
+    }
+    
+    // Show result
+    showResult(roundRecord);
+    updateHistory();
+    updateUI();
+    updateGameStatus(message);
+    
+    // Enable next round button
+    elements.nextButton.disabled = false;
+    
+    console.log(`Win calculation complete: ${winType}, Amount: ${winAmount}`);
+}
+
+function showResult(record) {
+    let resultHTML = `
+        <div class="result-details">
+            <p><strong>Round ${record.round}</strong></p>
+            <p>Bet: ${record.bet}</p>
+            <p>Prediction: ${record.prediction}</p>
+            <p>Card: ${record.card}</p>
+            <p>Dice: ${record.dice}</p>
+            <p class="result-${record.type}">
+                ${record.type.toUpperCase()}: ${record.win > 0 ? '+' : ''}${record.win}
+            </p>
+        </div>
+    `;
+    
+    elements.resultDisplay.innerHTML = resultHTML;
+}
+
+function updateHistory() {
+    if (gameState.roundHistory.length === 0) {
+        elements.historyList.innerHTML = 'No rounds played yet';
+        return;
+    }
+    
+    let historyHTML = '';
+    gameState.roundHistory.forEach(record => {
+        historyHTML += `
+            <div class="history-item">
+                Round ${record.round}: 
+                Bet ${record.bet} → 
+                Card:${record.card} | 
+                Dice:${record.dice} | 
+                Pred:${record.prediction}
+                <span class="history-result ${record.type}">
+                    ${record.win > 0 ? '+' : ''}${record.win}
+                </span>
+            </div>
+        `;
+    });
+    
+    elements.historyList.innerHTML = historyHTML;
+}
+
+// ============================================
+// DOUBLE OR NOTHING
+// ============================================
+
+function doubleOrNothing() {
+    if (!gameState.canDouble || gameState.money <= 0) return;
+    
+    console.log("Double or nothing!");
+    
+    // 50/50 chance
+    const win = Math.random() > 0.5;
+    
+    if (win) {
+        gameState.money *= 2;
+        updateGameStatus(`DOUBLE WIN! 🎉 Money doubled to ${gameState.money}!`);
+    } else {
+        gameState.money = 0;
+        updateGameStatus(`NOTHING! 💥 Lost all money!`);
+    }
+    
+    gameState.canDouble = false;
+    elements.doubleButton.disabled = true;
+    updateUI();
+    
+    if (gameState.money <= 0) {
+        endGame();
+    }
+}
+
+// ============================================
+// NEXT ROUND
+// ============================================
+
+function nextRound() {
+    console.log("Moving to next round...");
+    
+    // Update round
+    gameState.currentRound++;
+    
+    // Check if game over
+    if (gameState.currentRound > gameState.totalRounds || gameState.money <= 0) {
+        endGame();
+        return;
+    }
+    
+    // Reset for next round
+    gameState.currentPrediction = null;
+    gameState.selectedCard = null;
+    gameState.diceResult = null;
+    gameState.canDouble = false;
+    gameState.gameActive = true;
+    
+    // Reset prediction buttons
+    document.querySelectorAll('.prediction-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Generate new cards
+    generateCards();
+    
+    // Reset dice
+    elements.diceResult.textContent = '-';
+    elements.dice.innerHTML = '';
+    
+    // Reset result display
+    elements.resultDisplay.textContent = 'Roll dice to see results';
+    
+    // Update buttons
+    elements.playButton.disabled = false;
+    elements.doubleButton.disabled = true;
+    elements.nextButton.disabled = true;
+    
+    // Update UI
+    updateUI();
+    updateGameStatus(`Round ${gameState.currentRound}/${gameState.totalRounds}! Place your bet.`);
+    
+    console.log(`Next round: ${gameState.currentRound}`);
+}
+
+// ============================================
+// GAME END
+// ============================================
+
+function endGame() {
+    console.log("Game over!");
+    
+    gameState.gameActive = false;
+    elements.playButton.disabled = true;
+    elements.doubleButton.disabled = true;
+    elements.nextButton.disabled = true;
+    
+    // Calculate stats
+    const totalBet = gameState.roundHistory.reduce((sum, round) => sum + round.bet, 0);
+    const totalWon = gameState.roundHistory.reduce((sum, round) => sum + round.win, 0);
+    const wins = gameState.roundHistory.filter(round => round.win > 0).length;
+    const jackpots = gameState.roundHistory.filter(round => round.type === 'jackpot').length;
+    
+    // Update final score
+    elements.finalScore.textContent = gameState.money;
+    
+    // Update stats
+    elements.gameStats.innerHTML = `
+        <p>Rounds Played: ${gameState.roundHistory.length}</p>
+        <p>Total Bet: ${totalBet}</p>
+        <p>Total Won: ${totalWon}</p>
+        <p>Winning Rounds: ${wins}</p>
+        <p>Jackpots: ${jackpots}</p>
+        <p>Final Balance: <strong>${gameState.money}</strong></p>
+    `;
+    
+    // Show modal
+    elements.gameOverModal.style.display = 'flex';
+    
+    // Update status
+    if (gameState.money <= 0) {
+        updateGameStatus('GAME OVER! You lost all your money! 💸');
+    } else if (gameState.money > 1000) {
+        updateGameStatus(`CONGRATULATIONS! You won ${gameState.money - 1000} coins! 🏆`);
+    } else {
+        updateGameStatus(`Game over! Final bankroll: ${gameState.money}`);
+    }
+}
+
+// ============================================
+// RESET GAME
+// ============================================
+
+function resetGame() {
+    console.log("Resetting game...");
+    
+    // Reset game state
+    gameState.money = 1000;
+    gameState.currentBet = 10;
+    gameState.currentPrediction = null;
+    gameState.selectedCard = null;
+    gameState.diceResult = null;
+    gameState.currentRound = 1;
+    gameState.cardsCount = 3;
+    gameState.gameActive = true;
+    gameState.canDouble = false;
+    gameState.roundHistory = [];
+    
+    // Reset bet buttons
+    document.querySelectorAll('.bet-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.bet === '10') {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Reset difficulty buttons
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.cards === '3') {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Reset prediction buttons
+    document.querySelectorAll('.prediction-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Generate new cards
+    generateCards();
+    
+    // Reset dice
+    elements.diceResult.textContent = '-';
+    elements.dice.innerHTML = '';
+    
+    // Reset result display
+    elements.resultDisplay.textContent = 'Roll dice to see results';
+    
+    // Reset history
+    elements.historyList.textContent = 'No rounds played yet';
+    
+    // Reset buttons
+    elements.playButton.disabled = false;
+    elements.doubleButton.disabled = true;
+    elements.nextButton.disabled = true;
+    
+    // Hide modal
+    elements.gameOverModal.style.display = 'none';
+    
+    // Update UI
+    updateUI();
+    updateGameStatus('New game! Choose difficulty and place your bet.');
+    
+    console.log("Game reset complete");
+}
+
+// ============================================
+// EVENT LISTENERS
 // ============================================
 
 function setupEventListeners() {
+    console.log("Setting up event listeners...");
+    
     // Bet buttons
     document.querySelectorAll('.bet-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             if (!gameState.gameActive) return;
+            
             const bet = parseInt(this.dataset.bet);
             if (gameState.money >= bet) {
+                // Update active button
+                document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update game state
                 gameState.currentBet = bet;
-                updateBetButtons();
                 updateUI();
-                updateGameStatus();
+                updateGameStatus(`Bet set to ${bet}`);
             } else {
-                setGameStatus(`Not enough money! You have ${gameState.money}`, 'error');
+                updateGameStatus(`Not enough money! You have ${gameState.money}`);
             }
         });
     });
-
-    // Difficulty buttons - FIXED VERSION
-    document.querySelectorAll('.diff-btn').forEach(btn => {
+    
+    // Difficulty buttons
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            // Check if already active
-            if (this.classList.contains('active')) return;
-            
-            if (!gameState.gameActive && gameState.currentStep > 1) {
-                setGameStatus('Cannot change difficulty during a round!', 'error');
+            if (!gameState.gameActive && gameState.currentRound > 1) {
+                updateGameStatus('Cannot change difficulty during game!');
                 return;
             }
             
-            // Remove active class from all diff buttons
-            document.querySelectorAll('.diff-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            
-            // Add active class to clicked button
+            // Update active button
+            document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
             // Update game state
             gameState.cardsCount = parseInt(this.dataset.cards);
             
             // Generate new cards
-            try {
-                generateCards();
-                updateUI();
-                updateGameStatus();
-                
-                // Update step if at beginning
-                if (gameState.currentStep === 1) {
-                    gameState.currentStep = 2;
-                    updateStepIndicator();
-                }
-                
-                setGameStatus(`Difficulty set to ${gameState.cardsCount} cards. Place your bet!`);
-            } catch (error) {
-                console.error('Error generating cards:', error);
-                setGameStatus('Error changing difficulty. Please try again.', 'error');
-            }
+            generateCards();
+            updateUI();
+            updateGameStatus(`Difficulty: ${this.textContent}`);
         });
     });
-
-    // ... rest of the setupEventListeners function remains the same
-}
-
-// ============================================
-// FIXED generateCards function
-// ============================================
-
-function generateCards() {
-    try {
-        // Clear container
-        elements.cardsContainer.innerHTML = '';
-        gameState.selectedCard = null;
-        
-        // Validate cardsCount
-        if (!gameState.cardsCount || gameState.cardsCount < 3 || gameState.cardsCount > 7) {
-            gameState.cardsCount = 3; // Default to easy
-        }
-        
-        // Generate unique random numbers for cards
-        const cardNumbers = [];
-        const maxAttempts = 20;
-        let attempts = 0;
-        
-        while (cardNumbers.length < gameState.cardsCount && attempts < maxAttempts) {
-            const num = Math.floor(Math.random() * 6) + 1;
-            if (!cardNumbers.includes(num)) {
-                cardNumbers.push(num);
-            }
-            attempts++;
-        }
-        
-        // If we couldn't get enough unique numbers, fill with random numbers
-        while (cardNumbers.length < gameState.cardsCount) {
-            cardNumbers.push(Math.floor(Math.random() * 6) + 1);
-        }
-        
-        // Create card elements
-        for (let i = 0; i < gameState.cardsCount; i++) {
-            const card = document.createElement('div');
-            const colorIndex = i % CARD_COLORS.length;
-            const color = CARD_COLORS[colorIndex];
-            
-            // Add card classes
-            card.className = `card ${color}`;
-            card.dataset.number = cardNumbers[i];
-            card.dataset.index = i;
-            
-            // Create front face
-            const front = document.createElement('div');
-            front.className = 'card-face card-front';
-            
-            // Create back face
-            const back = document.createElement('div');
-            back.className = 'card-face card-back';
-            back.innerHTML = `
-                <div class="card-number" style="color: ${getColorCode(color)}">
-                    ${cardNumbers[i]}
-                </div>
-                <div class="card-symbol">
-                    ${getDiceSymbol(cardNumbers[i])}
-                </div>
-            `;
-            
-            // Append faces to card
-            card.appendChild(front);
-            card.appendChild(back);
-            
-            // Add click event listener
-            card.addEventListener('click', () => {
-                selectCard(card);
-            });
-            
-            // Add card to container
-            elements.cardsContainer.appendChild(card);
-        }
-        
-        // Update selected card info
-        updateSelectedCardInfo();
-        
-        // Update cards count display
-        elements.cardsCount.textContent = `${gameState.cardsCount} cards total`;
-        
-        return true;
-    } catch (error) {
-        console.error('Error in generateCards:', error);
-        // Create a simple fallback
-        elements.cardsContainer.innerHTML = '<div style="color: #ff6b6b; padding: 20px; text-align: center;">Error loading cards. Please try again.</div>';
-        return false;
+    
+    // Game control buttons
+    elements.playButton.addEventListener('click', rollDice);
+    elements.doubleButton.addEventListener('click', doubleOrNothing);
+    elements.nextButton.addEventListener('click', nextRound);
+    elements.resetButton.addEventListener('click', resetGame);
+    
+    // Rules toggle
+    const rulesToggle = document.getElementById('rulesToggle');
+    const rulesContent = document.getElementById('rulesContent');
+    
+    if (rulesToggle && rulesContent) {
+        rulesToggle.addEventListener('click', () => {
+            rulesContent.classList.toggle('collapsed');
+            const icon = rulesToggle.querySelector('i');
+            icon.className = rulesContent.classList.contains('collapsed') 
+                ? 'fas fa-chevron-up' 
+                : 'fas fa-chevron-down';
+        });
     }
+    
+    // Modal close buttons
+    document.querySelector('.close-modal')?.addEventListener('click', () => {
+        elements.gameOverModal.style.display = 'none';
+    });
+    
+    elements.playAgainBtn.addEventListener('click', resetGame);
+    
+    console.log("Event listeners setup complete");
 }
 
 // ============================================
-// FIXED selectCard function
-// ============================================
-
-function selectCard(card) {
-    try {
-        // Check if we can select a card
-        if (!gameState.gameActive) {
-            setGameStatus('Game is not active!', 'error');
-            return;
-        }
-        
-        if (gameState.currentStep < 3) {
-            setGameStatus('Complete betting and prediction first!', 'error');
-            return;
-        }
-        
-        // Remove selection from previous card
-        if (gameState.selectedCard) {
-            gameState.selectedCard.classList.remove('selected');
-        }
-        
-        // Select new card
-        gameState.selectedCard = card;
-        card.classList.add('selected');
-        
-        // Update step
-        if (gameState.currentStep === 3) {
-            gameState.currentStep = 4;
-            updateStepIndicator();
-        }
-        
-        updateSelectedCardInfo();
-        updateGameStatus();
-        updateUI(); // Enable play button if everything is ready
-        
-        setGameStatus(`Card selected! Ready to roll dice!`);
-        
-    } catch (error) {
-        console.error('Error selecting card:', error);
-        setGameStatus('Error selecting card. Please try again.', 'error');
-    }
-}
-
-// ============================================
-// FIXED updateUI function
+// UI UPDATES
 // ============================================
 
 function updateUI() {
-    try {
-        // Update money display
-        elements.money.textContent = gameState.money;
-        elements.currentBet.textContent = gameState.currentBet;
-        elements.currentPrediction.textContent = gameState.currentPrediction || '?';
-        elements.currentRound.textContent = gameState.currentRound;
-        elements.cardsCount.textContent = `${gameState.cardsCount} cards total`;
-        
-        // Update button states
-        const canPlay = gameState.gameActive && 
-                       gameState.currentPrediction && 
-                       gameState.selectedCard && 
-                       gameState.money >= gameState.currentBet &&
-                       gameState.currentStep >= 3;
-        
-        elements.playBtn.disabled = !canPlay;
-        elements.doubleBtn.disabled = !gameState.canDouble;
-        elements.nextBtn.disabled = gameState.currentStep !== 5;
-        
-        // Update selected card info if needed
-        if (gameState.selectedCard) {
-            updateSelectedCardInfo();
-        }
-    } catch (error) {
-        console.error('Error in updateUI:', error);
+    // Update money and round
+    elements.moneyDisplay.textContent = gameState.money;
+    elements.currentRound.textContent = gameState.currentRound;
+    
+    // Update current bet and prediction
+    elements.currentBet.textContent = gameState.currentBet;
+    elements.currentPrediction.textContent = gameState.currentPrediction || '?';
+    
+    // Update play button state
+    const canPlay = gameState.gameActive && 
+                   gameState.currentPrediction && 
+                   gameState.selectedCard && 
+                   gameState.money >= gameState.currentBet;
+    
+    elements.playButton.disabled = !canPlay;
+    elements.doubleButton.disabled = !gameState.canDouble;
+    
+    // Update selected card display
+    updateSelectedCardDisplay();
+}
+
+function updateGameStatus(message) {
+    console.log(`Game status: ${message}`);
+    if (elements.gameStatus) {
+        elements.gameStatus.textContent = message;
     }
 }
 
 // ============================================
-// DEBUG HELPER - Add to initGame
+// START THE GAME
 // ============================================
 
-function initGame() {
-    try {
-        createNumberButtons();
-        setupEventListeners();
-        generateCards();
-        updateUI();
-        updateGameStatus();
-        updateStepIndicator();
-        
-        // Log initialization
-        console.log('Game initialized successfully');
-        console.log('Initial state:', { ...gameState });
-        
-    } catch (error) {
-        console.error('Error initializing game:', error);
-        setGameStatus('Error initializing game. Please refresh the page.', 'error');
-    }
+// Wait for DOM to load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGame);
+} else {
+    initGame();
 }
 
-// ============================================
-// ADD ERROR HANDLING STYLES
-// ============================================
-
-// Add this CSS to your style.css or in a <style> tag:
-/*
-
-*/
+// Export for debugging
+window.gameState = gameState;
+window.elements = elements;
+console.log("Game script loaded and ready!");

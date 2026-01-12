@@ -1,89 +1,34 @@
+/* ============================================
+   RESET & BASE STYLES
+   ============================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: #fff;
     min-height: 100vh;
-    padding: 20px 20px 0 20px;
-    position: relative;
     overflow-x: hidden;
 }
 
-/* Progress Indicator */
-.progress-container {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.step-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.step-circle {
-    width: 90px;
-    height: 70px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: #888;
-    transition: all 0.3s ease;
-    padding: 8px;
-}
-
-.step-circle.active {
-    background: rgba(76, 201, 240, 0.2);
-    color: #4cc9f0;
-    border: 2px solid #4cc9f0;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
-}
-
-.step-circle i {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-}
-
-.step-circle span {
-    font-size: 0.7rem;
-    text-align: center;
-    font-weight: 600;
-}
-
-.step-line {
-    flex: 1;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.2);
-    max-width: 50px;
-}
-
-/* Rules Panel - Fixed to Top Right */
+/* ============================================
+   RULES PANEL - FIXED TOP RIGHT
+   ============================================ */
 .rules-panel {
     position: fixed;
     top: 20px;
     right: 20px;
     width: 320px;
-    max-height: 80vh;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #00b894;
     border-radius: 15px;
-    border: 3px solid #ffd700;
-    backdrop-filter: blur(10px);
     z-index: 1000;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-    overflow: hidden;
+    backdrop-filter: blur(10px);
 }
 
 .rules-header {
@@ -91,44 +36,42 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background: rgba(255, 215, 0, 0.1);
-    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    background: rgba(0, 184, 148, 0.1);
+    border-bottom: 2px solid rgba(0, 184, 148, 0.3);
 }
 
 .rules-header h3 {
-    color: #ffd700;
-    margin: 0;
-    font-size: 1.1rem;
+    color: #00b894;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 .rules-toggle {
-    background: transparent;
+    background: none;
     border: none;
-    color: #ffd700;
+    color: #00b894;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: transform 0.3s ease;
-    padding: 5px;
     width: 30px;
     height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
 .rules-toggle:hover {
-    background: rgba(255, 215, 0, 0.1);
+    background: rgba(0, 184, 148, 0.2);
 }
 
 .rules-content {
     padding: 20px;
-    max-height: 500px;
+    max-height: 400px;
     overflow-y: auto;
-    transition: max-height 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .rules-content.collapsed {
@@ -137,38 +80,34 @@ body {
     overflow: hidden;
 }
 
-.game-steps {
-    margin-bottom: 20px;
-}
-
 .step {
     display: flex;
+    align-items: flex-start;
     gap: 15px;
     margin-bottom: 15px;
-    align-items: flex-start;
 }
 
 .step-number {
-    width: 30px;
-    height: 30px;
-    background: #4cc9f0;
-    color: #16213e;
+    width: 28px;
+    height: 28px;
+    background: #6c5ce7;
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    flex-shrink: 0;
     font-size: 0.9rem;
+    flex-shrink: 0;
 }
 
 .step p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     line-height: 1.4;
 }
 
 .step strong {
-    color: #4cc9f0;
+    color: #00b894;
 }
 
 .win-conditions {
@@ -179,68 +118,43 @@ body {
 }
 
 .win-conditions h4 {
-    color: #ffd700;
+    color: #fdcb6e;
     margin-bottom: 10px;
     font-size: 1rem;
 }
 
-.win-condition {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    gap: 10px;
-}
-
-.win-label {
+.win-type {
+    display: inline-block;
     padding: 4px 10px;
     border-radius: 5px;
     font-weight: bold;
     font-size: 0.8rem;
-    min-width: 100px;
+    margin-right: 8px;
+    min-width: 80px;
     text-align: center;
 }
 
-.jackpot { background: #ffd700; color: #000; }
+.jackpot { background: #fdcb6e; color: #000; }
 .win { background: #00b894; color: white; }
-.even { background: #4cc9f0; color: white; }
+.even { background: #6c5ce7; color: white; }
 .lose { background: #ff6b6b; color: white; }
 
-.win-desc {
-    font-size: 0.8rem;
-    color: #ccc;
-}
-
-.game-info {
-    background: rgba(76, 201, 240, 0.1);
-    border-radius: 10px;
-    padding: 15px;
-    border-left: 4px solid #4cc9f0;
-}
-
-.game-info p {
-    font-size: 0.8rem;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.game-info i {
-    color: #ffd700;
-    width: 16px;
-}
-
-/* Main Container */
+/* ============================================
+   MAIN CONTAINER LAYOUT
+   ============================================ */
 .container {
     display: flex;
     max-width: 1600px;
     margin: 0 auto;
+    padding: 20px;
     gap: 25px;
-    min-height: calc(100vh - 140px);
-    padding-right: 340px; /* Space for rules panel */
+    min-height: 100vh;
+    padding-right: 350px; /* Space for rules panel */
 }
 
-/* Left Panel */
+/* ============================================
+   LEFT PANEL - CONTROLS
+   ============================================ */
 .left-panel {
     width: 350px;
     min-width: 350px;
@@ -248,23 +162,23 @@ body {
     border-radius: 20px;
     padding: 25px;
     border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
     display: flex;
     flex-direction: column;
     gap: 25px;
-    backdrop-filter: blur(5px);
 }
 
-.money-display {
+.money-section {
     text-align: center;
-    padding: 25px;
-    background: linear-gradient(135deg, #2d4263 0%, #191919 100%);
+    padding: 20px;
+    background: linear-gradient(135deg, #2d4263, #191919);
     border-radius: 15px;
-    border: 3px solid #ffd700;
-    box-shadow: 0 0 25px rgba(255, 215, 0, 0.3);
+    border: 3px solid #fdcb6e;
+    box-shadow: 0 0 20px rgba(253, 203, 110, 0.3);
 }
 
-.money-display h2 {
-    color: #ffd700;
+.money-section h2 {
+    color: #fdcb6e;
     margin-bottom: 15px;
     font-size: 1.3rem;
     display: flex;
@@ -273,8 +187,8 @@ body {
     gap: 10px;
 }
 
-.money-amount {
-    font-size: 4rem;
+.money-display {
+    font-size: 3.5rem;
     font-weight: bold;
     color: #4cc9f0;
     text-shadow: 0 0 15px rgba(76, 201, 240, 0.7);
@@ -283,11 +197,11 @@ body {
 
 .round-info {
     font-size: 1.2rem;
-    background: rgba(255, 215, 0, 0.1);
+    color: #fdcb6e;
+    background: rgba(253, 203, 110, 0.1);
     padding: 8px 15px;
     border-radius: 20px;
     display: inline-block;
-    color: #ffd700;
 }
 
 .controls {
@@ -296,14 +210,14 @@ body {
     gap: 25px;
 }
 
-.control-section {
+.control-group {
     background: rgba(0, 0, 0, 0.3);
     padding: 20px;
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-h3 {
+.control-group h3 {
     color: #4cc9f0;
     margin-bottom: 15px;
     font-size: 1.1rem;
@@ -312,15 +226,15 @@ h3 {
     gap: 10px;
 }
 
-.difficulty-control {
+.button-group {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
 }
 
-.diff-btn {
+.difficulty-btn, .bet-btn, .prediction-btn {
     flex: 1;
-    padding: 15px 5px;
+    padding: 12px 8px;
     border: none;
     border-radius: 10px;
     background: #2d4263;
@@ -328,150 +242,87 @@ h3 {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
+    font-size: 0.9rem;
 }
 
-.diff-btn:hover {
+.difficulty-btn:hover, .bet-btn:hover, .prediction-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.diff-btn.active {
-    background: #4cc9f0;
-    color: #16213e;
-    box-shadow: 0 0 15px rgba(76, 201, 240, 0.7);
-}
-
-.diff-btn i {
-    color: #ffd700;
-}
-
-.diff-btn small {
-    font-size: 0.7rem;
-    opacity: 0.9;
-}
-
-.bet-control {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.bet-btn {
-    flex: 1;
-    padding: 15px 5px;
-    border: none;
-    border-radius: 10px;
-    background: #2d4263;
+.difficulty-btn.active, .bet-btn.active, .prediction-btn.active {
+    background: #6c5ce7;
     color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.1rem;
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.7);
 }
 
-.bet-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.bet-btn.active {
-    background: #00b894;
-    color: white;
-    box-shadow: 0 0 15px rgba(0, 180, 148, 0.7);
-}
-
-.prediction-control {
+.prediction-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 15px;
 }
 
-.number-btn {
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    background: #2d4263;
-    color: white;
-    font-weight: bold;
+.prediction-btn {
+    padding: 15px 10px;
     font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.number-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.number-btn.active {
-    background: #6c5ce7;
-    color: white;
-    box-shadow: 0 0 15px rgba(108, 92, 231, 0.7);
 }
 
 .current-selection {
     font-size: 1.1rem;
-    color: #ffd700;
+    color: #fdcb6e;
     text-align: center;
     padding: 12px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    border: 1px solid rgba(253, 203, 110, 0.3);
 }
 
-.selection-value {
+.current-selection span {
     font-weight: bold;
     font-size: 1.3rem;
     margin-left: 5px;
 }
 
-.card-info {
+/* Selected Card Display */
+.selected-card-display {
     display: flex;
-    gap: 15px;
     align-items: center;
+    gap: 15px;
     padding: 15px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    min-height: 80px;
 }
 
 .card-preview {
-    width: 50px;
-    height: 70px;
-    background: linear-gradient(135deg, #2d4263 0%, #191919 100%);
-    border-radius: 8px;
-    border: 2px solid #4cc9f0;
+    width: 60px;
+    height: 85px;
+    background: linear-gradient(135deg, #2d4263, #191919);
+    border-radius: 10px;
+    border: 3px solid #4cc9f0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
     color: #4cc9f0;
     flex-shrink: 0;
 }
 
-.card-details p {
-    margin-bottom: 5px;
+.card-info {
     font-size: 0.9rem;
+    color: #ccc;
 }
 
-.card-hint {
-    color: #888;
-    font-size: 0.8rem;
-}
-
-.game-controls {
+/* Game Buttons */
+.game-buttons {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.play-btn, .double-btn, .next-btn, .reset-btn {
-    padding: 18px;
+.game-btn {
+    padding: 16px;
     border: none;
     border-radius: 12px;
     font-size: 1.1rem;
@@ -481,84 +332,86 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .play-btn {
-    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    background: linear-gradient(135deg, #00b894, #00a085);
     color: white;
 }
 
 .play-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #00d4a8 0%, #00b894 100%);
+    background: linear-gradient(135deg, #00d4a8, #00b894);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 180, 148, 0.4);
 }
 
 .double-btn {
-    background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+    background: linear-gradient(135deg, #fdcb6e, #e17055);
     color: #16213e;
 }
 
 .double-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+    background: linear-gradient(135deg, #ffeaa7, #fab1a0);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(253, 203, 110, 0.4);
 }
 
 .next-btn {
-    background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+    background: linear-gradient(135deg, #6c5ce7, #a29bfe);
     color: white;
 }
 
 .next-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #7d6ff0 0%, #b2a8ff 100%);
+    background: linear-gradient(135deg, #7d6ff0, #b2a8ff);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(108, 92, 231, 0.4);
 }
 
 .reset-btn {
-    background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
+    background: linear-gradient(135deg, #636e72, #2d3436);
     color: white;
 }
 
 .reset-btn:hover {
-    background: linear-gradient(135deg, #747d81 0%, #3d4446 100%);
+    background: linear-gradient(135deg, #747d81, #3d4446);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(99, 110, 114, 0.4);
 }
 
-.play-btn:disabled, .double-btn:disabled, .next-btn:disabled {
+.game-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none !important;
 }
 
-/* Game Area */
-.game-area {
+/* ============================================
+   RIGHT PANEL - GAME AREA
+   ============================================ */
+.right-panel {
     flex: 1;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     padding: 25px;
     display: flex;
     flex-direction: column;
+    gap: 25px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    overflow-y: auto;
-    min-height: 100%;
 }
 
-.header {
-    margin-bottom: 30px;
+.game-header {
+    text-align: center;
 }
 
-.header h1 {
+.game-header h1 {
     font-size: 2.8rem;
-    color: #ffd700;
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    color: #fdcb6e;
+    text-shadow: 0 0 15px rgba(253, 203, 110, 0.5);
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 15px;
-    margin-bottom: 15px;
 }
 
 .game-status {
@@ -570,29 +423,25 @@ h3 {
     border-left: 4px solid #4cc9f0;
 }
 
-/* Dice Section */
-.dice-section {
+/* Dice Area */
+.dice-area {
     display: flex;
     gap: 25px;
-    margin-bottom: 40px;
     flex-wrap: wrap;
 }
 
-.dice-container {
+.dice-container, .result-container {
     flex: 1;
+    min-width: 300px;
     background: rgba(0, 0, 0, 0.3);
     padding: 25px;
     border-radius: 15px;
-    min-width: 300px;
 }
 
-.dice-label {
+.dice-container h3, .result-container h3 {
+    color: #fdcb6e;
+    margin-bottom: 20px;
     font-size: 1.2rem;
-    color: #ffd700;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
 .dice-wrapper {
@@ -613,7 +462,6 @@ h3 {
     justify-content: center;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.5s ease;
 }
 
 .dice.rolling {
@@ -635,79 +483,76 @@ h3 {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     padding: 20px;
-    gap: 5px;
+    gap: 8px;
 }
 
-.dot {
+.dice-dot {
     background: #16213e;
     border-radius: 50%;
     justify-self: center;
     align-self: center;
+    width: 20px;
+    height: 20px;
+    transition: opacity 0.3s ease;
 }
 
-.dot-1 { grid-area: 2 / 2; }
-.dot-2 { grid-area: 1 / 1; }
-.dot-3 { grid-area: 3 / 3; }
-.dot-4 { grid-area: 1 / 3; }
-.dot-5 { grid-area: 3 / 1; }
-.dot-6 { grid-area: 1 / 1; width: 60%; height: 60%; }
-.dot-7 { grid-area: 1 / 3; width: 60%; height: 60%; }
-.dot-8 { grid-area: 2 / 2; width: 60%; height: 60%; }
-.dot-9 { grid-area: 3 / 1; width: 60%; height: 60%; }
-.dot-10 { grid-area: 3 / 3; width: 60%; height: 60%; }
+/* Dice dot positions */
+.top-left { grid-area: 1 / 1; }
+.top-center { grid-area: 1 / 2; }
+.top-right { grid-area: 1 / 3; }
+.middle-left { grid-area: 2 / 1; }
+.center { grid-area: 2 / 2; }
+.middle-right { grid-area: 2 / 3; }
+.bottom-left { grid-area: 3 / 1; }
+.bottom-center { grid-area: 3 / 2; }
+.bottom-right { grid-area: 3 / 3; }
 
 .dice-result {
     font-size: 1.8rem;
-    background: rgba(255, 215, 0, 0.2);
+    background: rgba(253, 203, 110, 0.2);
     padding: 20px 30px;
     border-radius: 10px;
-    border: 2px solid #ffd700;
+    border: 2px solid #fdcb6e;
     min-width: 180px;
 }
 
 .dice-result span {
     font-weight: bold;
     font-size: 2.2rem;
-    color: #ffd700;
+    color: #fdcb6e;
     margin-left: 10px;
 }
 
 .result-display {
-    flex: 1;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 25px;
-    border-radius: 15px;
-    min-width: 300px;
-}
-
-.result-title {
-    font-size: 1.2rem;
-    color: #4cc9f0;
-    margin-bottom: 15px;
+    font-size: 1.1rem;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
 }
 
 .result-details {
-    font-size: 1.3rem;
-    text-align: center;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    min-height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: left;
+    line-height: 1.6;
 }
 
-/* Cards Section */
-.cards-section {
+.result-jackpot { color: #fdcb6e; font-weight: bold; }
+.result-win { color: #00b894; font-weight: bold; }
+.result-even { color: #6c5ce7; font-weight: bold; }
+.result-lose { color: #ff6b6b; font-weight: bold; }
+
+/* Cards Area */
+.cards-area {
     background: rgba(0, 0, 0, 0.3);
     padding: 25px;
     border-radius: 15px;
-    margin-bottom: 30px;
 }
 
-.section-header {
+.cards-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -716,17 +561,10 @@ h3 {
     gap: 15px;
 }
 
-.section-header h3 {
+.cards-header h3 {
+    color: #4cc9f0;
     margin: 0;
     font-size: 1.3rem;
-}
-
-.cards-count {
-    color: #ffd700;
-    font-size: 1.1rem;
-    padding: 8px 15px;
-    background: rgba(255, 215, 0, 0.1);
-    border-radius: 20px;
 }
 
 .cards-container {
@@ -734,8 +572,8 @@ h3 {
     justify-content: center;
     align-items: center;
     gap: 25px;
-    perspective: 1000px;
     flex-wrap: wrap;
+    perspective: 1000px;
     min-height: 250px;
 }
 
@@ -748,11 +586,10 @@ h3 {
     cursor: pointer;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    flex-shrink: 0;
 }
 
-.card.flipped {
-    transform: rotateY(180deg);
+.card:hover:not(.flipped):not(.selected) {
+    transform: translateY(-10px);
 }
 
 .card.selected::before {
@@ -762,19 +599,33 @@ h3 {
     left: -8px;
     right: -8px;
     bottom: -8px;
-    border: 4px solid #ffd700;
+    border: 4px solid #fdcb6e;
     border-radius: 19px;
     z-index: 10;
     animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+    0% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(253, 203, 110, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(253, 203, 110, 0); }
 }
 
-.card-face {
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card.winning {
+    animation: winGlow 1.5s ease-in-out infinite alternate;
+    box-shadow: 0 0 40px rgba(253, 203, 110, 0.9);
+}
+
+@keyframes winGlow {
+    from { transform: rotateY(180deg) scale(1); }
+    to { transform: rotateY(180deg) scale(1.08); }
+}
+
+.card-front, .card-back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -786,17 +637,15 @@ h3 {
     align-items: center;
     font-weight: bold;
     color: white;
-    overflow: hidden;
 }
 
 .card-front {
-    background: linear-gradient(135deg, #2d4263 0%, #191919 100%);
+    background: linear-gradient(135deg, #2d4263, #191919);
     border: 4px solid rgba(255, 255, 255, 0.3);
 }
 
-.card-front::before {
-    content: '?';
-    font-size: 5rem;
+.card-front i {
+    font-size: 4rem;
     color: rgba(255, 255, 255, 0.3);
 }
 
@@ -812,42 +661,33 @@ h3 {
 .card.green { border-color: #00b894; }
 .card.yellow { border-color: #fdcb6e; }
 
-.card.winning {
-    animation: winGlow 1.5s ease-in-out infinite alternate;
-    box-shadow: 0 0 40px rgba(255, 215, 0, 0.9);
-}
-
-@keyframes winGlow {
-    from { transform: rotateY(180deg) scale(1); }
-    to { transform: rotateY(180deg) scale(1.08); }
-}
-
 .card-number {
     font-size: 4.5rem;
     margin-bottom: 15px;
     font-weight: bold;
 }
 
-.card-symbol {
+.dice-symbol {
     font-size: 3rem;
     text-align: center;
     line-height: 1.2;
     color: #333;
 }
 
-/* Round Summary */
-.round-summary {
+/* History Area */
+.history-area {
     background: rgba(0, 0, 0, 0.3);
     padding: 25px;
     border-radius: 15px;
 }
 
-.round-summary h3 {
-    margin: 0 0 20px 0;
+.history-area h3 {
+    color: #4cc9f0;
+    margin-bottom: 20px;
     font-size: 1.3rem;
 }
 
-.summary-content {
+.history-list {
     font-size: 1rem;
     padding: 20px;
     background: rgba(0, 0, 0, 0.2);
@@ -855,26 +695,50 @@ h3 {
     min-height: 100px;
 }
 
-/* Game Over Modal */
-.modal-overlay {
+.history-item {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-result {
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.history-result.jackpot { background: #fdcb6e; color: #000; }
+.history-result.win { background: #00b894; color: white; }
+.history-result.even { background: #6c5ce7; color: white; }
+.history-result.lose { background: #ff6b6b; color: white; }
+
+/* ============================================
+   GAME OVER MODAL
+   ============================================ */
+.modal {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.9);
-    display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
 }
 
 .modal-content {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
     border-radius: 20px;
     width: 90%;
     max-width: 500px;
-    border: 3px solid #ffd700;
+    border: 3px solid #fdcb6e;
     overflow: hidden;
 }
 
@@ -883,25 +747,24 @@ h3 {
     justify-content: space-between;
     align-items: center;
     padding: 25px;
-    background: rgba(255, 215, 0, 0.1);
-    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+    background: rgba(253, 203, 110, 0.1);
+    border-bottom: 2px solid rgba(253, 203, 110, 0.3);
 }
 
 .modal-header h2 {
-    color: #ffd700;
+    color: #fdcb6e;
     display: flex;
     align-items: center;
     gap: 15px;
 }
 
-.modal-close {
+.close-modal {
     background: transparent;
     border: none;
-    color: #ffd700;
+    color: #fdcb6e;
     font-size: 2.5rem;
     cursor: pointer;
     line-height: 1;
-    padding: 0;
     width: 40px;
     height: 40px;
     display: flex;
@@ -910,8 +773,8 @@ h3 {
     border-radius: 50%;
 }
 
-.modal-close:hover {
-    background: rgba(255, 215, 0, 0.1);
+.close-modal:hover {
+    background: rgba(253, 203, 110, 0.1);
 }
 
 .modal-body {
@@ -920,16 +783,16 @@ h3 {
 }
 
 .final-score {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: #4cc9f0;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .final-score span {
     font-weight: bold;
-    color: #ffd700;
+    color: #fdcb6e;
     display: block;
-    font-size: 3.5rem;
+    font-size: 3rem;
     margin-top: 10px;
 }
 
@@ -941,44 +804,40 @@ h3 {
     text-align: left;
 }
 
+.game-stats p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.game-stats strong {
+    color: #fdcb6e;
+}
+
 .modal-btn {
-    padding: 18px 40px;
+    padding: 16px 40px;
     border: none;
     border-radius: 12px;
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    background: linear-gradient(135deg, #00b894, #00a085);
     color: white;
-    margin: 0 auto;
+    transition: all 0.3s ease;
 }
 
 .modal-btn:hover {
-    background: linear-gradient(135deg, #00d4a8 0%, #00b894 100%);
+    background: linear-gradient(135deg, #00d4a8, #00b894);
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 180, 148, 0.4);
 }
 
-/* Responsive Design */
-@media (max-width: 1400px) {
-    .container {
-        padding-right: 340px;
-    }
-    
-    .rules-panel {
-        width: 300px;
-    }
-}
-
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
 @media (max-width: 1200px) {
     .container {
         flex-direction: column;
-        padding-right: 0;
+        padding-right: 20px;
     }
     
     .left-panel {
@@ -992,50 +851,31 @@ h3 {
         max-height: none;
         margin-bottom: 20px;
     }
-    
-    .step-circle {
-        width: 70px;
-        height: 60px;
-    }
-    
-    .step-circle span {
-        font-size: 0.6rem;
-    }
 }
 
 @media (max-width: 768px) {
-    body {
-        padding: 10px 10px 0 10px;
+    .container {
+        padding: 10px;
     }
     
-    .step-indicator {
-        gap: 2px;
+    .left-panel, .right-panel {
+        padding: 15px;
     }
     
-    .step-circle {
-        width: 60px;
-        height: 50px;
-        padding: 5px;
-    }
-    
-    .step-circle i {
-        font-size: 0.9rem;
-    }
-    
-    .step-circle span {
-        font-size: 0.5rem;
-    }
-    
-    .step-line {
-        max-width: 20px;
-    }
-    
-    .header h1 {
+    .game-header h1 {
         font-size: 2rem;
     }
     
-    .money-amount {
-        font-size: 3rem;
+    .money-display {
+        font-size: 2.8rem;
+    }
+    
+    .dice-area {
+        flex-direction: column;
+    }
+    
+    .dice-container, .result-container {
+        min-width: 100%;
     }
     
     .card {
@@ -1047,7 +887,7 @@ h3 {
         font-size: 3.5rem;
     }
     
-    .card-symbol {
+    .dice-symbol {
         font-size: 2.5rem;
     }
     
@@ -1056,31 +896,21 @@ h3 {
         height: 100px;
     }
     
-    .dice-face {
-        padding: 15px;
+    .dice-dot {
+        width: 15px;
+        height: 15px;
+    }
+    
+    .button-group {
+        flex-wrap: wrap;
+    }
+    
+    .difficulty-btn, .bet-btn {
+        min-width: calc(33.333% - 7px);
     }
 }
 
 @media (max-width: 576px) {
-    .step-indicator {
-        flex-wrap: wrap;
-        justify-content: space-around;
-    }
-    
-    .step-line {
-        display: none;
-    }
-    
-    .step-circle {
-        width: 55px;
-        height: 55px;
-        margin: 2px;
-    }
-    
-    .step-circle span {
-        display: none;
-    }
-    
     .card {
         width: 100px;
         height: 150px;
@@ -1090,21 +920,66 @@ h3 {
         font-size: 2.8rem;
     }
     
-    .card-symbol {
+    .dice-symbol {
         font-size: 2rem;
     }
     
-    .money-amount {
-        font-size: 2.5rem;
+    .money-display {
+        font-size: 2.2rem;
     }
     
-    .play-btn, .double-btn, .next-btn, .reset-btn {
+    .game-btn {
         padding: 14px;
         font-size: 1rem;
     }
     
-    .bet-btn, .diff-btn {
-        padding: 12px 3px;
-        font-size: 0.9rem;
+    .prediction-buttons {
+        grid-template-columns: repeat(2, 1fr);
     }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(76, 201, 240, 0.3);
+    border-top-color: #4cc9f0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
