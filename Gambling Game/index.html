@@ -17,6 +17,19 @@
     
 
     <!-- Rules Panel -->
+     <div class="win-conditions">
+    <h4>WIN CONDITIONS & MULTIPLIERS</h4>
+    <p><span class="win-type double">×2 WIN</span> Prediction matches Dice</p>
+    <p><span class="win-type double">×2 WIN</span> Prediction matches Card</p>
+    <p><span class="win-type quadruple">×4 JACKPOT</span> Prediction matches BOTH</p>
+    <div class="difficulty-multipliers">
+        <p><strong>Difficulty Multipliers:</strong></p>
+        <p><span class="multiplier easy">EASY (3 cards): ×1</span></p>
+        <p><span class="multiplier medium">MEDIUM (5 cards): ×2</span></p>
+        <p><span class="multiplier hard">HARD (7 cards): ×3</span></p>
+    </div>
+    <p><small>Example: ×2 win on HARD = Bet ×2 ×3 = ×6 total!</small></p>
+</div>
     <div class="rules-panel">
         <div class="rules-header">
             <h3><i class="fas fa-scroll"></i> HOW TO PLAY</h3>
@@ -84,6 +97,26 @@
                         <button class="difficulty-btn" data-cards="7">HARD (7)</button>
                     </div>
                 </div>
+                        <!-- Difficulty Section -->
+                <div class="control-group">
+                     <h3><i class="fas fa-chart-line"></i> DIFFICULTY & MULTIPLIER</h3>
+                        <div class="button-group">
+                             <button class="difficulty-btn active" data-cards="3">
+                                EASY (3)<br><small>×1 multiplier</small>
+                             </button>
+                             <button class="difficulty-btn" data-cards="5">
+                              MEDIUM (5)<br><small>×2 multiplier</small>
+                             </button>
+                                <button class="difficulty-btn" data-cards="7">
+                                 HARD (7)<br><small>×3 multiplier</small>
+                            </button>
+             </div>
+             <div class="current-selection">
+                 Current Multiplier: <span id="currentMultiplier">×1</span>
+                </div>
+            </div>
+
+                
                 
                 <!-- Bet -->
                 <div class="control-group">

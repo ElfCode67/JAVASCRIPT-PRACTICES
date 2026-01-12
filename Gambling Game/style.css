@@ -1010,3 +1010,22 @@ body {
 .fade-in {
     animation: fadeIn 0.5s ease-out;
 }
+
+.difficulty-multipliers {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.multiplier {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin: 2px;
+}
+
+.multiplier.easy { background: #00b894; color: white; }
+.multiplier.medium { background: #fdcb6e; color: #000; }
+.multiplier.hard { background: #ff6b6b; color: white; }

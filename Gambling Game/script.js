@@ -20,7 +20,8 @@ const gameState = {
     gameActive: true,
     canDouble: false,
     roundHistory: [],
-    cardColors: ['red', 'blue', 'green', 'yellow']
+    cardColors: ['red', 'blue', 'green', 'yellow'],
+    difficultyMultiplier: 1  // Easy: 1, Medium: 2, Hard: 3
 };
 
 // ============================================
@@ -859,6 +860,12 @@ function updateUI() {
     elements.currentBet.textContent = gameState.currentBet;
     elements.currentPrediction.textContent = gameState.currentPrediction || '?';
     
+    // Update multiplier display if element exists
+    const multiplierElement = document.getElementById('currentMultiplier');
+    if (multiplierElement) {
+        multiplierElement.textContent = `×${gameState.difficultyMultiplier}`;
+    }
+    
     // Update play button state
     const canPlay = gameState.gameActive && 
                    gameState.currentPrediction && 
@@ -894,3 +901,295 @@ if (document.readyState === 'loading') {
 window.gameState = gameState;
 window.elements = elements;
 console.log("Game script loaded and ready!");
+
+// ============================================
+// ADD TO GAME STATE
+// ============================================
+
+
+
+// ============================================
+// UPDATE: Difficulty button handler
+// ============================================
+
+// In setupEventListeners() function, update difficulty button handler:
+document.querySelectorAll('.difficulty-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        if (!gameState.gameActive && gameState.currentRound > 1) {
+            updateGameStatus('Cannot change difficulty during game!');
+            return;
+        }
+        
+        // Update active button
+        document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update game state
+        gameState.cardsCount = parseInt(this.dataset.cards);
+        
+        // Set difficulty multiplier based on cards count
+        if (gameState.cardsCount === 3) {
+            gameState.difficultyMultiplier = 1; // Easy
+        } else if (gameState.cardsCount === 5) {
+            gameState.difficultyMultiplier = 2; // Medium
+        } else if (gameState.cardsCount === 7) {
+            gameState.difficultyMultiplier = 3; // Hard
+        }
+        
+        // Generate new cards
+        generateCards();
+        updateUI();
+        updateGameStatus(`Difficulty: ${this.textContent} (×${gameState.difficultyMultiplier} multiplier)`);
+    });
+});
+
+// ============================================
+// UPDATE: calculateWin function with difficulty multipliers
+// ============================================
+
+function calculateWin() {
+    console.log("Calculating win with difficulty multiplier...");
+    
+    const cardNumber = parseInt(gameState.selectedCard.dataset.number);
+    const bet = gameState.currentBet;
+    const difficultyMultiplier = gameState.difficultyMultiplier;
+    let baseMultiplier = 0;
+    let winAmount = 0;
+    let winType = '';
+    let message = '';
+    
+    console.log(`Card: ${cardNumber}, Dice: ${gameState.diceResult}, Prediction: ${gameState.currentPrediction}`);
+    console.log(`Difficulty multiplier: ×${difficultyMultiplier}`);
+    
+    // NEW WIN CONDITIONS with difficulty multiplier:
+    const predictionMatchesDice = gameState.currentPrediction === gameState.diceResult;
+    const predictionMatchesCard = gameState.currentPrediction === cardNumber;
+    
+    if (predictionMatchesDice && predictionMatchesCard) {
+        // ×4 JACKPOT: Prediction matches BOTH card and dice
+        baseMultiplier = 4;
+        winAmount = bet * baseMultiplier * difficultyMultiplier;
+        winType = 'quadruple';
+        message = `🎰 JACKPOT! Prediction matched BOTH! ${bet} × ${baseMultiplier} × ${difficultyMultiplier} = ${winAmount}!`;
+    } else if (predictionMatchesDice) {
+        // ×2 WIN: Prediction matches dice
+        baseMultiplier = 2;
+        winAmount = bet * baseMultiplier * difficultyMultiplier;
+        winType = 'double';
+        message = `🎉 WIN! Prediction matched dice! ${bet} × ${baseMultiplier} × ${difficultyMultiplier} = ${winAmount}`;
+    } else if (predictionMatchesCard) {
+        // ×2 WIN: Prediction matches card
+        baseMultiplier = 2;
+        winAmount = bet * baseMultiplier * difficultyMultiplier;
+        winType = 'double';
+        message = `🎉 WIN! Prediction matched card! ${bet} × ${baseMultiplier} × ${difficultyMultiplier} = ${winAmount}`;
+    } else {
+        // LOSE: No matches
+        baseMultiplier = 0;
+        winAmount = 0;
+        winType = 'lose';
+        message = `💸 Lost ${bet}! No matches.`;
+    }
+    
+    // Update money
+    gameState.money += winAmount;
+    
+    // Record round
+    const roundRecord = {
+        round: gameState.currentRound,
+        bet: bet,
+        prediction: gameState.currentPrediction,
+        card: cardNumber,
+        dice: gameState.diceResult,
+        win: winAmount,
+        type: winType,
+        matches: {
+            dice: predictionMatchesDice,
+            card: predictionMatchesCard
+        },
+        difficultyMultiplier: difficultyMultiplier,
+        baseMultiplier: baseMultiplier
+    };
+    
+    gameState.roundHistory.push(roundRecord);
+    
+    // Enable double or nothing if won
+    if (winAmount > 0) {
+        gameState.canDouble = true;
+        elements.doubleButton.disabled = false;
+        
+        // Animate winning card
+        gameState.selectedCard.classList.add('winning');
+    }
+    
+    // Update the selected card display to show the actual number
+    updateSelectedCardDisplay();
+    
+    // Show result with difficulty info
+    showResult(roundRecord);
+    updateHistory();
+    updateUI();
+    updateGameStatus(message);
+    
+    // Enable next round button
+    elements.nextButton.disabled = false;
+    
+    console.log(`Win calculation complete: ${winType}, Base: ×${baseMultiplier}, Difficulty: ×${difficultyMultiplier}, Total: ${winAmount}`);
+}
+
+// ============================================
+// UPDATE: showResult function to show difficulty multiplier
+// ============================================
+
+function showResult(record) {
+    let matchesText = '';
+    let multiplierText = '';
+    
+    if (record.type === 'quadruple') {
+        matchesText = 'Matched BOTH card and dice!';
+        multiplierText = `Base: ×4 | Difficulty: ×${record.difficultyMultiplier}`;
+    } else if (record.type === 'double') {
+        if (record.matches.dice) {
+            matchesText = 'Matched dice!';
+        } else {
+            matchesText = 'Matched card!';
+        }
+        multiplierText = `Base: ×2 | Difficulty: ×${record.difficultyMultiplier}`;
+    } else {
+        matchesText = 'No matches';
+        multiplierText = '';
+    }
+    
+    let resultHTML = `
+        <div class="result-details">
+            <p><strong>Round ${record.round}</strong></p>
+            <p>Bet: ${record.bet}</p>
+            <p>Your Prediction: ${record.prediction}</p>
+            <p>Card Number: ${record.card}</p>
+            <p>Dice Roll: ${record.dice}</p>
+            <p>${matchesText}</p>
+            ${multiplierText ? `<p><small>${multiplierText}</small></p>` : ''}
+            <p class="result-${record.type}">
+                ${record.type.toUpperCase()}: ${record.win > 0 ? '+' : ''}${record.win}
+            </p>
+        </div>
+    `;
+    
+    elements.resultDisplay.innerHTML = resultHTML;
+}
+
+// ============================================
+// UPDATE: updateHistory function
+// ============================================
+
+function updateHistory() {
+    if (gameState.roundHistory.length === 0) {
+        elements.historyList.innerHTML = 'No rounds played yet';
+        return;
+    }
+    
+    let historyHTML = '';
+    gameState.roundHistory.forEach(record => {
+        let matchInfo = '';
+        if (record.type === 'quadruple') {
+            matchInfo = ' (BOTH)';
+        } else if (record.type === 'double') {
+            matchInfo = record.matches.dice ? ' (Dice)' : ' (Card)';
+        }
+        
+        historyHTML += `
+            <div class="history-item">
+                <div class="history-round">Round ${record.round}</div>
+                <div class="history-details">
+                    Bet ${record.bet} → Pred:${record.prediction} | Card:${record.card} | Dice:${record.dice}
+                    <span class="difficulty-badge">×${record.difficultyMultiplier}</span>
+                </div>
+                <span class="history-result ${record.type}">
+                    ${record.win > 0 ? '+' : ''}${record.win}${matchInfo}
+                </span>
+            </div>
+        `;
+    });
+    
+    elements.historyList.innerHTML = historyHTML;
+}
+
+// ============================================
+// UPDATE: resetGame function
+// ============================================
+
+function resetGame() {
+    console.log("Resetting game...");
+    
+    // Reset game state
+    gameState.money = 1000;
+    gameState.currentBet = 10;
+    gameState.currentPrediction = null;
+    gameState.selectedCard = null;
+    gameState.diceResult = null;
+    gameState.currentRound = 1;
+    gameState.cardsCount = 3;
+    gameState.difficultyMultiplier = 1; // Reset to Easy
+    gameState.gameActive = true;
+    gameState.canDouble = false;
+    gameState.roundHistory = [];
+    
+    // Reset bet buttons
+    document.querySelectorAll('.bet-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.bet === '10') {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Reset difficulty buttons
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.cards === '3') {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Reset prediction buttons
+    document.querySelectorAll('.prediction-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Generate new cards
+    generateCards();
+    
+    // Reset dice
+    elements.diceResult.textContent = '-';
+    elements.dice.innerHTML = '';
+    
+    // Reset result display
+    elements.resultDisplay.textContent = 'Roll dice to see results';
+    
+    // Reset history
+    elements.historyList.textContent = 'No rounds played yet';
+    
+    // Reset buttons
+    elements.playButton.disabled = false;
+    elements.doubleButton.disabled = true;
+    elements.nextButton.disabled = true;
+    
+    // Hide modal
+    elements.gameOverModal.style.display = 'none';
+    
+    // Update UI
+    updateUI();
+    updateGameStatus('New game! Choose difficulty and place your bet.');
+    
+    console.log("Game reset complete");
+}
+
+// ============================================
+// ADD: updateGameStatus with difficulty info
+// ============================================
+
+function updateGameStatus(message) {
+    console.log(`Game status: ${message}`);
+    if (elements.gameStatus) {
+        elements.gameStatus.textContent = message;
+    }
+}
