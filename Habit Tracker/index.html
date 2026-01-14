@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Blooming Habits - Your Daily Growth Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="themeToggle">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
+    </div>
+
+    <div class="container">
+        <!-- Header with Quote -->
+        <header class="header">
+            <div class="title-section">
+                <h1><i class="fas fa-seedling"></i> Blooming Habits</h1>
+                <p class="subtitle">Nurture your daily growth, one petal at a time</p>
+            </div>
+            <div class="daily-quote" id="dailyQuote">
+                <p>"Small daily improvements lead to stunning results."</p>
+                <small>– Your future self</small>
+            </div>
+        </header>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <!-- Left: Quick Stats & Add Habit -->
+            <section class="panel left-panel">
+                <div class="stats-card">
+                    <h2><i class="fas fa-chart-line"></i> Today's Overview</h2>
+                    <div class="stat-item">
+                        <span class="stat-label">Current Streak</span>
+                        <span class="stat-value" id="currentStreak">0 days</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Today's Progress</span>
+                        <span class="stat-value" id="todayProgress">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Active Habits</span>
+                        <span class="stat-value" id="activeHabits">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Best Streak</span>
+                        <span class="stat-value" id="bestStreak">0 days</span>
+                    </div>
+                </div>
+
+                <div class="add-habit-card">
+                    <h3><i class="fas fa-plus-circle"></i> Plant a New Habit</h3>
+                    <form id="addHabitForm">
+                        <input type="text" id="habitName" placeholder="Habit name (e.g., Morning Meditation)" required>
+                        
+                        <select id="habitCategory">
+                            <option value="health">🌸 Health & Wellness</option>
+                            <option value="learning">📚 Learning & Growth</option>
+                            <option value="productivity">💼 Productivity</option>
+                            <option value="mindfulness">🧘 Mindfulness</option>
+                            <option value="fitness">🏃 Fitness</option>
+                            <option value="creative">🎨 Creative</option>
+                        </select>
+                        
+                        <div class="time-preference">
+                            <label>Best Time:</label>
+                            <div class="time-options">
+                                <label><input type="radio" name="bestTime" value="morning" checked> ☀️ Morning</label>
+                                <label><input type="radio" name="bestTime" value="afternoon"> 🌤️ Afternoon</label>
+                                <label><input type="radio" name="bestTime" value="evening"> 🌙 Evening</label>
+                                <label><input type="radio" name="bestTime" value="anytime"> ⏳ Anytime</label>
+                            </div>
+                        </div>
+                        
+                        <div class="frequency-select">
+                            <label>Frequency:</label>
+                            <select id="habitFrequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">3x per week</option>
+                                <option value="weekdays">Weekdays only</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn-add">
+                            <i class="fas fa-leaf"></i> Plant Habit
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Center: Habits List -->
+            <section class="panel center-panel">
+                <div class="habits-header">
+                    <h2><i class="fas fa-list-check"></i> Today's Garden</h2>
+                    <div class="date-display">
+                        <span id="currentDate"></span>
+                        <div class="completion-rate">
+                            <span id="completionRate">0%</span> complete
+                        </div>
+                    </div>
+                </div>
+
+                <div class="habits-filters">
+                    <button class="filter-btn active" data-filter="all">All Blooms</button>
+                    <button class="filter-btn" data-filter="health">🌸 Health</button>
+                    <button class="filter-btn" data-filter="learning">📚 Learning</button>
+                    <button class="filter-btn" data-filter="productivity">💼 Work</button>
+                    <button class="filter-btn" data-filter="mindfulness">🧘 Mindfulness</button>
+                </div>
+
+                <div class="habits-container" id="habitsContainer">
+                    <!-- Habit cards will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Right: Analytics & Controls -->
+            <section class="panel right-panel">
+                <div class="time-of-day">
+                    <h3><i class="fas fa-clock"></i> Time Analytics</h3>
+                    <div class="time-stats">
+                        <div class="time-stat">
+                            <span class="time-label">☀️ Morning Success</span>
+                            <div class="time-bar">
+                                <div class="time-fill" id="morningSuccess" style="width: 0%"></div>
+                            </div>
+                            <span class="time-value" id="morningValue">0%</span>
+                        </div>
+                        <div class="time-stat">
+                            <span class="time-label">🌙 Evening Success</span>
+                            <div class="time-bar">
+                                <div class="time-fill" id="eveningSuccess" style="width: 0%"></div>
+                            </div>
+                            <span class="time-value" id="eveningValue">0%</span>
+                        </div>
+                        <div class="time-stat">
+                            <span class="time-label">📊 This Week vs Last</span>
+                            <div class="comparison">
+                                <span class="week-this" id="thisWeek">0%</span>
+                                <span class="week-arrow" id="weekComparison">→</span>
+                                <span class="week-last" id="lastWeek">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="streaks-card">
+                    <h3><i class="fas fa-fire"></i> Active Streaks</h3>
+                    <div class="streaks-list" id="streaksList">
+                        <!-- Streaks will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="controls-card">
+                    <h3><i class="fas fa-cog"></i> Garden Tools</h3>
+                    <div class="control-buttons">
+                        <button id="markAllToday" class="control-btn">
+                            <i class="fas fa-check-double"></i> Mark All Complete
+                        </button>
+                        <button id="printReport" class="control-btn">
+                            <i class="fas fa-print"></i> Print Monthly Report
+                        </button>
+                        <button id="clearCompleted" class="control-btn">
+                            <i class="fas fa-broom"></i> Clear Completed
+                        </button>
+                        <button id="resetHabits" class="control-btn danger">
+                            <i class="fas fa-trash-alt"></i> Reset All
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom: Calendar View -->
+        <section class="calendar-section">
+            <h2><i class="fas fa-calendar-alt"></i> 30-Day Bloom Calendar</h2>
+            <div class="calendar" id="calendar">
+                <!-- Calendar days will be generated by JavaScript -->
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Every day is a chance to grow something beautiful. <i class="fas fa-heart"></i></p>
+            <small>Your data is stored locally in your browser</small>
+        </footer>
+    </div>
+
+    <!-- Print Modal -->
+    <div id="printModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-file-pdf"></i> Monthly Report</h2>
+            <div id="printContent"></div>
+            <div class="modal-actions">
+                <button onclick="window.print()" class="btn-print">
+                    <i class="fas fa-print"></i> Print/PDF
+                </button>
+                <button id="closePrint" class="btn-close">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
