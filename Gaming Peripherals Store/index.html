@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Gaming | Premium Peripherals</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Techy Header with Neon Glow -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><span class="neon-text">NEXUS</span> GAMING</h1>
+                <p class="tagline">Power Your Play</p>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+                <a href="cart.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i> Cart 
+                    <span id="cart-count" class="badge">0</span>
+                </a>
+                <a href="wishlist.html" class="nav-link">
+                    <i class="fas fa-heart"></i> Wishlist 
+                    <span id="wishlist-count" class="badge">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h2>Level Up Your Setup</h2>
+            <p>Premium gaming peripherals with cutting-edge tech</p>
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search products...">
+                <button id="search-btn" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="filter-controls">
+                <select id="category-filter" class="tech-select">
+                    <option value="all">All Categories</option>
+                    <option value="keyboard">Keyboards</option>
+                    <option value="mouse">Mice</option>
+                    <option value="headset">Headsets</option>
+                    <option value="controller">Controllers</option>
+                    <option value="accessory">Accessories</option>
+                </select>
+                
+                <select id="sort-by" class="tech-select">
+                    <option value="default">Sort By</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name: A to Z</option>
+                    <option value="rating">Highest Rated</option>
+                </select>
+            </div>
+            
+            <div class="view-toggle">
+                <button id="grid-view" class="view-btn active"><i class="fas fa-th"></i></button>
+                <button id="list-view" class="view-btn"><i class="fas fa-list"></i></button>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <section id="products-container" class="products-grid">
+            <!-- Products will be rendered here by JavaScript -->
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Loading Gaming Gear...</p>
+            </div>
+        </section>
+
+        <!-- Cart Sidebar (Hidden by default) -->
+        <aside id="cart-sidebar" class="cart-sidebar">
+            <div class="sidebar-header">
+                <h3>Your Cart</h3>
+                <button id="close-cart" class="close-btn">&times;</button>
+            </div>
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items rendered here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <button class="btn btn-primary" onclick="window.location.href='cart.html'">
+                    Checkout <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
