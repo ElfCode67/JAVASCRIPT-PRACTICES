@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus Gaming | Premium Peripherals</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/home.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Techy Header with Neon Glow -->
+    <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="logo">
                 <h1><span class="neon-text">NEXUS</span> GAMING</h1>
-                <p class="tagline">Power Your Play</p>
+                <p class="tagline">⚡ Power Your Play ⚡</p>
             </div>
             
             <nav class="main-nav">
-                <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+                <a href="index.html" class="nav-link active">
+                    <i class="fas fa-home"></i> Home
+                </a>
                 <a href="cart.html" class="nav-link">
                     <i class="fas fa-shopping-cart"></i> Cart 
                     <span id="cart-count" class="badge">0</span>
@@ -32,78 +33,72 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container main-content">
+    <main class="container">
         <!-- Hero Section -->
-        <section class="hero">
-            <h2>Level Up Your Setup</h2>
-            <p>Premium gaming peripherals with cutting-edge tech</p>
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search products...">
-                <button id="search-btn" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
+        <section class="hero" style="text-align: center; padding: 40px 20px; margin-bottom: 30px;">
+            <h2 style="font-size: 2.5rem; color: #00f3ff; margin-bottom: 15px;">🎮 Level Up Your Setup</h2>
+            <p style="font-size: 1.2rem; color: #94a3b8;">Premium gaming peripherals with cutting-edge tech</p>
         </section>
 
         <!-- Controls -->
         <div class="controls">
+            <div class="search-bar">
+                <input type="text" id="search-input" class="search-input" placeholder="Search products...">
+                <button onclick="filterProducts()" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
             <div class="filter-controls">
-                <select id="category-filter" class="tech-select">
+                <select id="category-filter" class="filter-select">
                     <option value="all">All Categories</option>
-                    <option value="keyboard">Keyboards</option>
-                    <option value="mouse">Mice</option>
-                    <option value="headset">Headsets</option>
-                    <option value="controller">Controllers</option>
-                    <option value="accessory">Accessories</option>
+                    <option value="keyboard">⌨️ Keyboards</option>
+                    <option value="mouse">🐁 Mice</option>
+                    <option value="headset">🎧 Headsets</option>
+                    <option value="controller">🎮 Controllers</option>
+                    <option value="accessory">🔧 Accessories</option>
                 </select>
                 
-                <select id="sort-by" class="tech-select">
+                <select id="sort-by" class="filter-select">
                     <option value="default">Sort By</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
-                    <option value="name">Name: A to Z</option>
                     <option value="rating">Highest Rated</option>
                 </select>
-            </div>
-            
-            <div class="view-toggle">
-                <button id="grid-view" class="view-btn active"><i class="fas fa-th"></i></button>
-                <button id="list-view" class="view-btn"><i class="fas fa-list"></i></button>
             </div>
         </div>
 
         <!-- Products Grid -->
-        <section id="products-container" class="products-grid">
-            <!-- Products will be rendered here by JavaScript -->
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>Loading Gaming Gear...</p>
-            </div>
-        </section>
-
-        <!-- Cart Sidebar (Hidden by default) -->
-        <aside id="cart-sidebar" class="cart-sidebar">
-            <div class="sidebar-header">
-                <h3>Your Cart</h3>
-                <button id="close-cart" class="close-btn">&times;</button>
-            </div>
-            <div id="cart-items" class="cart-items">
-                <!-- Cart items rendered here -->
-            </div>
-            <div class="cart-footer">
-                <div class="cart-total">
-                    <span>Total:</span>
-                    <span id="cart-total">$0.00</span>
-                </div>
-                <button class="btn btn-primary" onclick="window.location.href='cart.html'">
-                    Checkout <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </aside>
+        <div id="products-container" class="products-grid">
+            <!-- Products will be rendered here -->
+        </div>
     </main>
 
-    <script src="js/data.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/home.js"></script>
+    <!-- Cart Sidebar -->
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+            <button id="close-cart" class="close-btn">&times;</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total">$0.00</span>
+            </div>
+            <a href="cart.html" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none;">
+                <i class="fas fa-arrow-right"></i> Checkout
+            </a>
+        </div>
+    </div>
+
+    <!-- Cart Toggle Button -->
+    <button id="cart-toggle" class="cart-toggle">
+        🛒
+        <span id="cart-badge" class="cart-badge">0</span>
+    </button>
+
+    <script src="data.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

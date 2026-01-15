@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist | Nexus Gaming</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html" style="text-decoration: none; color: inherit;"><span class="neon-text">NEXUS</span> GAMING</a></h1>
+                <p class="tagline">⚡ Power Your Play ⚡</p>
+            </div>
+            
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="cart.html" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i> Cart 
+                    <span id="cart-count" class="badge">0</span>
+                </a>
+                <a href="wishlist.html" class="nav-link active">
+                    <i class="fas fa-heart"></i> Wishlist 
+                    <span id="wishlist-count" class="badge">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="wishlist-header" style="text-align: center; margin-bottom: 40px;">
+            <h1 style="color: #9d4edd; display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <i class="fas fa-heart"></i>
+                Your Wishlist
+                <i class="fas fa-heart"></i>
+            </h1>
+            <p style="color: #94a3b8;">Save your favorite gaming gear for later</p>
+        </div>
+        
+        <div id="wishlist-container" class="products-grid">
+            <!-- Wishlist items will be rendered here -->
+            <div id="empty-wishlist" class="empty-state">
+                <div style="font-size: 4rem;">💔</div>
+                <h3>Your wishlist is empty</h3>
+                <p>Add some products to your wishlist to see them here!</p>
+                <a href="index.html" class="btn btn-primary" style="margin-top: 20px;">Browse Products</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="data.js"></script>
+    <script>
+        // Format price
+        function formatPrice(price) {
+            return `$${price.toFixed(2)}`;
+        }
+        
+        // Update counts
+        function updateCounts() {
+            const cartTotal = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = cartTotal;
+            document.getElementById('wishlist-count').textContent = wishlist.length;
+        }
+        
+        // Get wishlist products
+        function getWishlistProducts() {
+            return products.filter(product => wishlist.includes(product.id));
+        }
+        
+        // Add to cart from wishlist
+        function addToCartFromWishlist(productId) {
+            const product = products.find(p => p.id === productId);
+            
+            if (!product) return false;
+            
+            // Check if product already in cart
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    emoji: product.emoji,
+                    quantity: 1
+                });
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCounts();
+            alert('Added to cart!');
+            return true;
+        }
+        
+        // Remove from wishlist
+        function removeFromWishlist(productId) {
+            const index = wishlist.indexOf(productId);
+            if (index !== -1) {
+                wishlist.splice(index, 1);
+                localStorage.setItem('wishlist', JSON.stringify(wishlist));
+                updateCounts();
+                renderWishlist();
+            }
+        }
+        
+        // Generate star rating
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(rating)) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+        
+        // Render wishlist
+        function renderWishlist() {
+            const wishlistContainer = document.getElementById('wishlist-container');
+            const emptyWishlist = document.getElementById('empty-wishlist');
+            const wishlistProducts = getWishlistProducts();
+            
+            if (wishlistProducts.length === 0) {
+                emptyWishlist.style.display = 'block';
+                wishlistContainer.innerHTML = '';
+                return;
+            }
+            
+            emptyWishlist.style.display = 'none';
+            wishlistContainer.innerHTML = '';
+            
+            wishlistProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <div class="product-emoji">${product.emoji}</div>
+                    <div class="product-category">${product.category.toUpperCase()}</div>
+                    <h3 class="product-title">${product.name}</h3>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-rating">
+                        ${generateStars(product.rating)}
+                        <span>${product.rating}</span>
+                    </div>
+                    <div class="product-price">${formatPrice(product.price)}</div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="addToCartFromWishlist(${product.id})" class="btn btn-primary">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                        <button onclick="removeFromWishlist(${product.id})" class="btn btn-secondary">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                `;
+                wishlistContainer.appendChild(productCard);
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCounts();
+            renderWishlist();
+            
+            // Make functions globally available
+            window.addToCartFromWishlist = addToCartFromWishlist;
+            window.removeFromWishlist = removeFromWishlist;
+        });
+    </script>
+</body>
+</html>
