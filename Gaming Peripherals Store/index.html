@@ -16,17 +16,17 @@
                 <p class="tagline">⚡ Power Your Play ⚡</p>
             </div>
             
-            <nav class="main-nav">
-                <a href="index.html" class="nav-link active">
-                    <i class="fas fa-home"></i> Home
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <a href="index.html" class="nav-link active" aria-current="page">
+                    <i class="fas fa-home" aria-hidden="true"></i> Home
                 </a>
                 <a href="cart.html" class="nav-link">
-                    <i class="fas fa-shopping-cart"></i> Cart 
-                    <span id="cart-count" class="badge">0</span>
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i> Cart 
+                    <span id="cart-count" class="badge" aria-label="Cart items">0</span>
                 </a>
                 <a href="wishlist.html" class="nav-link">
-                    <i class="fas fa-heart"></i> Wishlist 
-                    <span id="wishlist-count" class="badge">0</span>
+                    <i class="fas fa-heart" aria-hidden="true"></i> Wishlist 
+                    <span id="wishlist-count" class="badge" aria-label="Wishlist items">0</span>
                 </a>
             </nav>
         </div>
@@ -43,14 +43,23 @@
         <!-- Controls -->
         <div class="controls">
             <div class="search-bar">
-                <input type="text" id="search-input" class="search-input" placeholder="Search products...">
-                <button onclick="filterProducts()" class="btn btn-primary">
-                    <i class="fas fa-search"></i>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    class="search-input" 
+                    placeholder="Search products..."
+                    aria-label="Search products"
+                >
+                <button onclick="filterProducts()" class="btn btn-primary" aria-label="Search">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+                <button id="clear-search" class="btn btn-secondary" style="display: none;" aria-label="Clear search">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
             
             <div class="filter-controls">
-                <select id="category-filter" class="filter-select">
+                <select id="category-filter" class="filter-select" aria-label="Filter by category">
                     <option value="all">All Categories</option>
                     <option value="keyboard">⌨️ Keyboards</option>
                     <option value="mouse">🐁 Mice</option>
@@ -59,26 +68,96 @@
                     <option value="accessory">🔧 Accessories</option>
                 </select>
                 
-                <select id="sort-by" class="filter-select">
+                <select id="sort-by" class="filter-select" aria-label="Sort products">
                     <option value="default">Sort By</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
                     <option value="rating">Highest Rated</option>
+                    <option value="name">Name A-Z</option>
                 </select>
             </div>
         </div>
 
+        <!-- Results Counter -->
+        <div id="results-counter" class="results-counter"></div>
+
         <!-- Products Grid -->
-        <div id="products-container" class="products-grid">
+        <div id="products-container" class="products-grid" role="list">
             <!-- Products will be rendered here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="loading-state" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading products...</p>
+        </div>
+
+        <!-- No Results State -->
+        <div id="no-results" class="empty-state" style="display: none;">
+            <div style="font-size: 4rem;">🔍</div>
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filters</p>
+            <button onclick="resetFilters()" class="btn btn-primary" style="margin-top: 20px;">
+                Clear Filters
+            </button>
+        </div>
+                <!-- Recent Products Section -->
+        <div id="recent-products-section" style="display: none;">
+            <!-- Will be populated by JavaScript -->
         </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="#">Shipping Information</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                        <li><a href="#">Order Tracking</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>About Us</h4>
+                    <ul>
+                        <li><a href="#">Our Story</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nexus Gaming. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="cart-sidebar">
+    <div id="cart-sidebar" class="cart-sidebar" role="dialog" aria-labelledby="cart-title" aria-modal="true">
         <div class="sidebar-header">
-            <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
-            <button id="close-cart" class="close-btn">&times;</button>
+            <h3 id="cart-title"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Your Cart</h3>
+            <button id="close-cart" class="close-btn" aria-label="Close cart">&times;</button>
         </div>
         <div id="cart-items" class="cart-items"></div>
         <div class="cart-footer">
@@ -87,16 +166,30 @@
                 <span id="cart-total">$0.00</span>
             </div>
             <a href="cart.html" class="btn btn-primary" style="width: 100%; text-align: center; text-decoration: none;">
-                <i class="fas fa-arrow-right"></i> Checkout
+                <i class="fas fa-arrow-right" aria-hidden="true"></i> Checkout
             </a>
         </div>
     </div>
 
+    <!-- Cart Overlay -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+
     <!-- Cart Toggle Button -->
-    <button id="cart-toggle" class="cart-toggle">
+    <button id="cart-toggle" class="cart-toggle" aria-label="Open cart">
         🛒
-        <span id="cart-badge" class="cart-badge">0</span>
+        <span id="cart-badge" class="cart-badge" aria-label="Cart item count">0</span>
     </button>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
 
     <script src="data.js"></script>
     <script src="main.js"></script>

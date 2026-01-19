@@ -15,14 +15,14 @@
                 <p class="tagline">⚡ Power Your Play ⚡</p>
             </div>
             
-            <nav class="main-nav">
-                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <a href="index.html" class="nav-link"><i class="fas fa-home" aria-hidden="true"></i> Home</a>
                 <a href="cart.html" class="nav-link">
-                    <i class="fas fa-shopping-cart"></i> Cart 
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i> Cart 
                     <span id="cart-count" class="badge">0</span>
                 </a>
-                <a href="wishlist.html" class="nav-link active">
-                    <i class="fas fa-heart"></i> Wishlist 
+                <a href="wishlist.html" class="nav-link active" aria-current="page">
+                    <i class="fas fa-heart" aria-hidden="true"></i> Wishlist 
                     <span id="wishlist-count" class="badge">0</span>
                 </a>
             </nav>
@@ -32,9 +32,9 @@
     <main class="container">
         <div class="wishlist-header" style="text-align: center; margin-bottom: 40px;">
             <h1 style="color: #9d4edd; display: flex; align-items: center; justify-content: center; gap: 15px;">
-                <i class="fas fa-heart"></i>
+                <i class="fas fa-heart" aria-hidden="true"></i>
                 Your Wishlist
-                <i class="fas fa-heart"></i>
+                <i class="fas fa-heart" aria-hidden="true"></i>
             </h1>
             <p style="color: #94a3b8;">Save your favorite gaming gear for later</p>
         </div>
@@ -50,128 +50,64 @@
         </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Customer Service</h4>
+                    <ul>
+                        <li><a href="#">Shipping Information</a></li>
+                        <li><a href="#">Returns & Exchanges</a></li>
+                        <li><a href="#">Order Tracking</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>About Us</h4>
+                    <ul>
+                        <li><a href="#">Our Story</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect With Us</h4>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Nexus Gaming. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
     <script src="data.js"></script>
-    <script>
-        // Format price
-        function formatPrice(price) {
-            return `$${price.toFixed(2)}`;
-        }
-        
-        // Update counts
-        function updateCounts() {
-            const cartTotal = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cart-count').textContent = cartTotal;
-            document.getElementById('wishlist-count').textContent = wishlist.length;
-        }
-        
-        // Get wishlist products
-        function getWishlistProducts() {
-            return products.filter(product => wishlist.includes(product.id));
-        }
-        
-        // Add to cart from wishlist
-        function addToCartFromWishlist(productId) {
-            const product = products.find(p => p.id === productId);
-            
-            if (!product) return false;
-            
-            // Check if product already in cart
-            const existingItem = cart.find(item => item.id === productId);
-            
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    emoji: product.emoji,
-                    quantity: 1
-                });
-            }
-            
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCounts();
-            alert('Added to cart!');
-            return true;
-        }
-        
-        // Remove from wishlist
-        function removeFromWishlist(productId) {
-            const index = wishlist.indexOf(productId);
-            if (index !== -1) {
-                wishlist.splice(index, 1);
-                localStorage.setItem('wishlist', JSON.stringify(wishlist));
-                updateCounts();
-                renderWishlist();
-            }
-        }
-        
-        // Generate star rating
-        function generateStars(rating) {
-            let stars = '';
-            for (let i = 1; i <= 5; i++) {
-                if (i <= Math.floor(rating)) {
-                    stars += '<i class="fas fa-star"></i>';
-                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
-                    stars += '<i class="fas fa-star-half-alt"></i>';
-                } else {
-                    stars += '<i class="far fa-star"></i>';
-                }
-            }
-            return stars;
-        }
-        
-        // Render wishlist
-        function renderWishlist() {
-            const wishlistContainer = document.getElementById('wishlist-container');
-            const emptyWishlist = document.getElementById('empty-wishlist');
-            const wishlistProducts = getWishlistProducts();
-            
-            if (wishlistProducts.length === 0) {
-                emptyWishlist.style.display = 'block';
-                wishlistContainer.innerHTML = '';
-                return;
-            }
-            
-            emptyWishlist.style.display = 'none';
-            wishlistContainer.innerHTML = '';
-            
-            wishlistProducts.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <div class="product-emoji">${product.emoji}</div>
-                    <div class="product-category">${product.category.toUpperCase()}</div>
-                    <h3 class="product-title">${product.name}</h3>
-                    <p class="product-description">${product.description}</p>
-                    <div class="product-rating">
-                        ${generateStars(product.rating)}
-                        <span>${product.rating}</span>
-                    </div>
-                    <div class="product-price">${formatPrice(product.price)}</div>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="addToCartFromWishlist(${product.id})" class="btn btn-primary">
-                            <i class="fas fa-cart-plus"></i> Add to Cart
-                        </button>
-                        <button onclick="removeFromWishlist(${product.id})" class="btn btn-secondary">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    </div>
-                `;
-                wishlistContainer.appendChild(productCard);
-            });
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCounts();
-            renderWishlist();
-            
-            // Make functions globally available
-            window.addToCartFromWishlist = addToCartFromWishlist;
-            window.removeFromWishlist = removeFromWishlist;
-        });
-    </script>
+    <script src="wishlist.js"></script>
 </body>
 </html>
