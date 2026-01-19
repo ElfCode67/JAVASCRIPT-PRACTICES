@@ -167,34 +167,73 @@ function addToCartFromWishlist(productId) {
     updateWishlistCounts();
     showWishlistToast(`${product.name} added to cart!`, 'success');
     
-    // Update the product card
-    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+    // Update the wishlist page UI immediately
+    const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
     if (productCard) {
-        const inCartBadge = productCard.querySelector('.in-cart-badge');
-        if (inCartBadge) {
-            inCartBadge.textContent = `${currentQuantity + 1} in cart`;
-        } else {
-            const badge = document.createElement('div');
-            badge.className = 'in-cart-badge';
-            badge.textContent = '1 in cart';
-            productCard.appendChild(badge);
+        // Update or add cart badge
+        let cartBadge = productCard.querySelector('.in-cart-badge');
+        if (!cartBadge) {
+            cartBadge = document.createElement('div');
+            cartBadge.className = 'in-cart-badge';
+            productCard.appendChild(cartBadge);
         }
+        cartBadge.textContent = `${currentQuantity + 1} in cart`;
+    }
+    
+    // Update any open modal
+    if (typeof closeProductModal === 'function') {
+        closeProductModal();
     }
 }
 
-// Remove from wishlist page
+// Remove from wishlist page - FIXED VERSION
 function removeFromWishlistPage(productId) {
     const index = wishlist.indexOf(productId);
     const product = products.find(p => p.id === productId);
     
     if (index !== -1) {
+        // Remove from wishlist array
         wishlist.splice(index, 1);
-        storage.set('wishlist', wishlist);
-        updateWishlistCounts();
-        renderWishlist();
         
+        // Save to storage
+        storage.set('wishlist', wishlist);
+        
+        // Update counts
+        updateWishlistCounts();
+        
+        // Remove the specific product card from DOM immediately
+        const productCard = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+        if (productCard) {
+            // Add fade-out animation
+            productCard.style.opacity = '0';
+            productCard.style.transform = 'translateX(-20px)';
+            
+            // Remove after animation
+            setTimeout(() => {
+                productCard.remove();
+                
+                // Re-render wishlist if empty
+                if (wishlist.length === 0) {
+                    renderWishlist();
+                }
+            }, 300);
+        }
+        
+        // Update main page if it exists
+        if (typeof updateCounts === 'function') {
+            updateCounts();
+        }
+        
+        // Show toast notification
         if (product) {
             showWishlistToast(`${product.name} removed from wishlist`, 'info');
+        }
+        
+        // Close any open modal
+        const modal = document.getElementById('product-modal');
+        if (modal && modal.classList.contains('show')) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
         }
     }
 }
@@ -233,7 +272,7 @@ function showWishlistToast(message, type = 'success') {
     }, 3000);
 }
 
-// Render wishlist
+// Render wishlist - IMPROVED VERSION
 function renderWishlist() {
     const container = document.getElementById('wishlist-container');
     const emptyWishlist = document.getElementById('empty-wishlist');
@@ -296,8 +335,9 @@ function renderWishlist() {
                 </button>
                 <button 
                     onclick="removeFromWishlistPage(${product.id})" 
-                    class="btn btn-secondary"
+                    class="btn btn-secondary remove-wishlist-btn"
                     style="color: #ef4444;"
+                    data-product-id="${product.id}"
                 >
                     <i class="fas fa-trash"></i>
                 </button>

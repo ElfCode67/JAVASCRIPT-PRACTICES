@@ -176,6 +176,7 @@ function renderCart() {
         
         const cartItem = document.createElement('div');
         cartItem.className = 'cart-items-list fade-in';
+        cartItem.setAttribute('data-cart-item-id', item.id);
         cartItem.style.animationDelay = `${index * 0.1}s`;
         cartItem.innerHTML = `
             <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
@@ -208,6 +209,7 @@ function renderCart() {
                             onclick="removeCartItem(${item.id})" 
                             style="background: none; border: none; color: #ef4444; cursor: pointer;"
                             aria-label="Remove ${item.name} from cart"
+                            data-remove-item="${item.id}"
                         >
                             <i class="fas fa-trash"></i> Remove
                         </button>
@@ -232,7 +234,7 @@ function renderCart() {
     updateShippingProgress();
 }
 
-// Update quantity in cart page
+// Update quantity in cart page - FIXED VERSION
 function updateCartQuantity(productId, change) {
     const item = cart.find(item => item.id === productId);
     const product = products.find(p => p.id === productId);
@@ -252,7 +254,54 @@ function updateCartQuantity(productId, change) {
         item.quantity = newQuantity;
         storage.set('cart', cart);
         updateCartCounts();
-        renderCart();
+        
+        // Update the specific item in the DOM immediately
+        const cartItemElement = document.querySelector(`[data-cart-item-id="${productId}"]`);
+        if (cartItemElement) {
+            // Update quantity display
+            const quantitySpan = cartItemElement.querySelector('span[style*="min-width: 30px"]');
+            if (quantitySpan) {
+                quantitySpan.textContent = newQuantity;
+            }
+            
+            // Update total for this item
+            const itemTotal = cartItemElement.querySelector('div[style*="font-weight: bold; font-size: 1.2rem"]');
+            if (itemTotal) {
+                itemTotal.textContent = formatPrice(item.price * newQuantity);
+            }
+            
+            // Update plus button disabled state
+            const plusButton = cartItemElement.querySelector('button[onclick*="updateCartQuantity"][onclick*="1"]');
+            if (plusButton) {
+                plusButton.disabled = newQuantity >= product.stock;
+            }
+            
+            // Update max stock warning
+            const warningDiv = cartItemElement.querySelector('div[style*="color: #ef4444"]');
+            if (product && newQuantity >= product.stock) {
+                if (!warningDiv) {
+                    const warning = document.createElement('div');
+                    warning.style.cssText = 'color: #ef4444; font-size: 0.9rem; margin-bottom: 10px;';
+                    warning.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Maximum available quantity';
+                    const buttonDiv = cartItemElement.querySelector('div[style*="display: flex; align-items: center; gap: 15px"]');
+                    if (buttonDiv) {
+                        buttonDiv.parentNode.insertBefore(warning, buttonDiv);
+                    }
+                }
+            } else if (warningDiv) {
+                warningDiv.remove();
+            }
+        }
+        
+        // Update summary totals
+        const totals = calculateTotals();
+        document.getElementById('subtotal').textContent = formatPrice(totals.subtotal);
+        document.getElementById('tax').textContent = formatPrice(totals.tax);
+        document.getElementById('total').textContent = formatPrice(totals.total);
+        document.getElementById('shipping').textContent = totals.shipping === 0 ? 'FREE' : formatPrice(totals.shipping);
+        
+        // Update shipping progress
+        updateShippingProgress();
         
         // Update main page cart if it exists
         if (typeof updateCounts === 'function') updateCounts();
@@ -260,18 +309,55 @@ function updateCartQuantity(productId, change) {
     }
 }
 
-// Remove item from cart page
+// Remove item from cart page - FIXED VERSION
 function removeCartItem(productId) {
     const index = cart.findIndex(item => item.id === productId);
     if (index !== -1) {
+        const itemName = cart[index].name;
+        
+        // Remove from cart array
         cart.splice(index, 1);
+        
+        // Save to storage
         storage.set('cart', cart);
+        
+        // Update counts
         updateCartCounts();
-        renderCart();
+        
+        // Remove the specific item from DOM with animation
+        const cartItemElement = document.querySelector(`[data-cart-item-id="${productId}"]`);
+        if (cartItemElement) {
+            // Add removal animation
+            cartItemElement.style.opacity = '0';
+            cartItemElement.style.transform = 'translateX(-20px)';
+            
+            // Remove after animation
+            setTimeout(() => {
+                cartItemElement.remove();
+                
+                // Check if cart is now empty
+                if (cart.length === 0) {
+                    renderCart(); // This will show empty cart state
+                } else {
+                    // Update totals
+                    const totals = calculateTotals();
+                    document.getElementById('subtotal').textContent = formatPrice(totals.subtotal);
+                    document.getElementById('tax').textContent = formatPrice(totals.tax);
+                    document.getElementById('total').textContent = formatPrice(totals.total);
+                    document.getElementById('shipping').textContent = totals.shipping === 0 ? 'FREE' : formatPrice(totals.shipping);
+                    
+                    // Update shipping progress
+                    updateShippingProgress();
+                }
+            }, 300);
+        }
         
         // Update main page
         if (typeof updateCounts === 'function') updateCounts();
         if (typeof updateCartSidebar === 'function') updateCartSidebar();
+        
+        // Show toast
+        showToast(`${itemName} removed from cart`, 'info');
     }
 }
 
