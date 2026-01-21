@@ -104,19 +104,56 @@ const totalRecipes = document.getElementById('totalRecipes');
 const avgTime = document.getElementById('avgTime');
 const noResults = document.getElementById('noResults');
 const sampleTags = document.querySelectorAll('.sample-tag');
+const clearPlanBtn = document.getElementById('clearPlanBtn');
+const generateListBtn = document.getElementById('generateListBtn');
+const exportBtn = document.getElementById('exportBtn');
+const shoppingModal = document.getElementById('shoppingModal');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const printListBtn = document.getElementById('printListBtn');
+const closeModalButton = document.querySelector('.close-modal');
+
+// App State
+let mealPlan = [];
+let favorites = [];
+let allRecipes = [...recipes]; // Copy with spread operator
 
 // Initialize the app
 function init() {
     console.log("Recipe Finder App Initialized");
+    console.log("Array methods used: filter(), map(), reduce(), sort(), some(), every(), find(), findIndex(), forEach()");
+    
+    // Load saved data from localStorage
+    loadSavedData();
     
     // Display all recipes initially
-    displayRecipes(recipes);
+    displayRecipes(allRecipes);
     
     // Update stats
-    updateStats(recipes);
+    updateStats(allRecipes);
+    updateDashboardStats();
     
     // Setup event listeners
     setupEventListeners();
+}
+
+// Load saved data from localStorage
+function loadSavedData() {
+    // Load meal plan
+    const savedPlan = localStorage.getItem('recipeFinder_mealPlan');
+    if (savedPlan) {
+        mealPlan = JSON.parse(savedPlan);
+        updateMealPlanDisplay();
+    }
+    
+    // Load favorites
+    const savedFavorites = localStorage.getItem('recipeFinder_favorites');
+    if (savedFavorites) {
+        favorites = JSON.parse(savedFavorites);
+        // Mark favorite recipes
+        allRecipes.forEach(recipe => {
+            recipe.favorite = favorites.includes(recipe.id);
+        });
+    }
 }
 
 // Setup event listeners
@@ -141,13 +178,39 @@ function setupEventListeners() {
     // Filter changes
     document.getElementById('timeFilter').addEventListener('change', handleSearch);
     document.getElementById('servingsFilter').addEventListener('change', handleSearch);
+    document.getElementById('categoryFilter').addEventListener('change', handleSearch);
     document.getElementById('sortBy').addEventListener('change', handleSearch);
+    
+    // Meal planner buttons
+    clearPlanBtn.addEventListener('click', clearMealPlan);
+    generateListBtn.addEventListener('click', generateShoppingList);
+    
+    // Export button
+    exportBtn.addEventListener('click', exportData);
+    
+    // Modal buttons
+    closeModalBtn.addEventListener('click', () => {
+        shoppingModal.classList.remove('active');
+    });
+    
+    closeModalButton.addEventListener('click', () => {
+        shoppingModal.classList.remove('active');
+    });
+    
+    printListBtn.addEventListener('click', printShoppingList);
+    
+    // Close modal on backdrop click
+    shoppingModal.addEventListener('click', (e) => {
+        if (e.target === shoppingModal) {
+            shoppingModal.classList.remove('active');
+        }
+    });
 }
 
 // Handle search
 function handleSearch() {
     const searchText = searchInput.value.trim().toLowerCase();
-    let filteredRecipes = [...recipes]; // Create copy with spread operator
+    let filteredRecipes = [...allRecipes]; // Create copy with spread operator
     
     // Filter by search text if provided
     if (searchText) {
@@ -157,14 +220,14 @@ function handleSearch() {
         // .filter() with .some() and .every()
         filteredRecipes = filteredRecipes.filter(recipe => {
             if (matchAll) {
-                // Must contain ALL ingredients (AND operator)
+                // Must contain ALL ingredients (AND operator) - using .every()
                 return searchIngredients.every(searchIng => 
                     recipe.ingredients.some(recipeIng => 
                         recipeIng.name.toLowerCase().includes(searchIng)
                     )
                 );
             } else {
-                // Must contain ANY ingredient (OR operator)
+                // Must contain ANY ingredient (OR operator) - using .some()
                 return searchIngredients.some(searchIng => 
                     recipe.ingredients.some(recipeIng => 
                         recipeIng.name.toLowerCase().includes(searchIng)
@@ -185,11 +248,11 @@ function handleSearch() {
     updateStats(filteredRecipes);
 }
 
-// Apply time and servings filters
+// Apply time, servings, and category filters
 function applyFilters(recipesList) {
     let filtered = [...recipesList];
     
-    // Time filter
+    // Time filter using .filter()
     const timeFilter = document.getElementById('timeFilter').value;
     if (timeFilter) {
         const maxTime = parseInt(timeFilter);
@@ -198,11 +261,19 @@ function applyFilters(recipesList) {
         );
     }
     
-    // Servings filter
+    // Servings filter using .filter()
     const servingsFilter = document.getElementById('servingsFilter').value;
     if (servingsFilter) {
         const minServings = parseInt(servingsFilter);
         filtered = filtered.filter(recipe => recipe.servings >= minServings);
+    }
+    
+    // Category filter using .filter() and .includes()
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    if (categoryFilter) {
+        filtered = filtered.filter(recipe => 
+            recipe.tags.includes(categoryFilter)
+        );
     }
     
     return filtered;
@@ -249,7 +320,7 @@ function displayRecipes(recipesList) {
     // Create recipe cards using .map()
     const recipeCards = recipesList.map(recipe => createRecipeCard(recipe));
     
-    // Append all cards at once (better performance)
+    // Append all cards at once
     recipeCards.forEach(card => {
         recipesContainer.appendChild(card);
     });
@@ -289,6 +360,9 @@ function createRecipeCard(recipe) {
                 <button class="btn btn-add" data-id="${recipe.id}">
                     <i class="fas fa-plus"></i> Add to Plan
                 </button>
+                <button class="btn-favorite ${recipe.favorite ? 'favorited' : ''}" data-id="${recipe.id}" title="${recipe.favorite ? 'Remove from favorites' : 'Add to favorites'}">
+                    <i class="fas fa-heart"></i>
+                </button>
             </div>
         </div>
     `;
@@ -296,9 +370,11 @@ function createRecipeCard(recipe) {
     // Add event listeners to buttons
     const viewBtn = card.querySelector('.btn-view');
     const addBtn = card.querySelector('.btn-add');
+    const favoriteBtn = card.querySelector('.btn-favorite');
     
     viewBtn.addEventListener('click', () => viewRecipe(recipe.id));
     addBtn.addEventListener('click', () => addToPlan(recipe.id));
+    favoriteBtn.addEventListener('click', () => toggleFavorite(recipe.id));
     
     return card;
 }
@@ -332,76 +408,102 @@ function updateStats(recipesList) {
     }
 }
 
+// Update dashboard stats
+function updateDashboardStats() {
+    // Total recipes
+    document.getElementById('totalRecipeCount').textContent = allRecipes.length;
+    
+    // Quick recipes (<30 min) using filter()
+    const quickRecipes = allRecipes.filter(recipe => 
+        (recipe.prepTime + recipe.cookTime) < 30
+    );
+    document.getElementById('quickRecipeCount').textContent = quickRecipes.length;
+    
+    // Vegetarian recipes using filter()
+    const vegRecipes = allRecipes.filter(recipe => 
+        recipe.tags.includes('vegetarian')
+    );
+    document.getElementById('vegRecipeCount').textContent = vegRecipes.length;
+    
+    // Unique tags using Set and spread operator
+    const allTags = allRecipes.reduce((tags, recipe) => {
+        recipe.tags.forEach(tag => tags.add(tag));
+        return tags;
+    }, new Set());
+    document.getElementById('totalTags').textContent = allTags.size;
+}
+
 // View recipe details
 function viewRecipe(recipeId) {
-    const recipe = recipes.find(r => r.id === recipeId);
+    const recipe = allRecipes.find(r => r.id === recipeId); // Using .find()
     if (!recipe) return;
     
-    alert(`Recipe Details:\n\n` +
-          `Name: ${recipe.name}\n` +
-          `Total Time: ${recipe.prepTime + recipe.cookTime} minutes\n` +
-          `Servings: ${recipe.servings}\n` +
-          `Tags: ${recipe.tags.join(', ')}\n\n` +
-          `Ingredients:\n${recipe.ingredients.map(ing => 
-            `• ${ing.amount} ${ing.unit} ${ing.name}`
-          ).join('\n')}\n\n` +
-          `(In a full app, this would open a modal with more details)`);
+    const ingredientsList = recipe.ingredients
+        .map(ing => `• ${ing.amount} ${ing.unit} ${ing.name}`)
+        .join('\n');
+    
+    alert(`📋 Recipe Details:\n\n` +
+          `🍽️ Name: ${recipe.name}\n` +
+          `⏱️ Total Time: ${recipe.prepTime + recipe.cookTime} minutes\n` +
+          `👥 Servings: ${recipe.servings}\n` +
+          `🏷️ Tags: ${recipe.tags.join(', ')}\n\n` +
+          `🥕 Ingredients:\n${ingredientsList}`);
 }
 
-// Add recipe to plan (simulated)
-function addToPlan(recipeId) {
-    const recipe = recipes.find(r => r.id === recipeId);
+// Toggle favorite
+function toggleFavorite(recipeId) {
+    const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
     
-    alert(`Added "${recipe.name}" to your meal plan!\n\n` +
-          `(In a full app, this would update your meal planner)`);
+    const index = favorites.indexOf(recipeId); // Using .indexOf()
     
-    // Simulate adding to plan with console log
-    console.log(`Recipe added to plan:`, recipe);
-}
-
-// Initialize app when page loads
-document.addEventListener('DOMContentLoaded', init);
-
-// Export recipes for debugging (optional)
-window.recipes = recipes;
-console.log('Array methods used in this app:');
-console.log('- .filter() - Filtering recipes by ingredients');
-console.log('- .map() - Creating recipe cards');
-console.log('- .reduce() - Calculating average time');
-console.log('- .sort() - Sorting recipes');
-console.log('- .some() - Checking if recipe contains any ingredient');
-console.log('- .every() - Checking if recipe contains all ingredients');
-console.log('- .forEach() - Setting up event listeners');
-console.log('- Spread operator [...] - Creating copies of arrays');
-
-// Meal Plan State
-let mealPlan = [];
-
-// Initialize meal plan from localStorage
-function initMealPlan() {
-    const savedPlan = localStorage.getItem('recipeFinder_mealPlan');
-    if (savedPlan) {
-        mealPlan = JSON.parse(savedPlan);
-        updateMealPlanDisplay();
+    if (index > -1) {
+        // Remove from favorites using .splice()
+        favorites.splice(index, 1);
+        recipe.favorite = false;
+    } else {
+        // Add to favorites using .push()
+        favorites.push(recipeId);
+        recipe.favorite = true;
     }
+    
+    // Save to localStorage
+    localStorage.setItem('recipeFinder_favorites', JSON.stringify(favorites));
+    
+    // Update favorite button state
+    updateFavoriteButton(recipeId);
+    
+    console.log('Favorites updated:', favorites);
 }
+
+// Update favorite button state
+function updateFavoriteButton(recipeId) {
+    const buttons = document.querySelectorAll(`.btn-favorite[data-id="${recipeId}"]`);
+    const isFavorite = favorites.includes(recipeId);
+    
+    buttons.forEach(btn => {
+        btn.classList.toggle('favorited', isFavorite);
+        btn.title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+    });
+}
+
+// MEAL PLANNER FUNCTIONS
 
 // Add recipe to meal plan
 function addToPlan(recipeId) {
-    const recipe = recipes.find(r => r.id === recipeId);
+    const recipe = allRecipes.find(r => r.id === recipeId);
     if (!recipe) return;
     
-    // Check if recipe already in plan
+    // Check if recipe already in plan using .findIndex()
     const existingIndex = mealPlan.findIndex(item => item.id === recipe.id);
     
     if (existingIndex > -1) {
         // Update quantity if already exists
         mealPlan[existingIndex].quantity += 1;
     } else {
-        // Add new recipe to plan with quantity 1
+        // Add new recipe to plan with quantity 1 using spread operator
         mealPlan.push({
-            ...recipe, // Spread operator to copy recipe
+            ...recipe,
             quantity: 1,
             addedAt: new Date().toISOString()
         });
@@ -414,15 +516,14 @@ function addToPlan(recipeId) {
     updateMealPlanDisplay();
     
     // Show feedback
-    alert(`Added "${recipe.name}" to your meal plan!\n\nTotal in plan: ${mealPlan.length} recipes`);
-    console.log('Meal plan updated:', mealPlan);
+    alert(`✅ Added "${recipe.name}" to your meal plan!\n\n📊 Total in plan: ${mealPlan.length} recipes`);
 }
 
 // Remove recipe from plan
 function removeFromPlan(recipeId) {
     const index = mealPlan.findIndex(item => item.id === recipeId);
     if (index > -1) {
-        mealPlan.splice(index, 1);
+        mealPlan.splice(index, 1); // Using .splice()
         saveMealPlan();
         updateMealPlanDisplay();
     }
@@ -448,7 +549,7 @@ function updateMealPlanDisplay() {
         return;
     }
     
-    // Calculate statistics using array methods
+    // Calculate statistics using .reduce()
     const totalTime = mealPlan.reduce((sum, item) => 
         sum + (item.prepTime + item.cookTime), 0
     );
@@ -495,34 +596,143 @@ function clearMealPlan() {
         mealPlan = [];
         saveMealPlan();
         updateMealPlanDisplay();
-        alert('Meal plan cleared!');
+        alert('✅ Meal plan cleared!');
     }
 }
 
-// Update init() function:
-function init() {
-    console.log("Recipe Finder App Initialized");
+// SHOPPING LIST FUNCTIONS
+
+// Generate shopping list from meal plan
+function generateShoppingList() {
+    if (mealPlan.length === 0) {
+        alert('Your meal plan is empty! Add some recipes first.');
+        return;
+    }
     
-    // Display all recipes initially
-    displayRecipes(recipes);
+    // Use reduce to consolidate ingredients
+    const shoppingList = mealPlan.reduce((list, recipe) => {
+        recipe.ingredients.forEach(ingredient => {
+            const key = ingredient.name.toLowerCase();
+            
+            if (!list[key]) {
+                list[key] = {
+                    name: ingredient.name,
+                    amount: ingredient.amount,
+                    unit: ingredient.unit,
+                    recipes: [recipe.name]
+                };
+            } else {
+                // Combine amounts
+                list[key].amount += ingredient.amount;
+                if (!list[key].recipes.includes(recipe.name)) {
+                    list[key].recipes.push(recipe.name);
+                }
+            }
+        });
+        
+        return list;
+    }, {});
     
-    // Update stats
-    updateStats(recipes);
+    // Convert to array and sort using .sort()
+    const sortedList = Object.values(shoppingList)
+        .sort((a, b) => a.name.localeCompare(b.name));
     
-    // Initialize meal plan
-    initMealPlan();
-    
-    // Setup event listeners
-    setupEventListeners();
+    // Display shopping list
+    displayShoppingList(sortedList);
 }
 
-// Add to setupEventListeners():
-function setupEventListeners() {
-    // ... existing code ...
+// Display shopping list in modal
+function displayShoppingList(items) {
+    const listHTML = items.map(item => `
+        <div class="shopping-item">
+            <div class="item-info">
+                <h4>${item.name}</h4>
+                <p><strong>${item.amount} ${item.unit}</strong></p>
+                <p><small>For: ${item.recipes.join(', ')}</small></p>
+            </div>
+            <input type="checkbox" class="item-checkbox">
+        </div>
+    `).join('');
     
-    // Clear plan button
-    const clearPlanBtn = document.getElementById('clearPlanBtn');
-    if (clearPlanBtn) {
-        clearPlanBtn.addEventListener('click', clearMealPlan);
-    }
+    document.getElementById('shoppingListContent').innerHTML = listHTML;
+    shoppingModal.classList.add('active');
 }
+
+// Print shopping list
+function printShoppingList() {
+    const printContent = document.getElementById('shoppingListContent').innerHTML;
+    const originalContent = document.body.innerHTML;
+    
+    document.body.innerHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Shopping List</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: #333; }
+                .shopping-item { margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #eee; }
+            </style>
+        </head>
+        <body>
+            <h1><i class="fas fa-shopping-cart"></i> Shopping List</h1>
+            ${printContent}
+            <p style="margin-top: 30px; color: #666;">Generated by Recipe Finder</p>
+        </body>
+        </html>
+    `;
+    
+    window.print();
+    document.body.innerHTML = originalContent;
+    window.location.reload(); // Reload to restore event listeners
+}
+
+// EXPORT DATA FUNCTION
+function exportData() {
+    const data = {
+        app: "Recipe Finder",
+        version: "1.0",
+        exportedAt: new Date().toISOString(),
+        recipes: allRecipes,
+        mealPlan: mealPlan,
+        favorites: favorites
+    };
+    
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `recipe-finder-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Data exported successfully!');
+}
+
+// Initialize app when page loads
+document.addEventListener('DOMContentLoaded', init);
+
+// Log array methods used for learning
+console.log('%c📚 Array Methods Demonstrated:', 'color: #4CAF50; font-size: 16px; font-weight: bold;');
+console.log('1. .filter() - Filter recipes by ingredients/time/servings');
+console.log('2. .map() - Create HTML elements from data');
+console.log('3. .reduce() - Calculate totals and consolidate data');
+console.log('4. .sort() - Sort recipes by various criteria');
+console.log('5. .some() - Check if recipe contains ANY ingredient');
+console.log('6. .every() - Check if recipe contains ALL ingredients');
+console.log('7. .find() - Find specific recipe by ID');
+console.log('8. .findIndex() - Find position of item in array');
+console.log('9. .forEach() - Loop through arrays/DOM elements');
+console.log('10. .includes() - Check if array contains value');
+console.log('11. .indexOf() - Find position of value in array');
+console.log('12. .slice() - Take portion of array');
+console.log('13. .splice() - Remove items from array');
+console.log('14. .join() - Convert array to string');
+console.log('15. .push() - Add items to end of array');
+console.log('16. Spread operator [...] - Copy arrays');
+console.log('17. Set() - Store unique values');
+console.log('18. Object.values() - Convert object to array');

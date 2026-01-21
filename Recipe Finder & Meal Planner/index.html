@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Recipe Finder</title>
+    <title>Recipe Finder - Array Methods Demo</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-utensils"></i> Recipe Finder</h1>
-            <p class="subtitle">Find recipes by ingredients you have</p>
+            <p class="subtitle">Find recipes using array methods: filter(), map(), reduce(), sort()</p>
         </header>
 
         <main>
@@ -50,6 +50,15 @@
                                 <option value="4">4+ servings</option>
                             </select>
                             
+                            <select id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="quick">Quick Meals</option>
+                                <option value="healthy">Healthy</option>
+                                <option value="dinner">Dinner</option>
+                                <option value="breakfast">Breakfast</option>
+                            </select>
+                            
                             <select id="sortBy">
                                 <option value="name">Sort by Name</option>
                                 <option value="time">Sort by Time</option>
@@ -68,6 +77,38 @@
                 </div>
             </section>
 
+            <!-- Quick Stats -->
+            <div class="stats-dashboard">
+                <div class="stat-card">
+                    <i class="fas fa-utensils"></i>
+                    <div>
+                        <h3 id="totalRecipeCount">0</h3>
+                        <p>Total Recipes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-bolt"></i>
+                    <div>
+                        <h3 id="quickRecipeCount">0</h3>
+                        <p>Quick Recipes (&lt;30 min)</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-leaf"></i>
+                    <div>
+                        <h3 id="vegRecipeCount">0</h3>
+                        <p>Vegetarian Recipes</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-tags"></i>
+                    <div>
+                        <h3 id="totalTags">0</h3>
+                        <p>Unique Tags</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Results Section -->
             <section class="results-section">
                 <div class="results-header">
@@ -75,6 +116,9 @@
                     <div class="results-info">
                         <span id="totalRecipes">0 recipes</span>
                         <span id="avgTime">0 min avg</span>
+                        <button id="exportBtn" class="btn-small">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
                     </div>
                 </div>
                 
@@ -88,33 +132,60 @@
                     <p>Try different ingredients or adjust your filters</p>
                 </div>
             </section>
+
             <!-- Meal Planner Section -->
-<section class="planner-section" style="margin-top: 2rem;">
-    <div class="planner-header">
-        <h3><i class="fas fa-calendar-alt"></i> Simple Meal Planner</h3>
-        <button id="clearPlanBtn" class="btn" style="background-color: var(--pastel-coral);">
-            <i class="fas fa-trash"></i> Clear Plan
-        </button>
-    </div>
-    
-    <div class="plan-summary">
-        <div class="plan-stats">
-            <span><i class="fas fa-utensils"></i> <span id="planCount">0</span> meals</span>
-            <span><i class="fas fa-clock"></i> <span id="planTime">0</span> min total</span>
-            <span><i class="fas fa-shopping-cart"></i> <span id="ingredientCount">0</span> ingredients</span>
-        </div>
-    </div>
-    
-    <div class="plan-days" id="planContainer">
-        <!-- Meal plan will be loaded here -->
-        <p class="empty-plan">No meals planned yet. Add recipes using "Add to Plan" button!</p>
-    </div>
-</section>
+            <section class="planner-section">
+                <div class="planner-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Meal Planner</h3>
+                    <div class="planner-buttons">
+                        <button id="generateListBtn" class="btn-small" style="background-color: var(--pastel-peach);">
+                            <i class="fas fa-shopping-cart"></i> Shopping List
+                        </button>
+                        <button id="clearPlanBtn" class="btn-small" style="background-color: var(--pastel-coral);">
+                            <i class="fas fa-trash"></i> Clear Plan
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="plan-summary">
+                    <div class="plan-stats">
+                        <span><i class="fas fa-utensils"></i> <span id="planCount">0</span> meals</span>
+                        <span><i class="fas fa-clock"></i> <span id="planTime">0</span> min total</span>
+                        <span><i class="fas fa-shopping-cart"></i> <span id="ingredientCount">0</span> ingredients</span>
+                    </div>
+                </div>
+                
+                <div class="plan-days" id="planContainer">
+                    <!-- Meal plan will be loaded here -->
+                    <p class="empty-plan">No meals planned yet. Add recipes using "Add to Plan" button!</p>
+                </div>
+            </section>
         </main>
 
         <footer>
-            <p>Built with vanilla JavaScript • Demonstrates array methods</p>
+            <p>Built with vanilla JavaScript • Demonstrates array methods: filter(), map(), reduce(), sort(), some(), every()</p>
         </footer>
+    </div>
+
+    <!-- Shopping List Modal -->
+    <div id="shoppingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shopping-cart"></i> Shopping List</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="shoppingListContent">
+                <!-- Shopping list items will go here -->
+            </div>
+            <div class="modal-footer">
+                <button id="printListBtn" class="btn">
+                    <i class="fas fa-print"></i> Print List
+                </button>
+                <button id="closeModalBtn" class="btn">
+                    Close
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
