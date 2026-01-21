@@ -1,12 +1,14 @@
-/* CSS Variables for pastel theme */
+/* Netflix-inspired Dark Theme */
 :root {
-    --pastel-mint: #A8E6CF;
-    --pastel-cream: #DCEDC1;
-    --pastel-peach: #FFD3B6;
-    --pastel-coral: #FFAAA5;
-    --pastel-light: #F9F7F7;
-    --pastel-dark: #698474;
-    --text-color: #5D5D5D;
+    --netflix-black: #141414;
+    --netflix-dark: #181818;
+    --netflix-gray: #2D2D2D;
+    --netflix-light-gray: #808080;
+    --netflix-white: #FFFFFF;
+    --netflix-red: #E50914;
+    --netflix-red-hover: #F40612;
+    --card-bg: #2D2D2D;
+    --card-hover: #404040;
 }
 
 /* Reset and Base Styles */
@@ -17,164 +19,444 @@
 }
 
 body {
-    font-family: Verdana, Geneva, Tahoma, sans-serif, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-family: Verdana, Geneva, Tahoma, sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--netflix-black);
+    color: var(--netflix-white);
     line-height: 1.6;
-    color: var(--text-color);
-    background: linear-gradient(135deg, var(--pastel-light) 0%, #f0f7f4 100%);
-    min-height: 100vh;
 }
 
-.container {
-    max-width: 1200px;
+/* Netflix Navigation */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.7) 10%, transparent);
+    z-index: 1000;
+    padding: 1rem 4%;
+    transition: background-color 0.3s;
+}
+
+.navbar.scrolled {
+    background-color: var(--netflix-black);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 2rem;
 }
 
-/* Header */
-header {
-    text-align: center;
-    margin-bottom: 2rem;
-    padding: 2rem;
-    background-color: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
 }
 
-header h1 {
-    color: var(--pastel-dark);
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--netflix-red);
 }
 
-header h1 i {
-    color: var(--pastel-coral);
-    margin-right: 10px;
+.logo i {
+    font-size: 2rem;
 }
 
-.subtitle {
-    color: var(--pastel-dark);
-    font-size: 1.1rem;
-    opacity: 0.8;
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
 }
 
-/* Buttons */
-.btn {
-    padding: 1rem 2rem;
-    background-color: var(--pastel-mint);
-    color: var(--pastel-dark);
+.nav-links a {
+    color: var(--netflix-white);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--netflix-red);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.search-box {
+    display: flex;
+    background: var(--netflix-gray);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.search-box input {
+    background: transparent;
     border: none;
-    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--netflix-white);
+    width: 200px;
+}
+
+.search-box input:focus {
+    outline: none;
+}
+
+.search-box button {
+    background: transparent;
+    border: none;
+    color: var(--netflix-white);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-notification {
+    background: none;
+    border: none;
+    color: var(--netflix-white);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.profile-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.profile-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+/* Hero Section - Netflix Style */
+.hero {
+    height: 70vh;
+    position: relative;
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+                url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    padding: 0 4%;
+    margin-top: 60px;
+}
+
+.hero-content {
+    max-width: 600px;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--netflix-red), #FFD700);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: var(--netflix-white);
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hero-search {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.hero-search input {
+    flex: 1;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    color: var(--netflix-white);
+    font-size: 1rem;
+}
+
+.hero-search input:focus {
+    outline: none;
+    border-color: var(--netflix-red);
+}
+
+.hero-search-btn {
+    background: var(--netflix-red);
+    color: var(--netflix-white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 4px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    transition: background-color 0.3s;
 }
 
-.btn:hover {
-    background-color: var(--pastel-dark);
-    color: white;
-    transform: translateY(-2px);
+.hero-search-btn:hover {
+    background: var(--netflix-red-hover);
 }
 
-.btn-small {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-}
-
-/* Search Section */
-.search-section {
-    background-color: white;
-    border-radius: 15px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.input-group {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.input-group input {
-    flex: 1;
-    padding: 1rem;
-    border: 2px solid var(--pastel-cream);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-.input-group input:focus {
-    outline: none;
-    border-color: var(--pastel-mint);
-}
-
-.filter-options {
-    padding: 1.5rem;
-    background-color: var(--pastel-light);
-    border-radius: 10px;
-}
-
-.filter-group {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.filter-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.filter-row {
+.hero-tags {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-.filter-row select {
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--pastel-cream);
-    border-radius: 8px;
-    background-color: white;
-    color: var(--text-color);
-    font-size: 0.9rem;
-    cursor: pointer;
-    min-width: 150px;
-}
-
-.sample-search {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--pastel-cream);
-}
-
-.sample-tag {
-    display: inline-block;
+.tag {
+    background: rgba(255,255,255,0.1);
     padding: 0.5rem 1rem;
-    background-color: var(--pastel-peach);
-    color: var(--pastel-dark);
     border-radius: 20px;
-    margin: 0 0.5rem;
+    font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s;
 }
 
-.sample-tag:hover {
-    background-color: var(--pastel-coral);
-    color: white;
+.tag:hover {
+    background: var(--netflix-red);
     transform: translateY(-2px);
 }
 
-/* Stats Dashboard */
-.stats-dashboard {
+.hero-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, var(--netflix-black));
+}
+
+/* Main Content */
+.main-content {
+    padding: 2rem 4%;
+}
+
+/* Content Rows - Netflix Style */
+.content-row {
+    margin-bottom: 3rem;
+}
+
+.row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.row-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.row-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-dropdown select {
+    background: var(--netflix-gray);
+    color: var(--netflix-white);
+    border: 1px solid var(--netflix-light-gray);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.view-btn {
+    background: var(--netflix-gray);
+    color: var(--netflix-white);
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-btn.active {
+    background: var(--netflix-red);
+}
+
+.row-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Recipe Cards - Netflix Style */
+.recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.recipe-card {
+    background: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s;
+    position: relative;
+    cursor: pointer;
+}
+
+.recipe-card:hover {
+    transform: scale(1.05);
+    z-index: 10;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.recipe-card:hover .recipe-actions {
+    opacity: 1;
+}
+
+.recipe-image {
+    height: 120px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    position: relative;
+}
+
+.recipe-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    padding: 1rem;
+}
+
+.recipe-card:hover .recipe-overlay {
+    opacity: 1;
+}
+
+.recipe-content {
+    padding: 1rem;
+}
+
+.recipe-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recipe-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--netflix-light-gray);
+    margin-bottom: 0.5rem;
+}
+
+.recipe-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.recipe-tag {
+    background: var(--netflix-black);
+    color: var(--netflix-light-gray);
+    padding: 0.1rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+}
+
+.recipe-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.btn-favorite {
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-favorite.favorited {
+    color: var(--netflix-red);
+}
+
+.btn-favorite:hover {
+    background: var(--netflix-red);
+    color: white;
+}
+
+.btn-add {
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-add:hover {
+    background: var(--netflix-red);
+}
+
+/* Stats Row */
+.stats-row {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
@@ -182,284 +464,206 @@ header h1 i {
 }
 
 .stat-card {
-    background: white;
-    border-radius: 10px;
+    background: var(--netflix-gray);
+    border-radius: 8px;
     padding: 1.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.3s;
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+}
+
+.stat-card.dark {
+    background: linear-gradient(135deg, var(--netflix-red), #9b1b1b);
 }
 
 .stat-card i {
     font-size: 2rem;
-    color: var(--pastel-mint);
+    color: var(--netflix-red);
 }
 
-.stat-card h3 {
-    color: var(--pastel-dark);
-    font-size: 1.5rem;
-    margin: 0;
-}
-
-.stat-card p {
-    color: var(--text-color);
-    opacity: 0.8;
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-/* Results Section */
-.results-section {
-    background-color: white;
-    border-radius: 15px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--pastel-cream);
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.results-header h2 {
-    color: var(--pastel-dark);
-}
-
-.results-info {
-    display: flex;
-    gap: 1.5rem;
-    color: var(--text-color);
-    opacity: 0.8;
-    align-items: center;
-}
-
-.recipes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.recipe-card {
-    background-color: var(--pastel-light);
-    border-radius: 10px;
-    overflow: hidden;
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: 1px solid var(--pastel-cream);
-}
-
-.recipe-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.recipe-image {
-    height: 150px;
-    background: linear-gradient(135deg, var(--pastel-peach), var(--pastel-coral));
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.stat-card.dark i {
     color: white;
-    font-size: 3rem;
 }
 
-.recipe-content {
-    padding: 1.5rem;
-}
-
-.recipe-title {
-    color: var(--pastel-dark);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-}
-
-.recipe-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-    font-size: 0.9rem;
-}
-
-.recipe-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.tag {
-    background-color: var(--pastel-cream);
-    color: var(--pastel-dark);
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.recipe-ingredients {
-    font-size: 0.9rem;
-    color: var(--text-color);
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
-}
-
-.recipe-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.recipe-actions .btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-}
-
-.btn-favorite {
-    background: none;
-    border: none;
-    color: #ccc;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-    transition: color 0.3s;
-}
-
-.btn-favorite.favorited {
-    color: var(--pastel-coral);
-}
-
-.btn-favorite:hover {
-    color: var(--pastel-coral);
-}
-
-.no-results {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-color);
-}
-
-.no-results i {
-    font-size: 3rem;
-    color: var(--pastel-cream);
-    margin-bottom: 1rem;
-}
-
-.no-results h3 {
-    color: var(--pastel-dark);
-    margin-bottom: 0.5rem;
-}
-
-/* Meal Planner Styles */
-.planner-section {
-    background-color: white;
-    border-radius: 15px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.planner-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--pastel-cream);
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.planner-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.plan-summary {
-    background-color: var(--pastel-light);
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.plan-stats {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.plan-stats span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    color: var(--pastel-dark);
-}
-
-.plan-days {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.meal-plan-item {
-    background-color: var(--pastel-light);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-left: 4px solid var(--pastel-mint);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.3s;
-}
-
-.meal-plan-item:hover {
-    transform: translateX(5px);
-}
-
-.meal-plan-info h4 {
-    color: var(--pastel-dark);
+.stat-info h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
     margin-bottom: 0.25rem;
 }
 
-.meal-plan-info p {
+.stat-info p {
+    color: var(--netflix-light-gray);
     font-size: 0.9rem;
-    color: var(--text-color);
-    opacity: 0.8;
 }
 
-.meal-plan-actions button {
+.stat-card.dark p {
+    color: rgba(255,255,255,0.8);
+}
+
+/* Meal Plan */
+.plan-container {
+    background: var(--netflix-dark);
+    border-radius: 8px;
+    padding: 2rem;
+    min-height: 200px;
+}
+
+.plan-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.plan-item {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.plan-info h4 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.plan-info p {
+    font-size: 0.8rem;
+    color: var(--netflix-light-gray);
+}
+
+.plan-actions button {
     background: none;
     border: none;
-    color: var(--pastel-coral);
+    color: var(--netflix-red);
     cursor: pointer;
     font-size: 1rem;
-    padding: 0.5rem;
 }
 
-.empty-plan {
+.empty-state {
     text-align: center;
-    padding: 2rem;
-    color: var(--text-color);
-    opacity: 0.7;
-    font-style: italic;
-    grid-column: 1 / -1;
+    padding: 3rem;
+    color: var(--netflix-light-gray);
 }
 
-/* Modal Styles */
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--netflix-gray);
+}
+
+/* Favorites Grid */
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Categories Row */
+.categories-row {
+    margin: 3rem 0;
+}
+
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.category-card {
+    background: var(--netflix-gray);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.category-card:hover {
+    transform: scale(1.05);
+    background: var(--netflix-red);
+}
+
+.category-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.category-image.veg { background: linear-gradient(135deg, #4CAF50, #2E7D32); }
+.category-image.quick { background: linear-gradient(135deg, #FF9800, #F57C00); }
+.category-image.healthy { background: linear-gradient(135deg, #2196F3, #1976D2); }
+.category-image.dinner { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+
+/* Buttons */
+.btn-primary {
+    background: var(--netflix-red);
+    color: var(--netflix-white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background: var(--netflix-red-hover);
+}
+
+.btn-secondary {
+    background: var(--netflix-gray);
+    color: var(--netflix-white);
+    border: 1px solid var(--netflix-light-gray);
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    background: var(--netflix-light-gray);
+}
+
+.btn-danger {
+    background: transparent;
+    color: var(--netflix-red);
+    border: 1px solid var(--netflix-red);
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+}
+
+.btn-danger:hover {
+    background: var(--netflix-red);
+    color: var(--netflix-white);
+}
+
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -467,41 +671,55 @@ header h1 i {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
 }
 
 .modal.active {
     display: flex;
 }
 
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    max-width: 500px;
+.dark-modal {
+    background: var(--netflix-dark);
+    border-radius: 8px;
     width: 90%;
+    max-width: 600px;
     max-height: 80vh;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .modal-header {
+    padding: 1.5rem;
+    background: var(--netflix-black);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--pastel-cream);
+    border-bottom: 1px solid var(--netflix-gray);
 }
 
 .modal-header .close-modal {
     background: none;
     border: none;
+    color: var(--netflix-white);
     font-size: 1.5rem;
-    color: var(--pastel-coral);
     cursor: pointer;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    background: var(--netflix-black);
+    border-top: 1px solid var(--netflix-gray);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 .shopping-item {
@@ -509,80 +727,149 @@ header h1 i {
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    border-bottom: 1px solid #eee;
-}
-
-.shopping-item:last-child {
-    border-bottom: none;
-}
-
-.item-checkbox {
-    transform: scale(1.5);
-}
-
-.modal-footer {
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 2px solid var(--pastel-cream);
+    background: var(--netflix-gray);
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
 }
 
 /* Footer */
-footer {
+.footer {
+    background: var(--netflix-black);
+    padding: 3rem 4%;
+    margin-top: 3rem;
+    border-top: 1px solid var(--netflix-gray);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.footer-section .logo {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.footer-tagline {
+    color: var(--netflix-light-gray);
+    font-size: 0.9rem;
+}
+
+.footer-section h4 {
+    color: var(--netflix-white);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: var(--netflix-light-gray);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--netflix-red);
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-links a {
+    color: var(--netflix-light-gray);
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+
+.social-links a:hover {
+    color: var(--netflix-red);
+}
+
+.footer-bottom {
+    max-width: 1400px;
+    margin: 2rem auto 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--netflix-gray);
     text-align: center;
-    margin-top: 2rem;
-    padding: 2rem;
-    color: var(--pastel-dark);
-    opacity: 0.8;
+    color: var(--netflix-light-gray);
+    font-size: 0.8rem;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: 1rem;
-    }
-    
-    .input-group {
-        flex-direction: column;
-    }
-    
-    .filter-group {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .filter-row {
-        flex-direction: column;
+@media (max-width: 1024px) {
+    .hero-title {
+        font-size: 2.5rem;
     }
     
     .recipes-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
     }
     
-    .results-header {
+    .nav-links {
+        display: none;
+    }
+    
+    .hero {
+        height: 60vh;
+        margin-top: 50px;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .hero-search {
+        flex-direction: column;
+    }
+    
+    .row-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 1rem;
     }
     
-    .plan-days {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-dashboard {
-        grid-template-columns: repeat(2, 1fr);
+    .recipes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
 }
 
 @media (max-width: 480px) {
-    .stats-dashboard {
-        grid-template-columns: 1fr;
+    .hero {
+        height: 50vh;
     }
     
-    .plan-stats {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
+    .hero-title {
+        font-size: 1.5rem;
+    }
+    
+    .stats-row {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .recipes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
