@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Recipe Finder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-utensils"></i> Recipe Finder</h1>
+            <p class="subtitle">Find recipes by ingredients you have</p>
+        </header>
+
+        <main>
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-box">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" placeholder="Enter ingredients (comma separated)...">
+                        <button id="searchBtn" class="btn">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                    
+                    <div class="filter-options">
+                        <div class="filter-group">
+                            <label>
+                                <input type="radio" name="matchType" value="any" checked>
+                                Contains ANY ingredient
+                            </label>
+                            <label>
+                                <input type="radio" name="matchType" value="all">
+                                Contains ALL ingredients
+                            </label>
+                        </div>
+                        
+                        <div class="filter-row">
+                            <select id="timeFilter">
+                                <option value="">Any Time</option>
+                                <option value="30">Under 30 min</option>
+                                <option value="60">Under 60 min</option>
+                            </select>
+                            
+                            <select id="servingsFilter">
+                                <option value="">Any Servings</option>
+                                <option value="2">2+ servings</option>
+                                <option value="4">4+ servings</option>
+                            </select>
+                            
+                            <select id="sortBy">
+                                <option value="name">Sort by Name</option>
+                                <option value="time">Sort by Time</option>
+                                <option value="servings">Sort by Servings</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sample-search">
+                    <p>Try searching for: 
+                        <span class="sample-tag" data-search="chicken, rice">chicken, rice</span>
+                        <span class="sample-tag" data-search="pasta, tomato">pasta, tomato</span>
+                        <span class="sample-tag" data-search="eggs, milk">eggs, milk</span>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <div class="results-header">
+                    <h2 id="resultsCount">Loading recipes...</h2>
+                    <div class="results-info">
+                        <span id="totalRecipes">0 recipes</span>
+                        <span id="avgTime">0 min avg</span>
+                    </div>
+                </div>
+                
+                <div class="recipes-grid" id="recipesContainer">
+                    <!-- Recipes will load here -->
+                </div>
+                
+                <div class="no-results" id="noResults" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>No recipes found</h3>
+                    <p>Try different ingredients or adjust your filters</p>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built with vanilla JavaScript • Demonstrates array methods</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
