@@ -88,6 +88,28 @@
                     <p>Try different ingredients or adjust your filters</p>
                 </div>
             </section>
+            <!-- Meal Planner Section -->
+<section class="planner-section" style="margin-top: 2rem;">
+    <div class="planner-header">
+        <h3><i class="fas fa-calendar-alt"></i> Simple Meal Planner</h3>
+        <button id="clearPlanBtn" class="btn" style="background-color: var(--pastel-coral);">
+            <i class="fas fa-trash"></i> Clear Plan
+        </button>
+    </div>
+    
+    <div class="plan-summary">
+        <div class="plan-stats">
+            <span><i class="fas fa-utensils"></i> <span id="planCount">0</span> meals</span>
+            <span><i class="fas fa-clock"></i> <span id="planTime">0</span> min total</span>
+            <span><i class="fas fa-shopping-cart"></i> <span id="ingredientCount">0</span> ingredients</span>
+        </div>
+    </div>
+    
+    <div class="plan-days" id="planContainer">
+        <!-- Meal plan will be loaded here -->
+        <p class="empty-plan">No meals planned yet. Add recipes using "Add to Plan" button!</p>
+    </div>
+</section>
         </main>
 
         <footer>
