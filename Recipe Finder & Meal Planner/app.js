@@ -374,3 +374,155 @@ console.log('- .some() - Checking if recipe contains any ingredient');
 console.log('- .every() - Checking if recipe contains all ingredients');
 console.log('- .forEach() - Setting up event listeners');
 console.log('- Spread operator [...] - Creating copies of arrays');
+
+// Meal Plan State
+let mealPlan = [];
+
+// Initialize meal plan from localStorage
+function initMealPlan() {
+    const savedPlan = localStorage.getItem('recipeFinder_mealPlan');
+    if (savedPlan) {
+        mealPlan = JSON.parse(savedPlan);
+        updateMealPlanDisplay();
+    }
+}
+
+// Add recipe to meal plan
+function addToPlan(recipeId) {
+    const recipe = recipes.find(r => r.id === recipeId);
+    if (!recipe) return;
+    
+    // Check if recipe already in plan
+    const existingIndex = mealPlan.findIndex(item => item.id === recipe.id);
+    
+    if (existingIndex > -1) {
+        // Update quantity if already exists
+        mealPlan[existingIndex].quantity += 1;
+    } else {
+        // Add new recipe to plan with quantity 1
+        mealPlan.push({
+            ...recipe, // Spread operator to copy recipe
+            quantity: 1,
+            addedAt: new Date().toISOString()
+        });
+    }
+    
+    // Save to localStorage
+    saveMealPlan();
+    
+    // Update display
+    updateMealPlanDisplay();
+    
+    // Show feedback
+    alert(`Added "${recipe.name}" to your meal plan!\n\nTotal in plan: ${mealPlan.length} recipes`);
+    console.log('Meal plan updated:', mealPlan);
+}
+
+// Remove recipe from plan
+function removeFromPlan(recipeId) {
+    const index = mealPlan.findIndex(item => item.id === recipeId);
+    if (index > -1) {
+        mealPlan.splice(index, 1);
+        saveMealPlan();
+        updateMealPlanDisplay();
+    }
+}
+
+// Save meal plan to localStorage
+function saveMealPlan() {
+    localStorage.setItem('recipeFinder_mealPlan', JSON.stringify(mealPlan));
+}
+
+// Update meal plan display
+function updateMealPlanDisplay() {
+    const planContainer = document.getElementById('planContainer');
+    const planCount = document.getElementById('planCount');
+    const planTime = document.getElementById('planTime');
+    const ingredientCount = document.getElementById('ingredientCount');
+    
+    if (mealPlan.length === 0) {
+        planContainer.innerHTML = '<p class="empty-plan">No meals planned yet. Add recipes using "Add to Plan" button!</p>';
+        planCount.textContent = '0';
+        planTime.textContent = '0';
+        ingredientCount.textContent = '0';
+        return;
+    }
+    
+    // Calculate statistics using array methods
+    const totalTime = mealPlan.reduce((sum, item) => 
+        sum + (item.prepTime + item.cookTime), 0
+    );
+    
+    const totalIngredients = mealPlan.reduce((sum, item) => 
+        sum + item.ingredients.length, 0
+    );
+    
+    // Update stats
+    planCount.textContent = mealPlan.length;
+    planTime.textContent = totalTime;
+    ingredientCount.textContent = totalIngredients;
+    
+    // Create plan items using .map()
+    const planItems = mealPlan.map(item => `
+        <div class="meal-plan-item">
+            <div class="meal-plan-info">
+                <h4>${item.name}</h4>
+                <p>${item.prepTime + item.cookTime} min • ${item.servings} servings</p>
+                <p><small>Ingredients: ${item.ingredients.length}</small></p>
+            </div>
+            <div class="meal-plan-actions">
+                <button class="remove-plan-btn" data-id="${item.id}" title="Remove from plan">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    planContainer.innerHTML = planItems;
+    
+    // Add event listeners to remove buttons
+    document.querySelectorAll('.remove-plan-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const recipeId = parseInt(e.target.closest('button').dataset.id);
+            removeFromPlan(recipeId);
+        });
+    });
+}
+
+// Clear meal plan
+function clearMealPlan() {
+    if (mealPlan.length > 0 && confirm('Clear your entire meal plan?')) {
+        mealPlan = [];
+        saveMealPlan();
+        updateMealPlanDisplay();
+        alert('Meal plan cleared!');
+    }
+}
+
+// Update init() function:
+function init() {
+    console.log("Recipe Finder App Initialized");
+    
+    // Display all recipes initially
+    displayRecipes(recipes);
+    
+    // Update stats
+    updateStats(recipes);
+    
+    // Initialize meal plan
+    initMealPlan();
+    
+    // Setup event listeners
+    setupEventListeners();
+}
+
+// Add to setupEventListeners():
+function setupEventListeners() {
+    // ... existing code ...
+    
+    // Clear plan button
+    const clearPlanBtn = document.getElementById('clearPlanBtn');
+    if (clearPlanBtn) {
+        clearPlanBtn.addEventListener('click', clearMealPlan);
+    }
+}
