@@ -1,4 +1,4 @@
-/* style.css */
+/* Root Variables */
 :root {
     --terminal-bg: #0a0e14;
     --terminal-glow: #00ffff;
@@ -6,6 +6,15 @@
     --led-off: #003322;
     --scanline: rgba(0, 255, 255, 0.05);
     --card-gradient: linear-gradient(135deg, #001122 0%, #003344 100%);
+    --error-color: #ff4444;
+    --success-color: #00ff9d;
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 /* CRT Monitor Effects */
@@ -13,7 +22,8 @@ body {
     background: #000;
     font-family: 'Courier New', monospace;
     color: var(--terminal-glow);
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
     position: relative;
 }
 
@@ -23,17 +33,15 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-        repeating-linear-gradient(
-            0deg,
-            rgba(0, 0, 0, 0.15) 0px,
-            rgba(0, 0, 0, 0.15) 1px,
-            transparent 1px,
-            transparent 2px
-        );
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
     pointer-events: none;
     z-index: 9999;
-    mix-blend-mode: overlay;
 }
 
 .scanlines {
@@ -65,9 +73,8 @@ body {
     background: var(--terminal-bg);
     border: 2px solid var(--terminal-glow);
     border-radius: 8px;
-    box-shadow: 
-        0 0 30px rgba(0, 255, 255, 0.3),
-        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
 }
@@ -83,21 +90,10 @@ body {
 }
 
 .led-text {
-    position: relative;
     font-size: 1.5rem;
     font-weight: bold;
     letter-spacing: 3px;
     text-shadow: 0 0 10px currentColor;
-}
-
-.led-text::after {
-    content: attr(data-text);
-    position: absolute;
-    left: 2px;
-    top: 2px;
-    color: var(--terminal-glow);
-    filter: blur(3px);
-    z-index: -1;
 }
 
 .led-clock {
@@ -114,15 +110,58 @@ body {
     50% { opacity: 0.7; }
 }
 
-/* 3D Bank Cards */
+/* Dashboard Layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.terminal-panel {
+    background: rgba(0, 20, 20, 0.3);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.panel-title {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.title-icon {
+    color: var(--led-on);
+}
+
+.blinking-cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Bank Cards */
+.card-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .bank-card {
     background: var(--card-gradient);
     border: 1px solid rgba(0, 255, 255, 0.3);
     border-radius: 12px;
     padding: 1.5rem;
-    margin: 1rem 0;
-    transform-style: preserve-3d;
-    transition: transform 0.3s ease;
+    cursor: pointer;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
@@ -134,15 +173,27 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, transparent 30%, rgba(0, 255, 255, 0.1) 70%);
-    transform: rotate(45deg);
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-.bank-card:hover {
-    transform: perspective(1000px) rotateY(10deg) translateZ(20px);
-    box-shadow: 
-        0 10px 30px rgba(0, 255, 255, 0.2),
-        inset 0 0 20px rgba(0, 255, 255, 0.1);
+.bank-card:hover::before,
+.bank-card:focus::before {
+    opacity: 1;
+}
+
+.bank-card:hover,
+.bank-card:focus {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+    border-color: var(--terminal-glow);
+    outline: none;
+}
+
+.bank-card.selected {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    border-color: var(--led-on);
 }
 
 .card-chip {
@@ -165,7 +216,126 @@ body {
     border-radius: 2px;
 }
 
-/* Terminal Buttons with LED */
+.card-number {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+
+.card-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.card-name {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.card-balance {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--led-on);
+}
+
+.card-progress {
+    height: 4px;
+    background: rgba(0, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--terminal-glow), var(--led-on));
+    width: 0%;
+    transition: width 1s ease-in-out;
+}
+
+/* Transaction Ledger */
+.ledger-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.ledger-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ledger-container::-webkit-scrollbar-track {
+    background: rgba(0, 20, 20, 0.5);
+}
+
+.ledger-container::-webkit-scrollbar-thumb {
+    background: var(--terminal-glow);
+    border-radius: 4px;
+}
+
+.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.ledger-table th {
+    background: rgba(0, 50, 50, 0.5);
+    padding: 0.8rem;
+    text-align: left;
+    border-bottom: 2px solid var(--terminal-glow);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.ledger-table td {
+    padding: 0.8rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+.ledger-table tr {
+    transition: all 0.2s ease;
+}
+
+.ledger-table tbody tr:hover {
+    background: rgba(0, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.no-transactions {
+    text-align: center;
+    opacity: 0.5;
+    padding: 2rem !important;
+}
+
+.credit {
+    color: var(--success-color);
+}
+
+.debit {
+    color: var(--error-color);
+}
+
+/* Control Panel */
+.control-panel {
+    background: rgba(0, 30, 30, 0.3);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 1.5rem;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
 .terminal-btn {
     background: linear-gradient(to bottom, #002222, #001111);
     border: 2px solid var(--terminal-glow);
@@ -178,7 +348,10 @@ body {
     cursor: pointer;
     position: relative;
     transition: all 0.2s ease;
-    transform-style: preserve-3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .terminal-btn::before {
@@ -192,9 +365,17 @@ body {
     border-radius: 4px;
 }
 
+.terminal-btn:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
 .terminal-btn:active {
     transform: translateY(2px) scale(0.98);
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.terminal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .btn-led {
@@ -203,34 +384,44 @@ body {
     height: 8px;
     background: var(--led-off);
     border-radius: 50%;
-    margin-left: 0.5rem;
     box-shadow: 0 0 5px currentColor;
+    transition: background 0.2s ease;
 }
 
 .terminal-btn:hover .btn-led {
     background: var(--led-on);
-    animation: blink 1s infinite;
+    animation: led-blink 1s infinite;
 }
 
-@keyframes blink {
+@keyframes led-blink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    50% { opacity: 0.3; }
 }
 
-/* Analog Dial Input */
+/* Input Dial */
+.input-dial {
+    margin-top: 1.5rem;
+}
+
+.dial-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
 .dial-container {
     position: relative;
-    width: 200px;
-    margin: 1rem auto;
+    margin-bottom: 1rem;
 }
 
 input[type="range"] {
-    -webkit-appearance: none;
     width: 100%;
-    height: 4px;
+    height: 6px;
     background: linear-gradient(to right, #001111, var(--terminal-glow));
-    border-radius: 2px;
+    border-radius: 3px;
     outline: none;
+    -webkit-appearance: none;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -243,92 +434,48 @@ input[type="range"]::-webkit-slider-thumb {
     box-shadow: 0 0 10px currentColor;
 }
 
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--terminal-glow);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px currentColor;
+    border: none;
+}
+
 .dial-display {
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
+    text-align: center;
     background: #001111;
     padding: 0.5rem 1rem;
     border: 1px solid var(--terminal-glow);
     border-radius: 4px;
-    min-width: 100px;
+    margin-bottom: 0.5rem;
+}
+
+.dial-value {
+    font-size: 1.2rem;
+    color: var(--led-on);
+}
+
+.amount-text-input {
+    width: 100%;
+    background: #001111;
+    border: 1px solid var(--terminal-glow);
+    color: var(--terminal-glow);
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 1rem;
+    border-radius: 4px;
     text-align: center;
 }
 
-.dial-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, transparent 30%, rgba(0, 255, 255, 0.1) 70%);
-    border-radius: inherit;
-}
-
-/* Transaction Table with Holographic Effect */
-.ledger-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 0.9rem;
-}
-
-.ledger-table th {
-    background: rgba(0, 50, 50, 0.5);
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 2px solid var(--terminal-glow);
-    position: sticky;
-    top: 0;
-}
-
-.ledger-table tr {
-    background: rgba(0, 20, 20, 0.3);
-    transition: all 0.2s ease;
-}
-
-.ledger-table tr:nth-child(even) {
-    background: rgba(0, 30, 30, 0.3);
-}
-
-.ledger-table tr:hover {
-    background: rgba(0, 255, 255, 0.1);
-    transform: translateX(10px);
-}
-
-/* CRT Modal */
-.crt-modal {
-    background: var(--terminal-bg);
-    border: 2px solid var(--terminal-glow);
-    border-radius: 8px;
-    padding: 2rem;
-    color: var(--terminal-glow);
-    max-width: 500px;
-    box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-}
-
-.crt-modal::backdrop {
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(3px);
-}
-
-.modal-input, .modal-select {
-    background: #001111;
-    border: 1px solid var(--terminal-glow);
-    color: inherit;
-    padding: 0.5rem;
-    font-family: inherit;
-    width: 100%;
-    border-radius: 4px;
-}
-
-.modal-input:focus, .modal-select:focus {
+.amount-text-input:focus {
     outline: none;
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
-/* Status Bar with Memory Usage Animation */
+/* Status Bar */
 .status-bar {
     display: flex;
     justify-content: space-between;
@@ -337,6 +484,14 @@ input[type="range"]::-webkit-slider-thumb {
     background: linear-gradient(to right, #001111, #002222);
     border-top: 1px solid var(--terminal-glow);
     font-size: 0.8rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .status-led {
@@ -353,20 +508,232 @@ input[type="range"]::-webkit-slider-thumb {
     50% { opacity: 0.3; }
 }
 
-/* Responsive Layout */
-.dashboard {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 2rem;
-    padding: 2rem;
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
 }
 
+.crt-modal {
+    background: var(--terminal-bg);
+    border: 2px solid var(--terminal-glow);
+    border-radius: 8px;
+    padding: 2rem;
+    color: var(--terminal-glow);
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.form-grid {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.input-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.modal-input,
+.modal-select {
+    background: #001111;
+    border: 1px solid var(--terminal-glow);
+    color: var(--terminal-glow);
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 1rem;
+    border-radius: 4px;
+}
+
+.modal-input:focus,
+.modal-select:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.modal-btn {
+    background: linear-gradient(to bottom, #002222, #001111);
+    border: 2px solid var(--terminal-glow);
+    border-radius: 6px;
+    color: var(--terminal-glow);
+    padding: 0.8rem 2rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-btn:hover {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.modal-btn.confirm {
+    border-color: var(--led-on);
+    color: var(--led-on);
+}
+
+.modal-btn.cancel {
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+
+/* Analytics Modal */
+.analytics-modal {
+    max-width: 600px;
+}
+
+.analytics-content {
+    margin-bottom: 1.5rem;
+}
+
+.analytics-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.analytics-cat {
+    min-width: 120px;
+}
+
+.analytics-bar {
+    flex: 1;
+    height: 30px;
+    background: linear-gradient(90deg, var(--terminal-glow), var(--led-on));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.analytics-percent {
+    min-width: 60px;
+    text-align: right;
+    color: var(--led-on);
+}
+
+/* Notifications */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.notification {
+    background: rgba(0, 20, 20, 0.95);
+    border: 1px solid var(--terminal-glow);
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideIn 0.5s forwards;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.notification.success {
+    border-color: var(--success-color);
+}
+
+.notification.error {
+    border-color: var(--error-color);
+}
+
+.notification-led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--led-on);
+    animation: led-blink 1s infinite;
+}
+
+.notification.error .notification-led {
+    background: var(--error-color);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
     .dashboard {
         grid-template-columns: 1fr;
     }
-    
-    .bank-card:hover {
-        transform: none;
+
+    .button-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .banking-terminal {
+        margin: 1rem;
+    }
+
+    .dashboard {
+        padding: 1rem;
+    }
+
+    .led-display {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .status-bar {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

@@ -1,121 +1,51 @@
-// bank.js
+// Bank Account Class
 class BankAccount {
-    #balance;
-    #transactions;
-    #accountNumber;
-    
-    constructor(owner, type, initialBalance = 0) {
-        this.owner = owner;
+    constructor(type, number, initialBalance = 0) {
         this.type = type;
-        this.#balance = initialBalance;
-        this.#accountNumber = this.#generateAccountNumber();
-        this.#transactions = [];
-        this.createdAt = new Date();
+        this.number = number;
+        this.balance = initialBalance;
+        this.transactions = [];
     }
-    
-    // Private method (closure)
-    #generateAccountNumber() {
-        const prefix = 'FIN';
-        const random = () => Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        return `${prefix}-${random()}-${random()}`;
+
+    deposit(amount, description) {
+        if (amount <= 0) {
+            throw new Error('Amount must be positive');
+        }
+
+        this.balance += amount;
+        this.addTransaction('deposit', amount, description);
+        return this.balance;
     }
-    
-    // Getter
-    get balance() {
-        return this.#balance;
+
+    withdraw(amount, description) {
+        if (amount <= 0) {
+            throw new Error('Amount must be positive');
+        }
+        if (amount > this.balance) {
+            throw new Error('Insufficient funds');
+        }
+
+        this.balance -= amount;
+        this.addTransaction('withdrawal', -amount, description);
+        return this.balance;
     }
-    
-    get accountNumber() {
-        return this.#accountNumber;
-    }
-    
-    get transactions() {
-        return [...this.#transactions]; // Return copy for encapsulation
-    }
-    
-    // Methods with validation
-    deposit(amount, description = 'Deposit') {
-        if (amount <= 0) throw new Error('Amount must be positive');
-        
-        this.#balance += amount;
-        this.#addTransaction('deposit', amount, description);
-        this.#updateUI();
-        return this.#balance;
-    }
-    
-    withdraw(amount, description = 'Withdrawal') {
-        if (amount <= 0) throw new Error('Amount must be positive');
-        if (amount > this.#balance) throw new Error('Insufficient funds');
-        
-        this.#balance -= amount;
-        this.#addTransaction('withdrawal', -amount, description);
-        this.#updateUI();
-        return this.#balance;
-    }
-    
-    transfer(amount, toAccount, description = 'Transfer') {
-        this.withdraw(amount, `Transfer to ${toAccount.accountNumber}`);
-        toAccount.deposit(amount, `Transfer from ${this.accountNumber}`);
-        return this.#balance;
-    }
-    
-    // Private method
-    #addTransaction(type, amount, description) {
+
+    addTransaction(type, amount, description) {
         const transaction = {
-            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+            id: Date.now() + Math.random().toString(36).substr(2, 9),
             date: new Date(),
-            type,
-            amount,
-            description,
-            balanceAfter: this.#balance
+            type: type,
+            amount: amount,
+            description: description,
+            balanceAfter: this.balance
         };
-        
-        this.#transactions.unshift(transaction); // Add to beginning
-        this.#saveToStorage();
-        
+
+        this.transactions.unshift(transaction);
         return transaction;
     }
-    
-    // LocalStorage integration
-    #saveToStorage() {
-        const data = {
-            owner: this.owner,
-            type: this.type,
-            balance: this.#balance,
-            accountNumber: this.#accountNumber,
-            transactions: this.#transactions
-        };
-        localStorage.setItem(this.#accountNumber, JSON.stringify(data));
-    }
-    
-    #updateUI() {
-        // Update balance display
-        const balanceEl = document.querySelector(`[data-account="${this.type}"] .card-balance`);
-        if (balanceEl) {
-            balanceEl.textContent = `$${this.#balance.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })}`;
-        }
-        
-        // Update transaction list
-        this.renderTransactions();
-    }
-    
-    renderTransactions() {
-        const tbody = document.getElementById('transaction-list');
-        if (!tbody) return;
-        
-        tbody.innerHTML = this.#transactions.slice(0, 10).map(trans => `
-            <tr>
-                <td>${trans.date.toLocaleDateString()}</td>
-                <td>${trans.description}</td>
-                <td class="${trans.amount >= 0 ? 'credit' : 'debit'}">
-                    ${trans.amount >= 0 ? '+' : ''}$${Math.abs(trans.amount).toFixed(2)}
-                </td>
-                <td>$${trans.balanceAfter.toFixed(2)}</td>
-            </tr>
-        `).join('');
+
+    getRecentTransactions(limit = 10) {
+        return this.transactions.slice(0, limit);
     }
 }
 
@@ -126,348 +56,440 @@ class FinFlowApp {
         this.currentAccount = null;
         this.init();
     }
-    
+
     init() {
-        // Load from localStorage or create demo accounts
-        this.loadAccounts();
-        
-        // Set up event listeners
+        this.createAccounts();
         this.setupEventListeners();
-        
-        // Start animations
         this.startAnimations();
-        
-        // Initial render
         this.render();
     }
-    
-    loadAccounts() {
-        // Try loading from localStorage
-        const keys = Object.keys(localStorage);
-        const bankKeys = keys.filter(key => key.startsWith('FIN-'));
-        
-        if (bankKeys.length > 0) {
-            bankKeys.forEach(key => {
-                const data = JSON.parse(localStorage.getItem(key));
-                const account = new BankAccount(data.owner, data.type, data.balance);
-                // Manually restore transactions (constructor doesn't handle this)
-                account.transactions = data.transactions;
-                this.accounts.set(key, account);
-            });
-        } else {
-            // Create demo accounts
-            const checking = new BankAccount('John Doe', 'main', 2450.00);
-            const savings = new BankAccount('John Doe', 'savings', 12500.00);
-            
-            // Add some demo transactions
-            checking.deposit(500, 'Paycheck');
-            checking.withdraw(150, 'Grocery Store');
-            checking.deposit(300, 'Freelance Work');
-            
-            savings.deposit(1000, 'Monthly Savings');
-            
-            this.accounts.set(checking.accountNumber, checking);
-            this.accounts.set(savings.accountNumber, savings);
-            
-            this.currentAccount = checking;
-        }
+
+    createAccounts() {
+        // Create checking account
+        const checking = new BankAccount('checking', '4512', 2450.00);
+        checking.deposit(1500, 'Paycheck Deposit');
+        checking.withdraw(250, 'Grocery Store');
+        checking.deposit(800, 'Freelance Payment');
+        checking.withdraw(150, 'Gas Station');
+        checking.deposit(450, 'Tax Refund');
+
+        // Create savings account
+        const savings = new BankAccount('savings', '7834', 12500.00);
+        savings.deposit(2000, 'Monthly Savings');
+        savings.deposit(500, 'Birthday Gift');
+        savings.withdraw(300, 'Emergency Fund');
+        savings.deposit(1000, 'Bonus');
+
+        this.accounts.set('checking', checking);
+        this.accounts.set('savings', savings);
+        this.currentAccount = checking;
     }
-    
+
     setupEventListeners() {
-        // Terminal button clicks
-        document.querySelectorAll('.terminal-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const action = btn.dataset.action;
-                this.handleAction(action);
-                
-                // Button press animation
-                btn.classList.add('pressed');
-                setTimeout(() => btn.classList.remove('pressed'), 200);
-            });
-        });
-        
-        // Amount dial interaction
-        const dial = document.getElementById('amount-dial');
-        const dialValue = document.querySelector('.dial-value');
-        
-        dial.addEventListener('input', (e) => {
-            const value = parseInt(e.target.value);
-            dialValue.textContent = `$${value.toLocaleString()}`;
-            
-            // Create visual feedback
-            const dialDisplay = document.querySelector('.dial-display');
-            dialDisplay.style.transform = `translateX(-50%) scale(${1 + value / 10000})`;
-        });
-        
-        // Modal form submission
-        const modal = document.getElementById('transaction-modal');
-        modal.addEventListener('close', (e) => {
-            if (modal.returnValue === 'confirm') {
-                const formData = new FormData(modal.querySelector('form'));
-                this.processTransaction(formData);
-            }
-        });
-        
         // Bank card selection
         document.querySelectorAll('.bank-card').forEach(card => {
-            card.addEventListener('click', (e) => {
+            card.addEventListener('click', () => {
                 const accountType = card.dataset.account;
                 this.selectAccount(accountType);
-                
-                // Visual feedback
-                document.querySelectorAll('.bank-card').forEach(c => {
-                    c.classList.remove('selected');
-                });
-                card.classList.add('selected');
+            });
+
+            card.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const accountType = card.dataset.account;
+                    this.selectAccount(accountType);
+                }
             });
         });
-        
-        // Real-time clock
+
+        // Action buttons
+        document.querySelectorAll('.terminal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                this.handleAction(action);
+            });
+        });
+
+        // Amount dial
+        const dial = document.getElementById('amount-dial');
+        const dialValue = document.getElementById('dial-value');
+        const amountInput = document.getElementById('amount-input');
+
+        dial.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            dialValue.textContent = `$${value.toFixed(2)}`;
+            amountInput.value = value.toFixed(2);
+        });
+
+        amountInput.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value) || 0;
+            if (value <= 5000) {
+                dial.value = value;
+                dialValue.textContent = `$${value.toFixed(2)}`;
+            }
+        });
+
+        // Transaction form
+        const form = document.getElementById('transaction-form');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.processTransaction(new FormData(form));
+        });
+
+        // Transaction type change
+        const transactionType = document.getElementById('transaction-type');
+        transactionType.addEventListener('change', () => {
+            this.updateModalForTransactionType();
+        });
+
+        // Modal cancel buttons
+        document.getElementById('modal-cancel').addEventListener('click', () => {
+            this.closeModal('transaction-modal');
+        });
+
+        document.getElementById('analytics-close').addEventListener('click', () => {
+            this.closeModal('analytics-modal');
+        });
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+        // Clock update
         this.updateClock();
         setInterval(() => this.updateClock(), 1000);
-        
+
         // Memory usage simulation
         this.updateMemoryUsage();
         setInterval(() => this.updateMemoryUsage(), 3000);
     }
-    
+
+    selectAccount(accountType) {
+        const account = this.accounts.get(accountType);
+        if (!account) return;
+
+        this.currentAccount = account;
+
+        // Update visual selection
+        document.querySelectorAll('.bank-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelector(`[data-account="${accountType}"]`).classList.add('selected');
+
+        // Update transactions display
+        this.renderTransactions();
+        this.showNotification(`${accountType.toUpperCase()} ACCOUNT SELECTED`, 'info');
+    }
+
     handleAction(action) {
-        const modal = document.getElementById('transaction-modal');
-        
+        if (!this.currentAccount && action !== 'analytics') {
+            this.showNotification('Please select an account first', 'error');
+            return;
+        }
+
         switch(action) {
             case 'deposit':
             case 'withdraw':
             case 'transfer':
-                modal.showModal();
-                modal.querySelector('[name="type"]').value = action;
+                this.openTransactionModal(action);
                 break;
-                
             case 'analytics':
                 this.showAnalytics();
                 break;
         }
     }
-    
+
+    openTransactionModal(type) {
+        const modal = document.getElementById('transaction-modal');
+        const form = document.getElementById('transaction-form');
+        const typeSelect = document.getElementById('transaction-type');
+        const amountInput = document.getElementById('transaction-amount');
+        const descInput = document.getElementById('transaction-description');
+        const transferAccount = document.getElementById('transfer-account');
+
+        // Reset form
+        form.reset();
+        typeSelect.value = type;
+        
+        // Set amount from dial
+        const dialValue = parseFloat(document.getElementById('amount-input').value) || 0;
+        if (dialValue > 0) {
+            amountInput.value = dialValue.toFixed(2);
+        }
+
+        // Update modal title and fields
+        this.updateModalForTransactionType();
+
+        // Update transfer account options
+        if (this.currentAccount) {
+            const otherAccount = this.currentAccount.type === 'checking' ? 'savings' : 'checking';
+            transferAccount.value = otherAccount;
+        }
+
+        modal.style.display = 'flex';
+        amountInput.focus();
+    }
+
+    updateModalForTransactionType() {
+        const type = document.getElementById('transaction-type').value;
+        const modalTitle = document.getElementById('modal-title');
+        const transferGroup = document.getElementById('transfer-account-group');
+
+        modalTitle.textContent = `${type.toUpperCase()} CONSOLE`;
+        transferGroup.style.display = type === 'transfer' ? 'block' : 'none';
+    }
+
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        modal.style.display = 'none';
+    }
+
     processTransaction(formData) {
         const type = formData.get('type');
         const amount = parseFloat(formData.get('amount'));
-        const description = formData.get('description');
-        
-        if (!this.currentAccount || !amount || amount <= 0) return;
-        
+        const description = formData.get('description').trim();
+        const toAccountType = formData.get('toAccount');
+
+        if (!amount || amount <= 0) {
+            this.showNotification('Invalid amount', 'error');
+            return;
+        }
+
+        if (!description) {
+            this.showNotification('Description required', 'error');
+            return;
+        }
+
         try {
             switch(type) {
                 case 'deposit':
                     this.currentAccount.deposit(amount, description);
+                    this.showNotification(`Deposited $${amount.toFixed(2)}`, 'success');
                     break;
+
                 case 'withdraw':
                     this.currentAccount.withdraw(amount, description);
+                    this.showNotification(`Withdrew $${amount.toFixed(2)}`, 'success');
                     break;
+
                 case 'transfer':
-                    // For demo, transfer to savings account
-                    const savings = Array.from(this.accounts.values())
-                        .find(acc => acc.type === 'savings');
-                    if (savings) {
-                        this.currentAccount.transfer(amount, savings, description);
+                    const toAccount = this.accounts.get(toAccountType);
+                    if (!toAccount) {
+                        throw new Error('Invalid destination account');
                     }
+                    this.currentAccount.withdraw(amount, `Transfer to ${toAccountType}`);
+                    toAccount.deposit(amount, `Transfer from ${this.currentAccount.type}`);
+                    this.showNotification(`Transferred $${amount.toFixed(2)} to ${toAccountType}`, 'success');
                     break;
             }
-            
-            // Visual confirmation
-            this.showNotification(`${type.toUpperCase()} COMPLETE`, 'success');
-            
+
+            // Update UI
+            this.render();
+            this.closeModal('transaction-modal');
+
+            // Reset dial
+            document.getElementById('amount-dial').value = 0;
+            document.getElementById('amount-input').value = '';
+            document.getElementById('dial-value').textContent = '$0.00';
+
         } catch (error) {
             this.showNotification(error.message, 'error');
         }
     }
-    
-    selectAccount(accountType) {
-        this.currentAccount = Array.from(this.accounts.values())
-            .find(acc => acc.type === accountType);
-        
-        if (this.currentAccount) {
-            this.currentAccount.renderTransactions();
-            this.showNotification(`${accountType.toUpperCase()} SELECTED`, 'info');
-        }
-    }
-    
+
     showAnalytics() {
-        // Create a simple spending chart using CSS gradients
-        const transactions = this.currentAccount?.transactions || [];
+        if (!this.currentAccount) {
+            this.showNotification('Please select an account first', 'error');
+            return;
+        }
+
+        const transactions = this.currentAccount.transactions;
         const spending = transactions.filter(t => t.amount < 0);
-        
-        if (spending.length === 0) return;
-        
+
+        if (spending.length === 0) {
+            this.showNotification('No spending data available', 'error');
+            return;
+        }
+
         const totalSpent = spending.reduce((sum, t) => sum + Math.abs(t.amount), 0);
         const categories = {};
-        
+
+        // Categorize spending
         spending.forEach(trans => {
-            // Simple category detection
             const desc = trans.description.toLowerCase();
             let category = 'Other';
-            
-            if (desc.includes('grocery')) category = 'Food';
-            else if (desc.includes('fuel') || desc.includes('gas')) category = 'Transport';
-            else if (desc.includes('netflix') || desc.includes('spotify')) category = 'Entertainment';
-            
+
+            if (desc.includes('grocery') || desc.includes('food')) {
+                category = 'Food & Groceries';
+            } else if (desc.includes('gas') || desc.includes('fuel') || desc.includes('transport')) {
+                category = 'Transportation';
+            } else if (desc.includes('transfer')) {
+                category = 'Transfers';
+            } else if (desc.includes('emergency') || desc.includes('medical')) {
+                category = 'Emergency';
+            }
+
             categories[category] = (categories[category] || 0) + Math.abs(trans.amount);
         });
-        
-        // Display analytics
-        const analyticsHTML = Object.entries(categories)
-            .map(([cat, amount]) => {
-                const percent = (amount / totalSpent * 100).toFixed(1);
+
+        // Sort categories by amount
+        const sortedCategories = Object.entries(categories)
+            .sort((a, b) => b[1] - a[1]);
+
+        // Generate analytics HTML
+        const analyticsContent = document.getElementById('analytics-content');
+        analyticsContent.innerHTML = `
+            <div style="margin-bottom: 1.5rem; text-align: center;">
+                <div style="font-size: 0.9rem; opacity: 0.8;">Total Spending</div>
+                <div style="font-size: 2rem; color: var(--led-on);">$${totalSpent.toFixed(2)}</div>
+            </div>
+            ${sortedCategories.map(([cat, amount]) => {
+                const percent = (amount / totalSpent * 100);
                 return `
                     <div class="analytics-row">
                         <span class="analytics-cat">${cat}</span>
-                        <div class="analytics-bar" style="--width: ${percent}%"></div>
-                        <span class="analytics-percent">${percent}%</span>
+                        <div class="analytics-bar" style="width: ${percent}%"></div>
+                        <span class="analytics-percent">${percent.toFixed(1)}%</span>
                     </div>
                 `;
-            }).join('');
-        
-        // Show in modal or dedicated area
-        this.showNotification('ANALYTICS GENERATED', 'info');
-        
-        // For demo, just log to console
-        console.table(categories);
+            }).join('')}
+        `;
+
+        document.getElementById('analytics-modal').style.display = 'flex';
     }
-    
-    // UI Utility Methods
+
+    renderTransactions() {
+        const tbody = document.getElementById('transaction-list');
+        if (!this.currentAccount) {
+            tbody.innerHTML = '<tr><td colspan="4" class="no-transactions">SELECT AN ACCOUNT</td></tr>';
+            return;
+        }
+
+        const transactions = this.currentAccount.getRecentTransactions();
+        
+        if (transactions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="no-transactions">NO TRANSACTIONS</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = transactions.map(trans => `
+            <tr>
+                <td>${trans.date.toLocaleDateString()}</td>
+                <td>${trans.description}</td>
+                <td class="${trans.amount >= 0 ? 'credit' : 'debit'}">
+                    ${trans.amount >= 0 ? '+' : ''}$${Math.abs(trans.amount).toFixed(2)}
+                </td>
+                <td>$${trans.balanceAfter.toFixed(2)}</td>
+            </tr>
+        `).join('');
+    }
+
+    render() {
+        // Update all account balances and progress bars
+        this.accounts.forEach((account, type) => {
+            const balanceEl = document.getElementById(`${type}-balance`);
+            const progressBar = document.getElementById(`${type}-progress`);
+
+            if (balanceEl) {
+                balanceEl.textContent = `$${account.balance.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })}`;
+            }
+
+            if (progressBar) {
+                // Calculate progress based on a max value (e.g., $20,000)
+                const maxValue = 20000;
+                const percent = Math.min((account.balance / maxValue) * 100, 100);
+                setTimeout(() => {
+                    progressBar.style.width = `${percent}%`;
+                }, 100);
+            }
+        });
+
+        // Update transactions for current account
+        this.renderTransactions();
+    }
+
     updateClock() {
         const clock = document.getElementById('digital-clock');
-        if (clock) {
-            const now = new Date();
-            clock.textContent = now.toLocaleTimeString('en-US', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-        }
+        if (!clock) return;
+
+        const now = new Date();
+        clock.textContent = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
     }
-    
+
     updateMemoryUsage() {
         const memoryEl = document.getElementById('memory-usage');
-        if (memoryEl) {
-            // Simulate realistic memory usage
-            const usage = 70 + Math.random() * 30;
-            memoryEl.textContent = `${Math.round(usage)}%`;
-            
-            // Change LED color based on usage
-            const statusLed = document.querySelector('.status-led');
-            if (usage > 90) {
-                statusLed.style.background = '#ff0000';
-            } else if (usage > 80) {
-                statusLed.style.background = '#ffff00';
-            } else {
-                statusLed.style.background = '#00ff9d';
-            }
+        const statusLed = document.querySelector('.status-led');
+        if (!memoryEl) return;
+
+        // Simulate realistic memory usage (70-95%)
+        const usage = 70 + Math.random() * 25;
+        memoryEl.textContent = `${Math.round(usage)}%`;
+
+        // Change LED color based on usage
+        if (usage > 90) {
+            statusLed.style.background = '#ff0000';
+        } else if (usage > 85) {
+            statusLed.style.background = '#ffff00';
+        } else {
+            statusLed.style.background = '#00ff9d';
         }
     }
-    
+
     showNotification(message, type = 'info') {
-        // Create notification element
+        const container = document.getElementById('notification-container');
         const notification = document.createElement('div');
+        
         notification.className = `notification ${type}`;
         notification.innerHTML = `
             <span class="notification-text">${message}</span>
             <span class="notification-led"></span>
         `;
-        
-        // Add to DOM
-        document.querySelector('.banking-terminal').appendChild(notification);
-        
-        // Remove after delay
+
+        container.appendChild(notification);
+
+        // Auto remove after 3 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.5s forwards';
-            setTimeout(() => notification.remove(), 500);
+            setTimeout(() => {
+                notification.remove();
+            }, 500);
         }, 3000);
     }
-    
+
     startAnimations() {
-        // Animate progress bars
-        document.querySelectorAll('.progress-bar').forEach(bar => {
-            const width = bar.style.getPropertyValue('--progress') || '0%';
-            bar.style.width = '0%';
-            
-            setTimeout(() => {
-                bar.style.transition = 'width 2s ease-in-out';
-                bar.style.width = width;
-            }, 500);
-        });
-        
-        // Random LED flickers
+        // Animate progress bars on load
+        setTimeout(() => {
+            this.render();
+        }, 300);
+
+        // Random LED flickers for visual interest
         setInterval(() => {
             const leds = document.querySelectorAll('.btn-led');
-            const randomLed = leds[Math.floor(Math.random() * leds.length)];
-            if (randomLed) {
-                randomLed.style.animation = 'none';
+            if (leds.length > 0) {
+                const randomLed = leds[Math.floor(Math.random() * leds.length)];
+                const originalBg = randomLed.style.background;
+                randomLed.style.background = 'var(--led-on)';
                 setTimeout(() => {
-                    randomLed.style.animation = 'blink 1s infinite';
-                }, 10);
+                    randomLed.style.background = originalBg || 'var(--led-off)';
+                }, 200);
             }
-        }, 3000);
-    }
-    
-    render() {
-        // Render all accounts
-        this.accounts.forEach(account => {
-            const card = document.querySelector(`[data-account="${account.type}"]`);
-            if (card) {
-                const balanceEl = card.querySelector('.card-balance');
-                if (balanceEl) {
-                    balanceEl.textContent = `$${account.balance.toFixed(2)}`;
-                }
-            }
-        });
-        
-        // Render transactions for current account
-        if (this.currentAccount) {
-            this.currentAccount.renderTransactions();
-        }
+        }, 4000);
     }
 }
 
-// Initialize app when DOM loads
+// Initialize application when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    window.finFlow = new FinFlowApp();
-    
-    // Add some CSS for dynamic elements
-    const style = document.createElement('style');
-    style.textContent = `
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 20, 20, 0.9);
-            border: 1px solid var(--terminal-glow);
-            padding: 1rem;
-            border-radius: 6px;
-            animation: slideIn 0.5s forwards;
-            z-index: 10000;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(100%); opacity: 0; }
-        }
-        
-        .credit { color: #00ff9d; }
-        .debit { color: #ff4444; }
-        
-        .pressed {
-            transform: translateY(4px) scale(0.98);
-        }
-        
-        .selected {
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5) !important;
-        }
-    `;
-    document.head.appendChild(style);
+    window.finFlowApp = new FinFlowApp();
 });
