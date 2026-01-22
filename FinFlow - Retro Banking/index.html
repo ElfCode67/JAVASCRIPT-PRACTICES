@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinFlow - Retro Banking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- CRT Monitor Effect -->
+    <div class="crt-overlay"></div>
+    <div class="scanlines"></div>
+    
+    <!-- Main Terminal -->
+    <main class="banking-terminal">
+        <!-- LED Header Display -->
+        <header class="led-display">
+            <div class="led-text" data-text="FINFLOW v1.0">
+                <span>FINFLOW v1.0</span>
+                <span class="led-glow"></span>
+            </div>
+            <time id="digital-clock" class="led-clock">00:00:00</time>
+        </header>
+        
+        <!-- Split Interface -->
+        <div class="dashboard">
+            <!-- Left Panel: Accounts -->
+            <section class="terminal-panel" data-panel="accounts">
+                <h2 class="panel-title">
+                    <span class="title-icon">█▓▒</span>
+                    ACCOUNTS
+                    <span class="blinking-cursor">_</span>
+                </h2>
+                
+                <!-- Account Cards with 3D tilt -->
+                <div class="card-stack">
+                    <article class="bank-card" data-account="main">
+                        <div class="card-chip"></div>
+                        <h3 class="card-number">**** 4512</h3>
+                        <div class="card-details">
+                            <span class="card-name">PRIMARY CHECKING</span>
+                            <output class="card-balance">$2,450.00</output>
+                        </div>
+                        <div class="card-progress">
+                            <div class="progress-bar" style="--progress: 65%"></div>
+                        </div>
+                    </article>
+                    
+                    <article class="bank-card" data-account="savings">
+                        <div class="card-chip"></div>
+                        <h3 class="card-number">**** 7834</h3>
+                        <div class="card-details">
+                            <span class="card-name">HIGH-YIELD SAVINGS</span>
+                            <output class="card-balance">$12,500.00</output>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            
+            <!-- Right Panel: Transactions & Controls -->
+            <section class="terminal-panel" data-panel="transactions">
+                <h2 class="panel-title">
+                    <span class="title-icon">█▓▒</span>
+                    TRANSACTION LEDGER
+                </h2>
+                
+                <!-- Transaction List (Virtual Scroll via JS) -->
+                <div class="ledger-container">
+                    <table class="ledger-table">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>DESCRIPTION</th>
+                                <th>AMOUNT</th>
+                                <th>BALANCE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-list">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Control Panel -->
+                <div class="control-panel">
+                    <!-- Physical-style buttons -->
+                    <div class="button-grid">
+                        <button class="terminal-btn" data-action="deposit" aria-label="Deposit">
+                            <span class="btn-label">DEPOSIT</span>
+                            <span class="btn-led" data-status="ready"></span>
+                        </button>
+                        
+                        <button class="terminal-btn" data-action="withdraw" aria-label="Withdraw">
+                            <span class="btn-label">WITHDRAW</span>
+                            <span class="btn-led"></span>
+                        </button>
+                        
+                        <button class="terminal-btn" data-action="transfer" aria-label="Transfer">
+                            <span class="btn-label">TRANSFER</span>
+                            <span class="btn-led"></span>
+                        </button>
+                        
+                        <button class="terminal-btn" data-action="analytics" aria-label="Analytics">
+                            <span class="btn-label">ANALYTICS</span>
+                            <span class="btn-led"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Analog-style input dials -->
+                    <div class="input-dial">
+                        <label for="amount-input" class="dial-label">AMOUNT</label>
+                        <div class="dial-container">
+                            <input type="range" id="amount-dial" min="0" max="10000" step="100" value="0">
+                            <div class="dial-display">
+                                <span class="dial-value">$0.00</span>
+                                <div class="dial-glow"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Bottom Status Bar -->
+        <footer class="status-bar">
+            <div class="status-led" data-status="online"></div>
+            <span class="status-text">SYSTEM: ONLINE</span>
+            <span class="status-crypto">ENCRYPTION: AES-256 ACTIVE</span>
+            <span class="status-memory">MEMORY: <span id="memory-usage">87%</span></span>
+        </footer>
+    </main>
+    
+    <!-- Modal for Transactions (Pure CSS/JS) -->
+    <dialog id="transaction-modal" class="crt-modal">
+        <form method="dialog" class="modal-form">
+            <h2 class="modal-title">TRANSACTION CONSOLE</h2>
+            <div class="form-grid">
+                <label class="input-label">
+                    <span class="label-text">TYPE</span>
+                    <select class="modal-select" name="type">
+                        <option value="deposit">DEPOSIT</option>
+                        <option value="withdraw">WITHDRAW</option>
+                        <option value="transfer">TRANSFER</option>
+                    </select>
+                </label>
+                
+                <label class="input-label">
+                    <span class="label-text">AMOUNT</span>
+                    <input type="number" class="modal-input" name="amount" step="0.01" required>
+                </label>
+                
+                <label class="input-label">
+                    <span class="label-text">DESCRIPTION</span>
+                    <input type="text" class="modal-input" name="description" maxlength="30" required>
+                </label>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="submit" class="modal-btn confirm" value="confirm">CONFIRM</button>
+                <button type="button" class="modal-btn cancel" onclick="this.closest('dialog').close()">ABORT</button>
+            </div>
+        </form>
+    </dialog>
+    
+    <script src="bank.js"></script>
+</body>
+</html>

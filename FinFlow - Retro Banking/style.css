@@ -1,0 +1,372 @@
+/* style.css */
+:root {
+    --terminal-bg: #0a0e14;
+    --terminal-glow: #00ffff;
+    --led-on: #00ff9d;
+    --led-off: #003322;
+    --scanline: rgba(0, 255, 255, 0.05);
+    --card-gradient: linear-gradient(135deg, #001122 0%, #003344 100%);
+}
+
+/* CRT Monitor Effects */
+body {
+    background: #000;
+    font-family: 'Courier New', monospace;
+    color: var(--terminal-glow);
+    overflow: hidden;
+    position: relative;
+}
+
+.crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            rgba(0, 0, 0, 0.15) 0px,
+            rgba(0, 0, 0, 0.15) 1px,
+            transparent 1px,
+            transparent 2px
+        );
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: overlay;
+}
+
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        transparent 50%,
+        var(--scanline) 51%
+    );
+    background-size: 100% 4px;
+    animation: scan 8s linear infinite;
+    pointer-events: none;
+    z-index: 9998;
+}
+
+@keyframes scan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(4px); }
+}
+
+/* Banking Terminal */
+.banking-terminal {
+    max-width: 1400px;
+    margin: 2rem auto;
+    background: var(--terminal-bg);
+    border: 2px solid var(--terminal-glow);
+    border-radius: 8px;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.3),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* LED Header Display */
+.led-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: linear-gradient(to right, #001111, #003333);
+    border-bottom: 1px solid var(--terminal-glow);
+}
+
+.led-text {
+    position: relative;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px currentColor;
+}
+
+.led-text::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    color: var(--terminal-glow);
+    filter: blur(3px);
+    z-index: -1;
+}
+
+.led-clock {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    background: #001a1a;
+    border: 1px solid var(--terminal-glow);
+    border-radius: 4px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* 3D Bank Cards */
+.bank-card {
+    background: var(--card-gradient);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    transform-style: preserve-3d;
+    transition: transform 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.bank-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, transparent 30%, rgba(0, 255, 255, 0.1) 70%);
+    transform: rotate(45deg);
+}
+
+.bank-card:hover {
+    transform: perspective(1000px) rotateY(10deg) translateZ(20px);
+    box-shadow: 
+        0 10px 30px rgba(0, 255, 255, 0.2),
+        inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+
+.card-chip {
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.card-chip::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+}
+
+/* Terminal Buttons with LED */
+.terminal-btn {
+    background: linear-gradient(to bottom, #002222, #001111);
+    border: 2px solid var(--terminal-glow);
+    border-radius: 6px;
+    color: var(--terminal-glow);
+    padding: 0.8rem 1.5rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    transform-style: preserve-3d;
+}
+
+.terminal-btn::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.terminal-btn:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.btn-led {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--led-off);
+    border-radius: 50%;
+    margin-left: 0.5rem;
+    box-shadow: 0 0 5px currentColor;
+}
+
+.terminal-btn:hover .btn-led {
+    background: var(--led-on);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Analog Dial Input */
+.dial-container {
+    position: relative;
+    width: 200px;
+    margin: 1rem auto;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to right, #001111, var(--terminal-glow));
+    border-radius: 2px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--terminal-glow);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.dial-display {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #001111;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--terminal-glow);
+    border-radius: 4px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.dial-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 30%, rgba(0, 255, 255, 0.1) 70%);
+    border-radius: inherit;
+}
+
+/* Transaction Table with Holographic Effect */
+.ledger-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem;
+}
+
+.ledger-table th {
+    background: rgba(0, 50, 50, 0.5);
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid var(--terminal-glow);
+    position: sticky;
+    top: 0;
+}
+
+.ledger-table tr {
+    background: rgba(0, 20, 20, 0.3);
+    transition: all 0.2s ease;
+}
+
+.ledger-table tr:nth-child(even) {
+    background: rgba(0, 30, 30, 0.3);
+}
+
+.ledger-table tr:hover {
+    background: rgba(0, 255, 255, 0.1);
+    transform: translateX(10px);
+}
+
+/* CRT Modal */
+.crt-modal {
+    background: var(--terminal-bg);
+    border: 2px solid var(--terminal-glow);
+    border-radius: 8px;
+    padding: 2rem;
+    color: var(--terminal-glow);
+    max-width: 500px;
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+}
+
+.crt-modal::backdrop {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(3px);
+}
+
+.modal-input, .modal-select {
+    background: #001111;
+    border: 1px solid var(--terminal-glow);
+    color: inherit;
+    padding: 0.5rem;
+    font-family: inherit;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.modal-input:focus, .modal-select:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Status Bar with Memory Usage Animation */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 2rem;
+    background: linear-gradient(to right, #001111, #002222);
+    border-top: 1px solid var(--terminal-glow);
+    font-size: 0.8rem;
+}
+
+.status-led {
+    width: 10px;
+    height: 10px;
+    background: var(--led-on);
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+    animation: status-pulse 2s infinite;
+}
+
+@keyframes status-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Responsive Layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .bank-card:hover {
+        transform: none;
+    }
+}
