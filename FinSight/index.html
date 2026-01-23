@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-book"></i> Library Management System</h1>
+            <p class="subtitle">Manage books, members, and borrowing with ease</p>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-label">Total Books:</span>
+                <span id="total-books" class="stat-value">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Available:</span>
+                <span id="available-books" class="stat-value">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Members:</span>
+                <span id="total-members" class="stat-value">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Books Borrowed:</span>
+                <span id="borrowed-books" class="stat-value">0</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="control-panel">
+                    <h2><i class="fas fa-cogs"></i> Control Panel</h2>
+                    
+                    <div class="form-group">
+                        <h3><i class="fas fa-book-medical"></i> Add New Book</h3>
+                        <select id="book-type" class="form-control">
+                            <option value="regular">Regular Book</option>
+                            <option value="ebook">E-Book</option>
+                            <option value="audiobook">Audio Book</option>
+                        </select>
+                        
+                        <div class="input-group">
+                            <input type="text" id="book-title" class="form-control" placeholder="Book Title">
+                            <input type="text" id="book-author" class="form-control" placeholder="Author">
+                        </div>
+                        
+                        <div class="input-group">
+                            <input type="text" id="book-isbn" class="form-control" placeholder="ISBN">
+                            <input type="number" id="book-year" class="form-control" placeholder="Year">
+                        </div>
+                        
+                        <div id="ebook-fields" class="special-fields hidden">
+                            <input type="text" id="ebook-format" class="form-control" placeholder="Format (PDF, EPUB)">
+                            <input type="number" id="ebook-size" class="form-control" placeholder="Size in MB">
+                        </div>
+                        
+                        <div id="audiobook-fields" class="special-fields hidden">
+                            <input type="text" id="audiobook-narrator" class="form-control" placeholder="Narrator">
+                            <input type="number" id="audiobook-duration" class="form-control" placeholder="Duration (minutes)">
+                        </div>
+                        
+                        <button id="add-book-btn" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Add Book
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3><i class="fas fa-user-plus"></i> Add New Member</h3>
+                        <div class="input-group">
+                            <input type="text" id="member-name" class="form-control" placeholder="Member Name">
+                            <input type="email" id="member-email" class="form-control" placeholder="Email">
+                        </div>
+                        <button id="add-member-btn" class="btn btn-secondary">
+                            <i class="fas fa-user-plus"></i> Add Member
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3><i class="fas fa-search"></i> Search & Filter</h3>
+                        <input type="text" id="search-input" class="form-control" placeholder="Search by title, author, ISBN...">
+                        <select id="filter-type" class="form-control">
+                            <option value="all">All Book Types</option>
+                            <option value="regular">Regular Books</option>
+                            <option value="ebook">E-Books</option>
+                            <option value="audiobook">Audio Books</option>
+                            <option value="available">Available Books</option>
+                            <option value="borrowed">Borrowed Books</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3><i class="fas fa-exchange-alt"></i> Borrow / Return</h3>
+                        <div class="input-group">
+                            <select id="borrow-book-select" class="form-control">
+                                <option value="">Select Book</option>
+                            </select>
+                            <select id="borrow-member-select" class="form-control">
+                                <option value="">Select Member</option>
+                            </select>
+                        </div>
+                        <button id="borrow-btn" class="btn btn-action borrow">
+                            <i class="fas fa-sign-out-alt"></i> Borrow Book
+                        </button>
+                        <button id="return-btn" class="btn btn-action return">
+                            <i class="fas fa-sign-in-alt"></i> Return Book
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <h3><i class="fas fa-database"></i> Data Management</h3>
+                        <div class="button-group">
+                            <button id="save-data-btn" class="btn btn-success">
+                                <i class="fas fa-save"></i> Save to Storage
+                            </button>
+                            <button id="load-data-btn" class="btn btn-info">
+                                <i class="fas fa-folder-open"></i> Load from Storage
+                            </button>
+                            <button id="clear-data-btn" class="btn btn-warning">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="books">
+                        <i class="fas fa-book"></i> Books
+                    </button>
+                    <button class="tab-btn" data-tab="members">
+                        <i class="fas fa-users"></i> Members
+                    </button>
+                    <button class="tab-btn" data-tab="borrowed">
+                        <i class="fas fa-clipboard-list"></i> Borrowed Books
+                    </button>
+                </div>
+                
+                <div class="tab-content active" id="books-tab">
+                    <h2><i class="fas fa-book-open"></i> Books Collection</h2>
+                    <div id="books-container" class="cards-container">
+                        <!-- Books will be displayed here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="members-tab">
+                    <h2><i class="fas fa-users"></i> Library Members</h2>
+                    <div id="members-container" class="cards-container">
+                        <!-- Members will be displayed here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="borrowed-tab">
+                    <h2><i class="fas fa-clipboard-list"></i> Currently Borrowed</h2>
+                    <div id="borrowed-container" class="cards-container">
+                        <!-- Borrowed books will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Library Management System &copy; 2023 | Built with ES6 Classes, Inheritance, localStorage</p>
+        </footer>
+    </div>
+
+    <script src="library.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

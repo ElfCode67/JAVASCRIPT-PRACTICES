@@ -1,7 +1,0 @@
-body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
-.container { max-width: 800px; margin: auto; }
-.form-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-input, select, button { padding: 10px; margin: 5px 0; display: block; width: 100%; }
-.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-.book-card { background: white; padding: 15px; border-left: 5px solid #007bff; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-#searchInput { margin-bottom: 20px; border: 2px solid #007bff; }
