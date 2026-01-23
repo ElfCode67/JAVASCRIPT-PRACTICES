@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES6 Library System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Library Management System</h1>
+        
+        <section class="form-section">
+            <h3>Add New Book</h3>
+            <form id="bookForm">
+                <input type="text" id="title" placeholder="Title" required>
+                <input type="text" id="author" placeholder="Author" required>
+                <select id="type">
+                    <option value="Regular">Regular Book</option>
+                    <option value="EBook">E-Book (MB)</option>
+                    <option value="AudioBook">Audio Book (Minutes)</option>
+                </select>
+                <input type="number" id="extraValue" placeholder="Size/Length">
+                <button type="submit">Add to Library</button>
+            </form>
+        </section>
+
+        <section class="stats">
+            <p id="totalBooks">Total Books: 0</p>
+        </section>
+
+        <input type="text" id="searchInput" placeholder="Search by title or author...">
+
+        <div id="bookList" class="book-grid"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
