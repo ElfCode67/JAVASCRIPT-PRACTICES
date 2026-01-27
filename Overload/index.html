@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IRON PROTOCOL // Workout Tracker</title>
+    <title>OVERLOAD // Workout Tracker</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1 class="logo">IRON PROTOCOL</h1>
+                <h1 class="logo">OVERLOAD</h1>
                 <div class="header-stats">
                     <div class="stat-item">
                         <span class="stat-label">WEEK</span>
@@ -138,22 +138,36 @@
                     </div>
                 </div>
                 
-                <!-- Volume Chart -->
-                <div class="chart-container">
-                    <h3 class="chart-title">TOTAL VOLUME (KG)</h3>
-                    <canvas id="volumeChart"></canvas>
+                <!-- Volume Stats Cards -->
+                <div class="stats-grid" id="volumeStats">
+                    <div class="stat-card">
+                        <div class="stat-card-label">TOTAL WORKOUTS</div>
+                        <div class="stat-card-value" id="totalWorkouts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-label">TOTAL VOLUME</div>
+                        <div class="stat-card-value" id="totalVolume">0 KG</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-label">AVG VOLUME/WORKOUT</div>
+                        <div class="stat-card-value" id="avgVolume">0 KG</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-label">TOTAL TIME</div>
+                        <div class="stat-card-value" id="totalTime">0 MIN</div>
+                    </div>
                 </div>
 
-                <!-- Exercise Progress -->
-                <div class="exercise-progress-container">
-                    <h3 class="chart-title">EXERCISE PROGRESSION</h3>
-                    <select id="exerciseSelect" class="exercise-select">
-                        <option value="">SELECT EXERCISE</option>
-                    </select>
-                    <canvas id="exerciseChart" class="hidden"></canvas>
-                    <div id="noProgressData" class="no-data">
-                        NO DATA AVAILABLE
-                    </div>
+                <!-- Workout Type Breakdown -->
+                <div class="breakdown-container">
+                    <h3 class="chart-title">WORKOUT BREAKDOWN</h3>
+                    <div class="breakdown-grid" id="workoutBreakdown"></div>
+                </div>
+
+                <!-- Exercise PRs -->
+                <div class="prs-container">
+                    <h3 class="chart-title">PERSONAL RECORDS</h3>
+                    <div class="prs-grid" id="personalRecords"></div>
                 </div>
             </section>
 

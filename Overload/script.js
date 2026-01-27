@@ -1,5 +1,5 @@
 /* ========================================
-   IRON PROTOCOL - FITNESS TRACKER
+   OVERLOAD - FITNESS TRACKER
    Main JavaScript Application
    ======================================== */
 
@@ -57,34 +57,34 @@ const EXERCISE_DATABASE = [
 // Preloaded workout programs
 const WORKOUT_PROGRAMS = {
     push: [
-        { exercise: 'Pec Deck', target: '150 lbs + 30 kg × 5.5', sets: 6 },
-        { exercise: 'Incline Chest Press', target: '50 lbs / 20 kg × 6', sets: 6 },
-        { exercise: 'Unilateral Triceps Extension', target: '100 lbs × 8', sets: 8 },
-        { exercise: 'Shoulder Press', target: '50 lbs × 4.5', sets: 5 },
-        { exercise: 'Reverse Curls', target: '140 lbs × 8', sets: 8 },
-        { exercise: 'Dips', target: '5 reps', sets: 5 },
-        { exercise: 'Abs', target: '150 lbs × 9', sets: 9 },
+        { exercise: 'Pec Deck', target: '150 lbs + 30 kg × 5.5', sets: 3 },
+        { exercise: 'Incline Chest Press', target: '50 lbs / 20 kg × 6', sets: 3 },
+        { exercise: 'Unilateral Triceps Extension', target: '100 lbs × 8', sets: 3 },
+        { exercise: 'Shoulder Press', target: '50 lbs × 4.5', sets: 3 },
+        { exercise: 'Reverse Curls', target: '140 lbs × 8', sets: 3 },
+        { exercise: 'Dips', target: '5 reps', sets: 3 },
+        { exercise: 'Abs', target: '150 lbs × 9', sets: 3 },
         { exercise: 'Cardio', target: '30 minutes', sets: 1 },
     ],
     pull: [
-        { exercise: 'Pull-Ups', target: '6 reps + 15 lbs × 5.5', sets: 6 },
-        { exercise: 'Lat Raise Machine', target: '13th Plate × 5.5', sets: 6 },
-        { exercise: 'Bicep Curl', target: '10 kg × 8', sets: 8 },
-        { exercise: 'T-Bar Row', target: '85 kg × 6', sets: 6 },
-        { exercise: 'Hammer Curl', target: '40 lbs × 5', sets: 5 },
-        { exercise: 'Cable Curl', target: '90 lbs × 5', sets: 5 },
-        { exercise: 'Seated Row', target: '45 kg × 8', sets: 8 },
+        { exercise: 'Pull-Ups', target: '6 reps + 15 lbs × 5.5', sets: 3 },
+        { exercise: 'Lat Raise Machine', target: '13th Plate × 5.5', sets: 3 },
+        { exercise: 'Bicep Curl', target: '10 kg × 8', sets: 3 },
+        { exercise: 'T-Bar Row', target: '85 kg × 6', sets: 3 },
+        { exercise: 'Hammer Curl', target: '40 lbs × 5', sets: 3 },
+        { exercise: 'Cable Curl', target: '90 lbs × 5', sets: 3 },
+        { exercise: 'Seated Row', target: '45 kg × 8', sets: 3 },
         { exercise: 'Cardio', target: '30 minutes', sets: 1 },
     ],
     legs: [
-        { exercise: 'Lying Leg Curl', target: '55 kg × 5', sets: 5 },
-        { exercise: 'Leg Press', target: '90 kg × 6', sets: 6 },
-        { exercise: 'Unilateral Calf Raises', target: '65 kg × 6', sets: 6 },
-        { exercise: 'Leg Extension', target: '85 kg × 6', sets: 6 },
-        { exercise: 'Stiff-Leg Deadlift', target: '40 kg × 5', sets: 5 },
+        { exercise: 'Lying Leg Curl', target: '55 kg × 5', sets: 3 },
+        { exercise: 'Leg Press', target: '90 kg × 6', sets: 3 },
+        { exercise: 'Unilateral Calf Raises', target: '65 kg × 6', sets: 3 },
+        { exercise: 'Leg Extension', target: '85 kg × 6', sets: 3 },
+        { exercise: 'Stiff-Leg Deadlift', target: '40 kg × 5', sets: 3 },
         { exercise: 'Hip Abduction', target: '150 lbs', sets: 3 },
         { exercise: 'Hip Adduction', target: '40 kg', sets: 3 },
-        { exercise: 'Abs', target: '150 lbs', sets: 9 },
+        { exercise: 'Abs', target: '150 lbs', sets: 3 },
         { exercise: 'Cardio', target: '20 minutes', sets: 1 },
     ],
 };
@@ -197,13 +197,8 @@ function setupEventListeners() {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            updateVolumeChart(e.target.dataset.period);
+            updateProgressStats(e.target.dataset.period);
         });
-    });
-    
-    // Exercise progress selector
-    document.getElementById('exerciseSelect').addEventListener('change', (e) => {
-        updateExerciseChart(e.target.value);
     });
 }
 
@@ -230,8 +225,7 @@ function switchView(viewName) {
     if (viewName === 'history') {
         renderHistory();
     } else if (viewName === 'progress') {
-        updateVolumeChart('week');
-        populateExerciseSelect();
+        updateProgressStats('week');
     }
 }
 
@@ -275,19 +269,22 @@ function createExerciseItem(item, index) {
     name.className = 'exercise-name';
     name.textContent = item.exercise;
     
-    const target = document.createElement('div');
-    target.className = 'exercise-target';
-    target.textContent = `TARGET: ${item.target}`;
-    
     header.appendChild(name);
-    header.appendChild(target);
+    
+    // Editable target weight input
+    const targetInput = document.createElement('input');
+    targetInput.type = 'text';
+    targetInput.className = 'target-input';
+    targetInput.placeholder = 'Target weight';
+    targetInput.value = item.target;
     
     const setList = document.createElement('div');
     setList.className = 'set-list';
     
-    // Create sets
+    // Create sets - 1 warmup + working sets
     for (let i = 0; i < item.sets; i++) {
-        const setItem = createSetItem(i + 1);
+        const setType = i === 0 ? 'warmup' : 'working';
+        const setItem = createSetItem(i + 1, setType);
         setList.appendChild(setItem);
     }
     
@@ -297,24 +294,30 @@ function createExerciseItem(item, index) {
     addSetBtn.textContent = '+ ADD SET';
     addSetBtn.addEventListener('click', () => {
         const newSetNum = setList.querySelectorAll('.set-item').length + 1;
-        const newSet = createSetItem(newSetNum);
+        const newSet = createSetItem(newSetNum, 'working');
         setList.insertBefore(newSet, addSetBtn);
     });
     
     div.appendChild(header);
+    div.appendChild(targetInput);
     div.appendChild(setList);
     setList.appendChild(addSetBtn);
     
     return div;
 }
 
-function createSetItem(setNumber) {
+function createSetItem(setNumber, setType = 'working') {
     const div = document.createElement('div');
     div.className = 'set-item';
     
     const label = document.createElement('div');
-    label.className = 'set-label';
-    label.textContent = `SET ${setNumber}`;
+    label.className = `set-label ${setType}`;
+    
+    if (setType === 'warmup') {
+        label.textContent = 'WARMUP';
+    } else {
+        label.textContent = `WORK ${setNumber - 1}`;
+    }
     
     const weightInput = document.createElement('input');
     weightInput.type = 'number';
@@ -691,211 +694,129 @@ function createLibraryItem(exercise) {
 // ========================================
 
 function setupProgressCharts() {
-    updateVolumeChart('week');
-    populateExerciseSelect();
+    updateProgressStats('week');
 }
 
-function populateExerciseSelect() {
-    const select = document.getElementById('exerciseSelect');
-    select.innerHTML = '<option value="">SELECT EXERCISE</option>';
-    
+function updateProgressStats(period) {
     const history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
-    const exerciseNames = new Set();
+    const now = new Date();
+    const daysAgo = period === 'week' ? 7 : 30;
+    const cutoffDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
     
+    // Filter workouts by period
+    const periodWorkouts = history.filter(workout => 
+        new Date(workout.date) >= cutoffDate
+    );
+    
+    // Calculate total stats
+    let totalWorkouts = periodWorkouts.length;
+    let totalVolume = 0;
+    let totalTime = 0;
+    
+    periodWorkouts.forEach(workout => {
+        totalVolume += calculateTotalVolume(workout.exercises);
+        totalTime += workout.duration;
+    });
+    
+    const avgVolume = totalWorkouts > 0 ? totalVolume / totalWorkouts : 0;
+    
+    // Update stat cards
+    document.getElementById('totalWorkouts').textContent = totalWorkouts;
+    document.getElementById('totalVolume').textContent = `${Math.round(totalVolume)} KG`;
+    document.getElementById('avgVolume').textContent = `${Math.round(avgVolume)} KG`;
+    document.getElementById('totalTime').textContent = `${totalTime} MIN`;
+    
+    // Update workout breakdown
+    updateWorkoutBreakdown(periodWorkouts);
+    
+    // Update personal records
+    updatePersonalRecords(history);
+}
+
+function updateWorkoutBreakdown(workouts) {
+    const breakdown = {
+        push: { count: 0, volume: 0 },
+        pull: { count: 0, volume: 0 },
+        legs: { count: 0, volume: 0 }
+    };
+    
+    workouts.forEach(workout => {
+        if (breakdown[workout.type]) {
+            breakdown[workout.type].count++;
+            breakdown[workout.type].volume += calculateTotalVolume(workout.exercises);
+        }
+    });
+    
+    const container = document.getElementById('workoutBreakdown');
+    container.innerHTML = '';
+    
+    Object.keys(breakdown).forEach(type => {
+        const data = breakdown[type];
+        const avgVol = data.count > 0 ? data.volume / data.count : 0;
+        
+        const item = document.createElement('div');
+        item.className = `breakdown-item ${type}`;
+        item.innerHTML = `
+            <div class="breakdown-type">${type.toUpperCase()}</div>
+            <div class="breakdown-stats">
+                <div class="breakdown-stat">
+                    <span>Workouts</span>
+                    <span class="breakdown-stat-value">${data.count}</span>
+                </div>
+                <div class="breakdown-stat">
+                    <span>Total Volume</span>
+                    <span class="breakdown-stat-value">${Math.round(data.volume)} KG</span>
+                </div>
+                <div class="breakdown-stat">
+                    <span>Avg Volume</span>
+                    <span class="breakdown-stat-value">${Math.round(avgVol)} KG</span>
+                </div>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+function updatePersonalRecords(history) {
+    const prs = {};
+    
+    // Find max weight for each exercise
     history.forEach(workout => {
         workout.exercises.forEach(exercise => {
-            exerciseNames.add(exercise.name);
-        });
-    });
-    
-    Array.from(exerciseNames).sort().forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        select.appendChild(option);
-    });
-}
-
-function updateVolumeChart(period) {
-    const canvas = document.getElementById('volumeChart');
-    const ctx = canvas.getContext('2d');
-    const history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Get data points
-    const dataPoints = getVolumeDataPoints(history, period);
-    
-    if (dataPoints.length === 0) {
-        drawNoData(ctx, canvas);
-        return;
-    }
-    
-    drawLineChart(ctx, canvas, dataPoints, 'VOLUME (KG)');
-}
-
-function getVolumeDataPoints(history, period) {
-    const now = new Date();
-    const points = [];
-    
-    const daysToShow = period === 'week' ? 7 : 30;
-    
-    for (let i = daysToShow - 1; i >= 0; i--) {
-        const date = new Date(now);
-        date.setDate(date.getDate() - i);
-        date.setHours(0, 0, 0, 0);
-        
-        const nextDate = new Date(date);
-        nextDate.setDate(nextDate.getDate() + 1);
-        
-        let dayVolume = 0;
-        history.forEach(workout => {
-            const workoutDate = new Date(workout.date);
-            if (workoutDate >= date && workoutDate < nextDate) {
-                dayVolume += calculateTotalVolume(workout.exercises);
-            }
-        });
-        
-        points.push({
-            label: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            value: dayVolume,
-        });
-    }
-    
-    return points;
-}
-
-function updateExerciseChart(exerciseName) {
-    const canvas = document.getElementById('exerciseChart');
-    const noData = document.getElementById('noProgressData');
-    
-    if (!exerciseName) {
-        canvas.classList.add('hidden');
-        noData.classList.remove('hidden');
-        return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    const history = JSON.parse(localStorage.getItem('workoutHistory') || '[]');
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Get data points
-    const dataPoints = getExerciseDataPoints(history, exerciseName);
-    
-    if (dataPoints.length === 0) {
-        canvas.classList.add('hidden');
-        noData.classList.remove('hidden');
-        return;
-    }
-    
-    canvas.classList.remove('hidden');
-    noData.classList.add('hidden');
-    
-    drawLineChart(ctx, canvas, dataPoints, exerciseName.toUpperCase());
-}
-
-function getExerciseDataPoints(history, exerciseName) {
-    const points = [];
-    
-    // Get last 10 workouts with this exercise
-    const relevantWorkouts = history.filter(workout => 
-        workout.exercises.some(ex => ex.name === exerciseName)
-    ).slice(0, 10).reverse();
-    
-    relevantWorkouts.forEach(workout => {
-        const exercise = workout.exercises.find(ex => ex.name === exerciseName);
-        if (exercise && exercise.sets.length > 0) {
-            // Get max weight used
-            const maxWeight = Math.max(...exercise.sets.map(set => set.weight));
-            
-            points.push({
-                label: new Date(workout.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                value: maxWeight,
+            exercise.sets.forEach(set => {
+                if (!prs[exercise.name] || set.weight > prs[exercise.name].weight) {
+                    prs[exercise.name] = {
+                        weight: set.weight,
+                        reps: set.reps,
+                        date: workout.date
+                    };
+                }
             });
-        }
+        });
     });
     
-    return points;
-}
-
-function drawLineChart(ctx, canvas, dataPoints, title) {
-    const width = canvas.width;
-    const height = canvas.height;
-    const padding = 50;
-    const chartWidth = width - padding * 2;
-    const chartHeight = height - padding * 2;
+    const container = document.getElementById('personalRecords');
+    container.innerHTML = '';
     
-    // Set colors
-    ctx.strokeStyle = '#00ff41';
-    ctx.fillStyle = '#00ff41';
-    ctx.font = '12px JetBrains Mono';
+    // Sort by weight descending and take top 10
+    const sortedPRs = Object.entries(prs)
+        .sort((a, b) => b[1].weight - a[1].weight)
+        .slice(0, 10);
     
-    // Find min and max values
-    const values = dataPoints.map(p => p.value);
-    const maxValue = Math.max(...values);
-    const minValue = Math.min(...values);
-    const range = maxValue - minValue || 1;
+    if (sortedPRs.length === 0) {
+        container.innerHTML = '<div class="no-data">NO PERSONAL RECORDS YET</div>';
+        return;
+    }
     
-    // Draw axes
-    ctx.strokeStyle = '#2a2a2a';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
-    
-    // Draw data points and lines
-    ctx.strokeStyle = '#00ff41';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    
-    const pointSpacing = chartWidth / (dataPoints.length - 1 || 1);
-    
-    dataPoints.forEach((point, index) => {
-        const x = padding + index * pointSpacing;
-        const normalizedValue = (point.value - minValue) / range;
-        const y = height - padding - (normalizedValue * chartHeight);
-        
-        if (index === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-        
-        // Draw point
-        ctx.fillStyle = '#00ff41';
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw value
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText(point.value.toFixed(0), x, y - 10);
-        
-        // Draw label
-        ctx.fillStyle = '#888888';
-        ctx.save();
-        ctx.translate(x, height - padding + 15);
-        ctx.rotate(-Math.PI / 4);
-        ctx.textAlign = 'right';
-        ctx.fillText(point.label, 0, 0);
-        ctx.restore();
+    sortedPRs.forEach(([name, data]) => {
+        const item = document.createElement('div');
+        item.className = 'pr-item';
+        item.innerHTML = `
+            <div class="pr-name">${name}</div>
+            <div class="pr-value">${data.weight} KG × ${data.reps}</div>
+        `;
+        container.appendChild(item);
     });
-    
-    ctx.strokeStyle = '#00ff41';
-    ctx.stroke();
-}
-
-function drawNoData(ctx, canvas) {
-    ctx.fillStyle = '#555555';
-    ctx.font = '14px JetBrains Mono';
-    ctx.textAlign = 'center';
-    ctx.fillText('NO DATA AVAILABLE', canvas.width / 2, canvas.height / 2);
 }
 
 // ========================================
