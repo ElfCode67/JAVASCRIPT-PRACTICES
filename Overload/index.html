@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRON PROTOCOL // Workout Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Archivo+Black&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">IRON PROTOCOL</h1>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">WEEK</span>
+                        <span class="stat-value" id="currentWeek">01</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">VOLUME</span>
+                        <span class="stat-value" id="weeklyVolume">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">STREAK</span>
+                        <span class="stat-value" id="streak">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav">
+            <button class="nav-btn active" data-view="today">TODAY</button>
+            <button class="nav-btn" data-view="schedule">SCHEDULE</button>
+            <button class="nav-btn" data-view="progress">PROGRESS</button>
+            <button class="nav-btn" data-view="history">HISTORY</button>
+            <button class="nav-btn" data-view="exercises">LIBRARY</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- TODAY VIEW -->
+            <section id="view-today" class="view active">
+                <div class="view-header">
+                    <h2 class="view-title" id="todayTitle">SELECT WORKOUT</h2>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
+
+                <!-- Workout Selector -->
+                <div class="workout-selector">
+                    <button class="workout-type-btn" data-workout="push">PUSH</button>
+                    <button class="workout-type-btn" data-workout="pull">PULL</button>
+                    <button class="workout-type-btn" data-workout="legs">LEGS</button>
+                </div>
+
+                <!-- Active Workout Display -->
+                <div id="activeWorkout" class="active-workout hidden">
+                    <div class="workout-controls">
+                        <button id="timerBtn" class="control-btn">
+                            <span class="timer-display">00:00</span>
+                            <span class="timer-label">REST TIMER</span>
+                        </button>
+                        <button id="finishWorkout" class="control-btn finish-btn">
+                            FINISH
+                        </button>
+                    </div>
+
+                    <!-- Exercise List -->
+                    <div id="exerciseList" class="exercise-list"></div>
+                </div>
+            </section>
+
+            <!-- SCHEDULE VIEW -->
+            <section id="view-schedule" class="view">
+                <div class="view-header">
+                    <h2 class="view-title">WEEKLY SCHEDULE</h2>
+                </div>
+                <div class="schedule-grid">
+                    <div class="schedule-day" data-day="sunday">
+                        <div class="day-header">
+                            <span class="day-name">SUNDAY</span>
+                            <span class="day-workout push">PUSH</span>
+                        </div>
+                    </div>
+                    <div class="schedule-day" data-day="monday">
+                        <div class="day-header">
+                            <span class="day-name">MONDAY</span>
+                            <span class="day-workout pull">PULL</span>
+                        </div>
+                    </div>
+                    <div class="schedule-day" data-day="tuesday">
+                        <div class="day-header">
+                            <span class="day-name">TUESDAY</span>
+                            <span class="day-workout rest">REST</span>
+                        </div>
+                    </div>
+                    <div class="schedule-day" data-day="wednesday">
+                        <div class="day-header">
+                            <span class="day-name">WEDNESDAY</span>
+                            <span class="day-workout legs">LEGS</span>
+                        </div>
+                    </div>
+                    <div class="schedule-day" data-day="thursday">
+                        <div class="day-header">
+                            <span class="day-name">THURSDAY</span>
+                            <span class="day-workout push">PUSH</span>
+                        </div>
+                    </div>
+                    <div class="schedule-day" data-day="friday">
+                        <div class="day-header">
+                            <span class="day-name">FRIDAY</span>
+                            <span class="day-workout pull">PULL</span>
+                        </div>
+                    </div>
+                    <div class="schedule-day" data-day="saturday">
+                        <div class="day-header">
+                            <span class="day-name">SATURDAY</span>
+                            <span class="day-workout legs">LEGS</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROGRESS VIEW -->
+            <section id="view-progress" class="view">
+                <div class="view-header">
+                    <h2 class="view-title">PROGRESS TRACKING</h2>
+                    <div class="progress-controls">
+                        <button class="period-btn active" data-period="week">WEEK</button>
+                        <button class="period-btn" data-period="month">MONTH</button>
+                    </div>
+                </div>
+                
+                <!-- Volume Chart -->
+                <div class="chart-container">
+                    <h3 class="chart-title">TOTAL VOLUME (KG)</h3>
+                    <canvas id="volumeChart"></canvas>
+                </div>
+
+                <!-- Exercise Progress -->
+                <div class="exercise-progress-container">
+                    <h3 class="chart-title">EXERCISE PROGRESSION</h3>
+                    <select id="exerciseSelect" class="exercise-select">
+                        <option value="">SELECT EXERCISE</option>
+                    </select>
+                    <canvas id="exerciseChart" class="hidden"></canvas>
+                    <div id="noProgressData" class="no-data">
+                        NO DATA AVAILABLE
+                    </div>
+                </div>
+            </section>
+
+            <!-- HISTORY VIEW -->
+            <section id="view-history" class="view">
+                <div class="view-header">
+                    <h2 class="view-title">WORKOUT HISTORY</h2>
+                </div>
+                <div id="historyList" class="history-list"></div>
+                <div id="noHistory" class="no-data">
+                    NO WORKOUT HISTORY
+                </div>
+            </section>
+
+            <!-- EXERCISES LIBRARY VIEW -->
+            <section id="view-exercises" class="view">
+                <div class="view-header">
+                    <h2 class="view-title">EXERCISE LIBRARY</h2>
+                    <div class="filter-controls">
+                        <select id="muscleFilter" class="filter-select">
+                            <option value="all">ALL GROUPS</option>
+                            <option value="push">PUSH</option>
+                            <option value="pull">PULL</option>
+                            <option value="legs">LEGS</option>
+                            <option value="abs">ABS</option>
+                            <option value="cardio">CARDIO</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="exerciseLibrary" class="exercise-library"></div>
+            </section>
+
+        </main>
+
+        <!-- Timer Modal -->
+        <div id="timerModal" class="modal hidden">
+            <div class="modal-content timer-modal">
+                <div class="timer-big" id="timerDisplay">00:00</div>
+                <div class="timer-controls">
+                    <button id="timer30" class="timer-preset">30s</button>
+                    <button id="timer60" class="timer-preset">60s</button>
+                    <button id="timer90" class="timer-preset">90s</button>
+                    <button id="timer120" class="timer-preset">2m</button>
+                    <button id="timer180" class="timer-preset">3m</button>
+                </div>
+                <div class="timer-actions">
+                    <button id="timerStart" class="timer-action-btn">START</button>
+                    <button id="timerPause" class="timer-action-btn hidden">PAUSE</button>
+                    <button id="timerReset" class="timer-action-btn">RESET</button>
+                    <button id="timerClose" class="timer-action-btn close">CLOSE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completion Modal -->
+        <div id="completionModal" class="modal hidden">
+            <div class="modal-content completion-modal">
+                <h2 class="completion-title">WORKOUT COMPLETE</h2>
+                <div class="completion-stats">
+                    <div class="completion-stat">
+                        <span class="completion-label">EXERCISES</span>
+                        <span class="completion-value" id="completionExercises">0</span>
+                    </div>
+                    <div class="completion-stat">
+                        <span class="completion-label">TOTAL VOLUME</span>
+                        <span class="completion-value" id="completionVolume">0 KG</span>
+                    </div>
+                    <div class="completion-stat">
+                        <span class="completion-label">DURATION</span>
+                        <span class="completion-value" id="completionDuration">0 MIN</span>
+                    </div>
+                </div>
+                <button id="completionClose" class="completion-btn">CONTINUE</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
