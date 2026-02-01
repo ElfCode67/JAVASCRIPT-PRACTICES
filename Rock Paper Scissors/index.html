@@ -2,32 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Rock Paper Scissors</title>
+  <title>Rock Paper Scissors Lizard Spock</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="container">
-    <h1>Rock - Paper - Scissors</h1>
+<div class="container">
+  <h1>Rock • Paper • Scissors • Lizard • Spock</h1>
 
-    <div class="choices">
-      <button class="choice" data-choice="rock">✊</button>
-      <button class="choice" data-choice="paper">✋</button>
-      <button class="choice" data-choice="scissors">✌️</button>
-    </div>
-
-    <div class="result">
-      <p><strong>PLAYER:</strong> <span id="playerChoice">-</span></p>
-      <p><strong>COMPUTER:</strong> <span id="computerChoice">-</span></p>
-      <h2 id="resultText">Make a move!</h2>
-    </div>
-
-    <div class="score">
-      <p>Player Score: <span id="playerScore">0</span></p>
-      <p>Computer Score: <span id="computerScore">0</span></p>
-    </div>
+  <div class="choices">
+    <button class="choice" data-choice="rock">✊</button>
+    <button class="choice" data-choice="paper">✋</button>
+    <button class="choice" data-choice="scissors">✌️</button>
+    <button class="choice" data-choice="lizard">🦎</button>
+    <button class="choice" data-choice="spock">🖖</button>
   </div>
 
-  <script src="script.js"></script>
+  <div class="result">
+    <p>PLAYER: <span id="playerChoice">-</span></p>
+    <p>COMPUTER: <span id="computerChoice">-</span></p>
+    <h2 id="resultText">Make a move!</h2>
+  </div>
+
+  <div class="score">
+    <p>Player Score: <span id="playerScore">0</span></p>
+    <p>Computer Score: <span id="computerScore">0</span></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
