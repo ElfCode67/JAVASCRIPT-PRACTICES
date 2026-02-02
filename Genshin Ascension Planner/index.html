@@ -6,132 +6,133 @@
     <title>Genshin Ascension Planner</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <header>
+        <header class="app-header">
             <div class="header-content">
-                <h1><i class="fas fa-seedling"></i> Genshin Ascension Planner</h1>
-                <p class="subtitle">Select characters to see what to farm today</p>
-            </div>
-            <div class="current-day">
-                <i class="fas fa-calendar-day"></i>
-                <span id="currentDay">Loading...</span>
+                <h1><i class="fas fa-mountain"></i> Genshin Ascension Planner</h1>
+                <p class="subtitle">Plan your character ascension materials</p>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main>
-            <!-- Character Selection -->
-            <section class="character-selection">
+        <main class="main-content">
+            <!-- Character Selection Section -->
+            <section class="selection-section">
                 <div class="section-header">
-                    <h2><i class="fas fa-users"></i> Select Characters</h2>
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search characters...">
-                        <i class="fas fa-search"></i>
+                    <h2><i class="fas fa-search"></i> Select Character</h2>
+                    <div class="controls">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Search characters...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="pyro">Pyro</button>
+                            <button class="filter-btn" data-filter="hydro">Hydro</button>
+                            <button class="filter-btn" data-filter="anemo">Anemo</button>
+                            <button class="filter-btn" data-filter="electro">Electro</button>
+                            <button class="filter-btn" data-filter="dendro">Dendro</button>
+                            <button class="filter-btn" data-filter="cryo">Cryo</button>
+                            <button class="filter-btn" data-filter="geo">Geo</button>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="character-grid" id="characterGrid">
-                    <!-- Characters will load here -->
-                    <div class="loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading characters...
+
+                <div class="character-list" id="characterList">
+                    <!-- Characters will be loaded here -->
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading characters...</p>
                     </div>
-                </div>
-                
-                <div class="selection-info">
-                    <span>Selected: <strong id="selectedCount">0</strong> characters</span>
-                    <button id="clearBtn" class="btn-clear">
-                        <i class="fas fa-trash"></i> Clear All
-                    </button>
                 </div>
             </section>
 
-            <!-- Farming Plan -->
-            <section class="farming-plan">
-                <div class="section-header">
-                    <h2><i class="fas fa-clipboard-list"></i> Today's Farming Plan</h2>
-                    <div class="day-filter">
-                        <label>Show: </label>
-                        <select id="dayFilter">
-                            <option value="all">All Materials</option>
-                            <option value="today">Today Only</option>
-                            <option value="monday">Mon/Thu</option>
-                            <option value="tuesday">Tue/Fri</option>
-                            <option value="wednesday">Wed/Sat</option>
-                            <option value="sunday">Sunday</option>
+            <!-- Ascension Materials Section -->
+            <section class="materials-section">
+                <div class="selected-character" id="selectedCharacter">
+                    <div class="placeholder">
+                        <i class="fas fa-user"></i>
+                        <p>Select a character to view ascension materials</p>
+                    </div>
+                </div>
+
+                <div class="materials-container">
+                    <h3><i class="fas fa-cubes"></i> Ascension Materials</h3>
+                    
+                    <div class="level-selector">
+                        <label for="levelSelect">Target Ascension Level:</label>
+                        <select id="levelSelect">
+                            <option value="1">Level 1 → 20</option>
+                            <option value="2">Level 20 → 40</option>
+                            <option value="3">Level 40 → 50</option>
+                            <option value="4">Level 50 → 60</option>
+                            <option value="5">Level 60 → 70</option>
+                            <option value="6">Level 70 → 80</option>
+                            <option value="7" selected>Level 80 → 90 (MAX)</option>
                         </select>
                     </div>
-                </div>
 
-                <!-- Resin Summary -->
-                <div class="resin-summary">
-                    <div class="resin-card">
-                        <h3><i class="fas fa-vial"></i> Resin Required</h3>
-                        <div class="resin-details">
-                            <div class="resin-item">
-                                <span>Total:</span>
-                                <strong id="totalResin">0</strong>
-                            </div>
-                            <div class="resin-item">
-                                <span>Today:</span>
-                                <strong id="todayResin">0</strong>
-                            </div>
-                            <div class="resin-item">
-                                <span>Days:</span>
-                                <strong id="totalDays">0</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Materials List -->
-                <div class="materials-container">
-                    <h3><i class="fas fa-cubes"></i> Required Materials</h3>
-                    <div class="materials-list" id="materialsList">
+                    <div class="materials-grid" id="materialsGrid">
                         <div class="empty-state">
                             <i class="fas fa-inbox"></i>
-                            <p>Select characters to see materials needed</p>
+                            <p>No character selected</p>
                         </div>
                     </div>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <button id="generateBtn" class="btn-primary">
-                        <i class="fas fa-magic"></i> Generate Plan
-                    </button>
-                    <button id="saveBtn" class="btn-secondary">
-                        <i class="fas fa-save"></i> Save to Browser
-                    </button>
+                    <div class="summary">
+                        <div class="summary-item">
+                            <span>Total Materials:</span>
+                            <strong id="totalMaterials">0</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Resin Required:</span>
+                            <strong id="totalResin">0</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Mora Cost:</span>
+                            <strong id="totalMora">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="trackMaterialsBtn" class="btn btn-primary">
+                            <i class="fas fa-check-circle"></i> Track Owned Materials
+                        </button>
+                        <button id="resetBtn" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button id="saveBtn" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Progress
+                        </button>
+                    </div>
                 </div>
             </section>
         </main>
 
-        <!-- Footer -->
-        <footer>
+        <footer class="app-footer">
             <p>
-                <i class="fas fa-info-circle"></i> 
-                Data from <a href="https://genshin.dev" target="_blank">Genshin.dev API</a> • 
-                Not affiliated with HoYoverse
-            </p>
-            <p class="footer-note">
-                <i class="fas fa-sync-alt"></i> 
-                Click character cards to select/deselect • 
-                Plan automatically updates
+                <i class="fas fa-code"></i> Built with Genshin Impact API |
+                <i class="fas fa-heart"></i> Not affiliated with HoYoverse
             </p>
         </footer>
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-content">
-            <i class="fas fa-spinner fa-spin fa-3x"></i>
-            <p>Loading Genshin Impact data...</p>
+    <!-- Material Tracking Modal -->
+    <div class="modal-overlay" id="trackingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Track Owned Materials</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-content" id="trackingContent">
+                <!-- Materials to track will be added here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelTracking">Cancel</button>
+                <button class="btn btn-primary" id="saveTracking">Save</button>
+            </div>
         </div>
     </div>
 
