@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Image Fetcher</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-paw"></i> Random Dog Fetcher</h1>
+            <p>Click the button to fetch a new random dog image!</p>
+        </header>
+        
+        <main>
+            <div class="image-container">
+                <div class="placeholder" id="placeholder">
+                    <i class="fas fa-dog"></i>
+                    <p>No dog loaded yet</p>
+                </div>
+                <img id="dogImage" alt="Random dog" style="display: none;">
+            </div>
+            
+            <div class="controls">
+                <button id="fetchBtn" class="btn">
+                    <i class="fas fa-bone"></i> Fetch Random Dog
+                </button>
+                <div class="loader" id="loader" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading...
+                </div>
+            </div>
+            
+            <div class="info">
+                <h3><i class="fas fa-info-circle"></i> How it works:</h3>
+                <p>This app uses the <strong>Dog CEO API</strong> to fetch random dog images. Each click makes an HTTP request to <code>https://dog.ceo/api/breeds/image/random</code> and displays the result.</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Made with <i class="fas fa-heart"></i> for learning APIs</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> 
