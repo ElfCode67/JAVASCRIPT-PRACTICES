@@ -3,139 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genshin Ascension Planner</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Genshin Impact Ascension Planner</title>
+    <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="https://genshin.hoyoverse.com/favicon.ico">
 </head>
 <body>
-    <div class="container">
-        <header class="app-header">
-            <div class="header-content">
-                <h1><i class="fas fa-mountain"></i> Genshin Ascension Planner</h1>
-                <p class="subtitle">Plan your character ascension materials</p>
-            </div>
-        </header>
+    <!-- Dark Mode Toggle -->
+    <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+    </button>
 
-        <main class="main-content">
-            <!-- Character Selection Section -->
-            <section class="selection-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-search"></i> Select Character</h2>
-                    <div class="controls">
-                        <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="Search characters...">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <div class="filter-buttons">
-                            <button class="filter-btn" data-filter="all">All</button>
-                            <button class="filter-btn" data-filter="pyro">Pyro</button>
-                            <button class="filter-btn" data-filter="hydro">Hydro</button>
-                            <button class="filter-btn" data-filter="anemo">Anemo</button>
-                            <button class="filter-btn" data-filter="electro">Electro</button>
-                            <button class="filter-btn" data-filter="dendro">Dendro</button>
-                            <button class="filter-btn" data-filter="cryo">Cryo</button>
-                            <button class="filter-btn" data-filter="geo">Geo</button>
-                        </div>
-                    </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">
+                <i class="fas fa-fire"></i>
+                Genshin Impact Ascension Planner
+            </h1>
+            <p class="subtitle">Plan your character progression and track required materials</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Search and Filters Section -->
+        <section class="filters-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        id="characterSearch" 
+                        placeholder="Search characters..." 
+                        aria-label="Search characters"
+                    >
                 </div>
-
-                <div class="character-list" id="characterList">
-                    <!-- Characters will be loaded here -->
-                    <div class="loading-state">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Loading characters...</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Ascension Materials Section -->
-            <section class="materials-section">
-                <div class="selected-character" id="selectedCharacter">
-                    <div class="placeholder">
-                        <i class="fas fa-user"></i>
-                        <p>Select a character to view ascension materials</p>
-                    </div>
-                </div>
-
-                <div class="materials-container">
-                    <h3><i class="fas fa-cubes"></i> Ascension Materials</h3>
+                
+                <div class="filter-controls">
+                    <select id="elementFilter" class="filter-dropdown" aria-label="Filter by element">
+                        <option value="">All Elements</option>
+                        <option value="Pyro">Pyro</option>
+                        <option value="Hydro">Hydro</option>
+                        <option value="Electro">Electro</option>
+                        <option value="Cryo">Cryo</option>
+                        <option value="Anemo">Anemo</option>
+                        <option value="Geo">Geo</option>
+                        <option value="Dendro">Dendro</option>
+                    </select>
                     
-                    <div class="level-selector">
-                        <label for="levelSelect">Target Ascension Level:</label>
-                        <select id="levelSelect">
-                            <option value="1">Level 1 → 20</option>
-                            <option value="2">Level 20 → 40</option>
-                            <option value="3">Level 40 → 50</option>
-                            <option value="4">Level 50 → 60</option>
-                            <option value="5">Level 60 → 70</option>
-                            <option value="6">Level 70 → 80</option>
-                            <option value="7" selected>Level 80 → 90 (MAX)</option>
-                        </select>
-                    </div>
-
-                    <div class="materials-grid" id="materialsGrid">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <p>No character selected</p>
-                        </div>
-                    </div>
-
-                    <div class="summary">
-                        <div class="summary-item">
-                            <span>Total Materials:</span>
-                            <strong id="totalMaterials">0</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Resin Required:</span>
-                            <strong id="totalResin">0</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Mora Cost:</span>
-                            <strong id="totalMora">0</strong>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button id="trackMaterialsBtn" class="btn btn-primary">
-                            <i class="fas fa-check-circle"></i> Track Owned Materials
-                        </button>
-                        <button id="resetBtn" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> Reset
-                        </button>
-                        <button id="saveBtn" class="btn btn-success">
-                            <i class="fas fa-save"></i> Save Progress
-                        </button>
-                    </div>
+                    <select id="rarityFilter" class="filter-dropdown" aria-label="Filter by rarity">
+                        <option value="">All Rarity</option>
+                        <option value="4">4★</option>
+                        <option value="5">5★</option>
+                    </select>
+                    
+                    <select id="roleFilter" class="filter-dropdown" aria-label="Filter by role">
+                        <option value="">All Roles</option>
+                        <option value="DPS">DPS</option>
+                        <option value="Support">Support</option>
+                        <option value="Healer">Healer</option>
+                        <option value="Sub DPS">Sub DPS</option>
+                    </select>
+                    
+                    <button id="clearFilters" class="btn-secondary">
+                        <i class="fas fa-times"></i> Clear Filters
+                    </button>
                 </div>
-            </section>
-        </main>
+            </div>
+            
+            <div class="filter-tags" id="activeFilters"></div>
+        </section>
 
-        <footer class="app-footer">
-            <p>
-                <i class="fas fa-code"></i> Built with Genshin Impact API |
-                <i class="fas fa-heart"></i> Not affiliated with HoYoverse
-            </p>
-        </footer>
-    </div>
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading characters from Teyvat...</p>
+        </div>
 
-    <!-- Material Tracking Modal -->
-    <div class="modal-overlay" id="trackingModal">
-        <div class="modal">
+        <!-- Error State -->
+        <div id="errorState" class="error-state hidden">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Failed to load data</h3>
+            <p id="errorMessage"></p>
+            <button id="retryButton" class="btn-primary">Retry</button>
+        </div>
+
+        <!-- Character Grid -->
+        <section class="characters-section">
+            <div class="section-header">
+                <h2>Characters</h2>
+                <div class="controls">
+                    <span id="characterCount" class="character-count">0 characters</span>
+                    <button id="toggleView" class="btn-icon" aria-label="Toggle view">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="charactersGrid" class="characters-grid grid-view"></div>
+            
+            <div id="emptyState" class="empty-state hidden">
+                <i class="fas fa-search"></i>
+                <h3>No characters found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+            
+            <div class="load-more-container">
+                <button id="loadMore" class="btn-secondary hidden">
+                    <i class="fas fa-sync"></i> Load More Characters
+                </button>
+            </div>
+        </section>
+
+        <!-- My Characters Section -->
+        <section class="my-characters-section">
+            <div class="section-header">
+                <h2>My Characters <span id="selectedCount" class="badge">0</span></h2>
+                <button id="clearAll" class="btn-secondary">Clear All</button>
+            </div>
+            <div id="selectedCharacters" class="selected-characters"></div>
+        </section>
+    </main>
+
+    <!-- Ascension Modal -->
+    <div id="ascensionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
             <div class="modal-header">
-                <h3>Track Owned Materials</h3>
-                <button class="close-modal">&times;</button>
+                <h2 id="modalTitle">Character Ascension</h2>
+                <button id="closeModal" class="close-modal" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="modal-content" id="trackingContent">
-                <!-- Materials to track will be added here -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelTracking">Cancel</button>
-                <button class="btn btn-primary" id="saveTracking">Save</button>
+            <div class="modal-body">
+                <div id="modalCharacterInfo" class="modal-character-info"></div>
+                <div id="modalLoading" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading ascension data...</p>
+                </div>
+                <div id="ascensionContent" class="ascension-content"></div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Data provided by <a href="https://genshin.dev/" target="_blank" rel="noopener">Genshin.dev API</a></p>
+            <p class="disclaimer">This is a fan-made project. Genshin Impact is a trademark of miHoYo.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="js/api.js"></script>
+    <script type="module" src="js/state.js"></script>
+    <script type="module" src="js/ui.js"></script>
+    <script type="module" src="js/events.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
