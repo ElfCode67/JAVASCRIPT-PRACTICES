@@ -14,6 +14,32 @@
             <p class="subtitle">Brew ideas, time tasks, calculate your day</p>
         </header>
 
+        <!-- Productivity Statistics Panel (NEW) -->
+        <section class="stats-panel">
+            <div class="stats-grid">
+                <div class="stat-card" id="totalTasksStat">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Total Tasks</h3>
+                    <span class="stat-value">0</span>
+                </div>
+                <div class="stat-card" id="completedTasksStat">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Completed</h3>
+                    <span class="stat-value">0</span>
+                </div>
+                <div class="stat-card" id="coffeeCountStat">
+                    <i class="fas fa-coffee"></i>
+                    <h3>Coffee Breaks</h3>
+                    <span class="stat-value">0</span>
+                </div>
+                <div class="stat-card" id="productivityScoreStat">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Productivity</h3>
+                    <span class="stat-value">0%</span>
+                </div>
+            </div>
+        </section>
+
         <main class="dashboard">
             <!-- Left Column: Calculator -->
             <section class="panel calculator-panel">
@@ -46,6 +72,12 @@
                         <button class="btn operator equals" data-action="=">=</button>
                     </div>
                 </div>
+                <!-- Calculator History (NEW) -->
+                <div class="calc-history" id="calcHistory">
+                    <h3><i class="fas fa-history"></i> History</h3>
+                    <ul id="historyList"></ul>
+                    <button id="clearHistory" class="small-btn">Clear History</button>
+                </div>
             </section>
 
             <!-- Center: Timer -->
@@ -70,38 +102,86 @@
                         <button class="preset-btn" data-minutes="45">Deep Work</button>
                         <button class="preset-btn" data-minutes="60">Hour Brew</button>
                     </div>
+                    <!-- Timer Sessions (NEW) -->
+                    <div class="timer-sessions">
+                        <h4><i class="fas fa-list-ol"></i> Today's Sessions</h4>
+                        <div id="sessionList" class="session-list"></div>
+                    </div>
                     <div class="timer-status" id="timerStatus">Ready to brew...</div>
                 </div>
             </section>
 
-            <!-- Right Column: To-Do List -->
+            <!-- Right Column: Enhanced To-Do List -->
             <section class="panel todo-panel">
                 <h2><i class="fas fa-list-check"></i> Café Tasks</h2>
                 <div class="todo-container">
                     <div class="todo-input">
                         <input type="text" id="todoInput" placeholder="Add a new task...">
+                        <select id="todoCategory">
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="coffee">Coffee Break</option>
+                            <option value="shopping">Shopping</option>
+                        </select>
                         <button id="addTodoBtn">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="todo-filters">
-                        <button class="filter-btn active" data-filter="all">All</button>
-                        <button class="filter-btn" data-filter="active">Active</button>
-                        <button class="filter-btn" data-filter="completed">Done</button>
+                    
+                    <!-- Advanced Filters (NEW) -->
+                    <div class="todo-controls">
+                        <div class="todo-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="active">Active</button>
+                            <button class="filter-btn" data-filter="completed">Done</button>
+                            <button class="filter-btn" data-filter="coffee">Coffee Tasks</button>
+                        </div>
+                        <div class="sort-options">
+                            <select id="sortTodos">
+                                <option value="newest">Newest First</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="priority">Priority</option>
+                                <option value="category">Category</option>
+                            </select>
+                        </div>
                     </div>
+                    
+                    <!-- Task Categories Summary (NEW) -->
+                    <div class="categories-summary" id="categoriesSummary"></div>
+                    
                     <ul class="todo-list" id="todoList">
                         <!-- Tasks will be added here by JavaScript -->
                     </ul>
+                    
                     <div class="todo-stats">
                         <span id="taskCount">0 tasks</span>
-                        <button id="clearCompleted">Clear Completed</button>
+                        <div class="action-buttons">
+                            <button id="markAllComplete" class="small-btn">Mark All Done</button>
+                            <button id="clearCompleted">Clear Completed</button>
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
 
+        <!-- Coffee Menu Panel (NEW) -->
+        <section class="panel menu-panel">
+            <h2><i class="fas fa-coffee"></i> Coffee Menu</h2>
+            <div class="menu-grid" id="coffeeMenu"></div>
+            <div class="coffee-counter">
+                <button id="addCoffeeBreak" class="coffee-btn">
+                    <i class="fas fa-mug-hot"></i> Log Coffee Break
+                </button>
+                <span id="coffeeBreakCount">Today: 0 coffee breaks</span>
+            </div>
+        </section>
+
         <footer class="footer">
             <p>Enjoy your brew time! <i class="fas fa-coffee"></i></p>
+            <div class="footer-stats">
+                <span id="totalTimeTracked">Total time tracked: 0 min</span>
+                <span id="currentStreak">Current streak: 1 day</span>
+            </div>
         </footer>
     </div>
 

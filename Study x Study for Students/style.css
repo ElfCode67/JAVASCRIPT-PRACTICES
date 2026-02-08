@@ -1,3 +1,6 @@
+/* ==============================
+   BASE STYLES
+   ============================== */
 * {
     margin: 0;
     padding: 0;
@@ -27,6 +30,9 @@ body {
     border: 2px solid #d7ccc8;
 }
 
+/* ==============================
+   HEADER
+   ============================== */
 .header {
     background: linear-gradient(135deg, #8d6e63, #a1887f);
     color: #fff8f0;
@@ -50,6 +56,58 @@ body {
     font-style: italic;
 }
 
+/* ==============================
+   STATS PANEL (NEW)
+   ============================== */
+.stats-panel {
+    background: #fff;
+    padding: 20px;
+    border-bottom: 2px solid #e0d5ce;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.stat-card {
+    background: #faf5f0;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    border-left: 4px solid #a1887f;
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: #8d6e63;
+    margin-bottom: 10px;
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    color: #795548;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #5d4037;
+}
+
+/* ==============================
+   DASHBOARD LAYOUT
+   ============================== */
 .dashboard {
     display: grid;
     grid-template-columns: 1fr 1.2fr 1fr;
@@ -63,6 +121,9 @@ body {
     }
 }
 
+/* ==============================
+   PANEL COMMON STYLES
+   ============================== */
 .panel {
     background: white;
     border-radius: 15px;
@@ -87,12 +148,15 @@ body {
     border-bottom: 2px solid #f5e9dc;
 }
 
-/* Calculator Styles */
+/* ==============================
+   CALCULATOR STYLES
+   ============================== */
 .calculator {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
     border: 2px solid #d7ccc8;
+    margin-bottom: 20px;
 }
 
 .display {
@@ -150,7 +214,63 @@ body {
     color: white;
 }
 
-/* Timer Styles */
+.equals:hover {
+    background: #8d6e63;
+}
+
+/* Calculator History (NEW) */
+.calc-history {
+    margin-top: 20px;
+    padding: 15px;
+    background: #faf5f0;
+    border-radius: 10px;
+    border: 1px solid #e0d5ce;
+}
+
+.calc-history h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+#historyList {
+    list-style: none;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+#historyList li {
+    padding: 8px;
+    border-bottom: 1px solid #e0d5ce;
+    font-family: 'Courier New', monospace;
+    display: flex;
+    justify-content: space-between;
+}
+
+#historyList li:hover {
+    background: #f5e9dc;
+}
+
+.small-btn {
+    padding: 8px 15px;
+    background: #8d6e63;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.small-btn:hover {
+    background: #6d4c41;
+}
+
+/* ==============================
+   TIMER STYLES
+   ============================== */
 .timer {
     text-align: center;
 }
@@ -219,6 +339,44 @@ body {
     border-color: #8d6e63;
 }
 
+/* Timer Sessions (NEW) */
+.timer-sessions {
+    margin: 20px 0;
+    padding: 15px;
+    background: #faf5f0;
+    border-radius: 10px;
+    border: 1px solid #e0d5ce;
+}
+
+.timer-sessions h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: #795548;
+}
+
+.session-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background: white;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.session-item:nth-child(odd) {
+    background: #f5e9dc;
+}
+
 .timer-status {
     font-style: italic;
     color: #8d6e63;
@@ -228,7 +386,9 @@ body {
     margin-top: 10px;
 }
 
-/* To-Do List Styles */
+/* ==============================
+   ENHANCED TO-DO STYLES
+   ============================== */
 .todo-container {
     display: flex;
     flex-direction: column;
@@ -254,6 +414,14 @@ body {
     border-color: #8d6e63;
 }
 
+#todoCategory {
+    padding: 15px;
+    border: 2px solid #d7ccc8;
+    border-radius: 8px;
+    background: #fff;
+    color: #5d4037;
+}
+
 #addTodoBtn {
     padding: 15px 25px;
     background: #8d6e63;
@@ -271,10 +439,17 @@ body {
     background: #6d4c41;
 }
 
+/* Todo Controls (NEW) */
+.todo-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
 .todo-filters {
     display: flex;
     gap: 10px;
-    justify-content: center;
 }
 
 .filter-btn {
@@ -284,6 +459,7 @@ body {
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.2s;
+    font-size: 0.9rem;
 }
 
 .filter-btn.active {
@@ -292,6 +468,59 @@ body {
     border-color: #8d6e63;
 }
 
+.filter-btn:hover:not(.active) {
+    background: #f5e9dc;
+}
+
+.sort-options select {
+    padding: 8px 12px;
+    border: 2px solid #d7ccc8;
+    border-radius: 5px;
+    background: white;
+    color: #5d4037;
+}
+
+/* Categories Summary (NEW) */
+.categories-summary {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px;
+    background: #faf5f0;
+    border-radius: 8px;
+    border: 1px solid #e0d5ce;
+}
+
+.category-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.category-work {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.category-personal {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.category-coffee {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.category-shopping {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+/* Todo List */
 .todo-list {
     list-style: none;
     max-height: 300px;
@@ -338,6 +567,13 @@ body {
     font-size: 1rem;
 }
 
+.todo-category {
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #e0d5ce;
+}
+
 .todo-actions {
     display: flex;
     gap: 8px;
@@ -379,14 +615,20 @@ body {
     color: #8d6e63;
 }
 
-#clearCompleted {
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#clearCompleted, #markAllComplete {
     background: none;
     border: 1px solid #d7ccc8;
     padding: 8px 15px;
     border-radius: 5px;
     cursor: pointer;
-    color: #8d6e63;
+    color: #8d4037;
     transition: all 0.2s;
+    font-size: 0.9rem;
 }
 
 #clearCompleted:hover {
@@ -395,6 +637,94 @@ body {
     color: #f44336;
 }
 
+#markAllComplete:hover {
+    background: #e8f5e9;
+    border-color: #4caf50;
+    color: #2e7d32;
+}
+
+/* ==============================
+   COFFEE MENU PANEL (NEW)
+   ============================== */
+.menu-panel {
+    margin: 0 30px 30px 30px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.coffee-item {
+    background: #faf5f0;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px solid #e0d5ce;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.coffee-item:hover {
+    background: #f5e9dc;
+    transform: translateY(-5px);
+    border-color: #a1887f;
+}
+
+.coffee-item i {
+    font-size: 2rem;
+    color: #8d6e63;
+    margin-bottom: 10px;
+}
+
+.coffee-item h4 {
+    margin-bottom: 5px;
+    color: #5d4037;
+}
+
+.coffee-item p {
+    font-size: 0.9rem;
+    color: #795548;
+}
+
+.coffee-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f5e9dc;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.coffee-btn {
+    padding: 12px 25px;
+    background: #8d6e63;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.coffee-btn:hover {
+    background: #6d4c41;
+    transform: scale(1.05);
+}
+
+#coffeeBreakCount {
+    font-weight: bold;
+    color: #5d4037;
+}
+
+/* ==============================
+   FOOTER
+   ============================== */
 .footer {
     text-align: center;
     padding: 20px;
@@ -402,6 +732,29 @@ body {
     color: #8d6e63;
     border-top: 2px dashed #d7ccc8;
     font-style: italic;
+}
+
+.footer-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.footer-stats span {
+    padding: 5px 15px;
+    background: #f5e9dc;
+    border-radius: 15px;
+}
+
+/* ==============================
+   UTILITIES
+   ============================== */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #a1887f;
 }
 
 /* Scrollbar Styling */
@@ -420,4 +773,42 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #bcaaa4;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.todo-item {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .time-display {
+        font-size: 3.5rem;
+    }
+    
+    .todo-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .footer-stats {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
