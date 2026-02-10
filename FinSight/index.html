@@ -1,69 +1,133 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Management System</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Enhanced Library Management System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+    
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu hidden">
+        <ul>
+            <li data-action="edit"><i class="fas fa-edit"></i> Edit</li>
+            <li data-action="delete"><i class="fas fa-trash"></i> Delete</li>
+            <li data-action="borrow"><i class="fas fa-sign-out-alt"></i> Borrow</li>
+            <li data-action="return"><i class="fas fa-sign-in-alt"></i> Return</li>
+            <li data-action="details"><i class="fas fa-info-circle"></i> Details</li>
+        </ul>
+    </div>
+    
     <div class="container">
         <header>
-            <h1><i class="fas fa-book"></i> Library Management System</h1>
-            <p class="subtitle">Manage books, members, and borrowing with ease</p>
+            <div class="header-top">
+                <h1><i class="fas fa-book"></i> Enhanced Library Management System</h1>
+                <div class="header-controls">
+                    <button id="theme-toggle" class="btn-icon" title="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button id="export-btn" class="btn-icon" title="Export data">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="subtitle">Advanced book tracking with real-time API sync</p>
         </header>
 
+        <!-- Stats Dashboard -->
         <div class="stats-bar">
-            <div class="stat">
+            <div class="stat" id="stat-total-books">
                 <span class="stat-label">Total Books:</span>
-                <span id="total-books" class="stat-value">0</span>
+                <span class="stat-value">0</span>
             </div>
-            <div class="stat">
+            <div class="stat" id="stat-available">
                 <span class="stat-label">Available:</span>
-                <span id="available-books" class="stat-value">0</span>
+                <span class="stat-value">0</span>
             </div>
-            <div class="stat">
+            <div class="stat" id="stat-members">
                 <span class="stat-label">Members:</span>
-                <span id="total-members" class="stat-value">0</span>
+                <span class="stat-value">0</span>
             </div>
-            <div class="stat">
-                <span class="stat-label">Books Borrowed:</span>
-                <span id="borrowed-books" class="stat-value">0</span>
+            <div class="stat" id="stat-borrowed">
+                <span class="stat-label">Borrowed:</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat" id="stat-overdue">
+                <span class="stat-label">Overdue:</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat" id="stat-connection">
+                <span class="stat-label">Status:</span>
+                <span class="stat-value online">Online</span>
             </div>
         </div>
 
         <div class="main-content">
+            <!-- Sidebar Control Panel -->
             <div class="sidebar">
                 <div class="control-panel">
                     <h2><i class="fas fa-cogs"></i> Control Panel</h2>
                     
+                    <!-- Quick Actions -->
                     <div class="form-group">
-                        <h3><i class="fas fa-book-medical"></i> Add New Book</h3>
-                        <select id="book-type" class="form-control">
-                            <option value="regular">Regular Book</option>
-                            <option value="ebook">E-Book</option>
-                            <option value="audiobook">Audio Book</option>
-                        </select>
-                        
-                        <div class="input-group">
-                            <input type="text" id="book-title" class="form-control" placeholder="Book Title">
-                            <input type="text" id="book-author" class="form-control" placeholder="Author">
+                        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                        <div class="button-group">
+                            <button id="api-import-btn" class="btn btn-primary">
+                                <i class="fas fa-cloud-download-alt"></i> Import from API
+                            </button>
+                            <button id="bulk-upload-btn" class="btn btn-secondary">
+                                <i class="fas fa-upload"></i> Bulk Upload
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Book Management -->
+                    <div class="form-group">
+                        <h3><i class="fas fa-book-medical"></i> Add Book</h3>
+                        <div class="tabs" id="book-type-tabs">
+                            <button class="tab-btn active" data-type="regular">Regular</button>
+                            <button class="tab-btn" data-type="ebook">E-Book</button>
+                            <button class="tab-btn" data-type="audiobook">Audio</button>
                         </div>
                         
-                        <div class="input-group">
-                            <input type="text" id="book-isbn" class="form-control" placeholder="ISBN">
-                            <input type="number" id="book-year" class="form-control" placeholder="Year">
+                        <div id="book-form-regular" class="book-form active">
+                            <input type="text" id="book-title" class="form-control" placeholder="Title*" required>
+                            <input type="text" id="book-author" class="form-control" placeholder="Author*" required>
+                            <div class="input-group">
+                                <input type="text" id="book-isbn" class="form-control" placeholder="ISBN*" required>
+                                <button id="isbn-lookup" class="btn-icon" title="Lookup ISBN">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <input type="number" id="book-year" class="form-control" placeholder="Publication Year">
+                            <input type="text" id="book-genre" class="form-control" placeholder="Genre">
                         </div>
                         
-                        <div id="ebook-fields" class="special-fields hidden">
-                            <input type="text" id="ebook-format" class="form-control" placeholder="Format (PDF, EPUB)">
-                            <input type="number" id="ebook-size" class="form-control" placeholder="Size in MB">
+                        <div id="book-form-ebook" class="book-form">
+                            <input type="text" id="ebook-title" class="form-control" placeholder="Title*" required>
+                            <input type="text" id="ebook-author" class="form-control" placeholder="Author*" required>
+                            <div class="input-group">
+                                <input type="text" id="ebook-isbn" class="form-control" placeholder="ISBN*" required>
+                                <input type="text" id="ebook-format" class="form-control" placeholder="Format (PDF/EPUB)">
+                            </div>
+                            <input type="number" id="ebook-size" class="form-control" placeholder="Size (MB)">
                         </div>
                         
-                        <div id="audiobook-fields" class="special-fields hidden">
-                            <input type="text" id="audiobook-narrator" class="form-control" placeholder="Narrator">
-                            <input type="number" id="audiobook-duration" class="form-control" placeholder="Duration (minutes)">
+                        <div id="book-form-audiobook" class="book-form">
+                            <input type="text" id="audio-title" class="form-control" placeholder="Title*" required>
+                            <input type="text" id="audio-author" class="form-control" placeholder="Author*" required>
+                            <input type="text" id="audio-narrator" class="form-control" placeholder="Narrator">
+                            <input type="number" id="audio-duration" class="form-control" placeholder="Duration (min)">
                         </div>
                         
                         <button id="add-book-btn" class="btn btn-primary">
@@ -71,66 +135,48 @@
                         </button>
                     </div>
                     
+                    <!-- Member Management -->
                     <div class="form-group">
-                        <h3><i class="fas fa-user-plus"></i> Add New Member</h3>
-                        <div class="input-group">
-                            <input type="text" id="member-name" class="form-control" placeholder="Member Name">
-                            <input type="email" id="member-email" class="form-control" placeholder="Email">
-                        </div>
+                        <h3><i class="fas fa-user-plus"></i> Add Member</h3>
+                        <input type="text" id="member-name" class="form-control" placeholder="Full Name*" required>
+                        <input type="email" id="member-email" class="form-control" placeholder="Email*" required>
+                        <input type="tel" id="member-phone" class="form-control" placeholder="Phone">
                         <button id="add-member-btn" class="btn btn-secondary">
                             <i class="fas fa-user-plus"></i> Add Member
                         </button>
                     </div>
                     
+                    <!-- Search & Filter -->
                     <div class="form-group">
-                        <h3><i class="fas fa-search"></i> Search & Filter</h3>
-                        <input type="text" id="search-input" class="form-control" placeholder="Search by title, author, ISBN...">
-                        <select id="filter-type" class="form-control">
-                            <option value="all">All Book Types</option>
-                            <option value="regular">Regular Books</option>
-                            <option value="ebook">E-Books</option>
-                            <option value="audiobook">Audio Books</option>
-                            <option value="available">Available Books</option>
-                            <option value="borrowed">Borrowed Books</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <h3><i class="fas fa-exchange-alt"></i> Borrow / Return</h3>
+                        <h3><i class="fas fa-search"></i> Search</h3>
                         <div class="input-group">
-                            <select id="borrow-book-select" class="form-control">
-                                <option value="">Select Book</option>
-                            </select>
-                            <select id="borrow-member-select" class="form-control">
-                                <option value="">Select Member</option>
-                            </select>
+                            <input type="text" id="search-input" class="form-control" 
+                                   placeholder="Search books/members..." autocomplete="off">
+                            <button id="clear-search" class="btn-icon">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <button id="borrow-btn" class="btn btn-action borrow">
-                            <i class="fas fa-sign-out-alt"></i> Borrow Book
-                        </button>
-                        <button id="return-btn" class="btn btn-action return">
-                            <i class="fas fa-sign-in-alt"></i> Return Book
-                        </button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <h3><i class="fas fa-database"></i> Data Management</h3>
-                        <div class="button-group">
-                            <button id="save-data-btn" class="btn btn-success">
-                                <i class="fas fa-save"></i> Save to Storage
-                            </button>
-                            <button id="load-data-btn" class="btn btn-info">
-                                <i class="fas fa-folder-open"></i> Load from Storage
-                            </button>
-                            <button id="clear-data-btn" class="btn btn-warning">
-                                <i class="fas fa-trash"></i> Clear All Data
-                            </button>
+                        <div class="filter-group">
+                            <select id="filter-status" class="form-control">
+                                <option value="all">All Status</option>
+                                <option value="available">Available</option>
+                                <option value="borrowed">Borrowed</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                            <select id="filter-type" class="form-control">
+                                <option value="all">All Types</option>
+                                <option value="regular">Regular Books</option>
+                                <option value="ebook">E-Books</option>
+                                <option value="audiobook">Audio Books</option>
+                            </select>
                         </div>
                     </div>
                 </div>
             </div>
-
+            
+            <!-- Main Content Area -->
             <div class="content-area">
+                <!-- Navigation Tabs -->
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="books">
                         <i class="fas fa-book"></i> Books
@@ -139,39 +185,123 @@
                         <i class="fas fa-users"></i> Members
                     </button>
                     <button class="tab-btn" data-tab="borrowed">
-                        <i class="fas fa-clipboard-list"></i> Borrowed Books
+                        <i class="fas fa-clipboard-list"></i> Borrowed
+                    </button>
+                    <button class="tab-btn" data-tab="analytics">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </button>
+                    <button class="tab-btn" data-tab="discover">
+                        <i class="fas fa-compass"></i> Discover
                     </button>
                 </div>
                 
+                <!-- Books Tab -->
                 <div class="tab-content active" id="books-tab">
-                    <h2><i class="fas fa-book-open"></i> Books Collection</h2>
+                    <div class="tab-header">
+                        <h2><i class="fas fa-book-open"></i> Book Collection</h2>
+                        <div class="tab-actions">
+                            <button id="bulk-select-btn" class="btn btn-outline">
+                                <i class="fas fa-check-square"></i> Select Multiple
+                            </button>
+                            <button id="sort-books" class="btn btn-outline">
+                                <i class="fas fa-sort-amount-down"></i> Sort
+                            </button>
+                        </div>
+                    </div>
                     <div id="books-container" class="cards-container">
-                        <!-- Books will be displayed here -->
+                        <!-- Books will be dynamically rendered here -->
                     </div>
                 </div>
                 
+                <!-- Members Tab -->
                 <div class="tab-content" id="members-tab">
-                    <h2><i class="fas fa-users"></i> Library Members</h2>
+                    <div class="tab-header">
+                        <h2><i class="fas fa-users"></i> Library Members</h2>
+                    </div>
                     <div id="members-container" class="cards-container">
-                        <!-- Members will be displayed here -->
+                        <!-- Members will be dynamically rendered here -->
                     </div>
                 </div>
                 
+                <!-- Borrowed Tab -->
                 <div class="tab-content" id="borrowed-tab">
-                    <h2><i class="fas fa-clipboard-list"></i> Currently Borrowed</h2>
+                    <div class="tab-header">
+                        <h2><i class="fas fa-clipboard-list"></i> Borrowed Items</h2>
+                        <button id="send-reminders" class="btn btn-warning">
+                            <i class="fas fa-bell"></i> Send Reminders
+                        </button>
+                    </div>
                     <div id="borrowed-container" class="cards-container">
-                        <!-- Borrowed books will be displayed here -->
+                        <!-- Borrowed items will be dynamically rendered here -->
+                    </div>
+                </div>
+                
+                <!-- Analytics Tab -->
+                <div class="tab-content" id="analytics-tab">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
+                    </div>
+                    <div class="analytics-container">
+                        <div class="chart-container">
+                            <canvas id="books-chart"></canvas>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <h3><i class="fas fa-book"></i> Most Popular Genre</h3>
+                                <p id="popular-genre">Loading...</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3><i class="fas fa-user"></i> Top Borrower</h3>
+                                <p id="top-borrower">Loading...</p>
+                            </div>
+                            <div class="stat-card">
+                                <h3><i class="fas fa-calendar"></i> Busiest Month</h3>
+                                <p id="busy-month">Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Discover Tab -->
+                <div class="tab-content" id="discover-tab">
+                    <div class="tab-header">
+                        <h2><i class="fas fa-compass"></i> Discover Books</h2>
+                        <div class="discover-controls">
+                            <input type="text" id="discover-search" class="form-control" 
+                                   placeholder="Search Open Library...">
+                            <button id="discover-btn" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                    <div id="discover-container" class="cards-container">
+                        <!-- API search results will appear here -->
                     </div>
                 </div>
             </div>
         </div>
         
+        <!-- Footer -->
         <footer>
-            <p>Library Management System &copy; 2023 | Built with ES6 Classes, Inheritance, localStorage</p>
+            <div class="footer-content">
+                <p>Enhanced Library Management System &copy; 2023</p>
+                <div class="footer-info">
+                    <span id="data-status"><i class="fas fa-database"></i> Local</span>
+                    <span id="last-saved">Last saved: Never</span>
+                </div>
+            </div>
         </footer>
     </div>
 
-    <script src="library.js"></script>
-    <script src="script.js"></script>
+    <!-- TypeScript would be compiled to these -->
+    <script src="modules/libraryClasses.js" type="module"></script>
+    <script src="modules/bookManager.js" type="module"></script>
+    <script src="modules/memberManager.js" type="module"></script>
+    <script src="modules/uiRenderer.js" type="module"></script>
+    <script src="modules/storageService.js" type="module"></script>
+    <script src="modules/apiService.js" type="module"></script>
+    <script src="modules/eventHandlers.js" type="module"></script>
+    <script src="modules/notifications.js" type="module"></script>
+    <script src="app.js" type="module"></script>
 </body>
 </html>
