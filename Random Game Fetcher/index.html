@@ -1,52 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>FreeToGame Explorer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>random game fetcher</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="frame">
+        <h1>← RANDOM GAME</h1>
+        
+        <div class="filter-grid">
+            <div class="filter-item">
+                <label for="genre">genre</label>
+                <select id="genre">
+                    <option value="">any</option>
+                    <option value="mmorpg">MMORPG</option>
+                    <option value="shooter">shooter</option>
+                    <option value="strategy">strategy</option>
+                    <option value="racing">racing</option>
+                    <option value="sports">sports</option>
+                    <option value="rpg">RPG</option>
+                    <option value="fighting">fighting</option>
+                    <option value="battle-royale">battle royale</option>
+                    <option value="survival">survival</option>
+                    <option value="arcade">arcade</option>
+                </select>
+            </div>
+            
+            <div class="filter-item">
+                <label for="year">released after</label>
+                <input type="number" id="year" placeholder="2018" min="2000" max="2026" value="2018">
+            </div>
+            
+            <button class="random-button" id="fetchBtn">→ random game</button>
+        </div>
 
-  <div class="container">
-    <h1>FreeToGame Explorer</h1>
-
-    <div class="controls">
-      <select id="genreSelect">
-        <option value="">All Genres</option>
-        <option value="mmorpg">MMORPG</option>
-        <option value="shooter">Shooter</option>
-        <option value="strategy">Strategy</option>
-        <option value="moba">MOBA</option>
-        <option value="racing">Racing</option>
-        <option value="sports">Sports</option>
-        <option value="social">Social</option>
-        <option value="sandbox">Sandbox</option>
-        <option value="open-world">Open World</option>
-        <option value="survival">Survival</option>
-        <option value="pvp">PVP</option>
-        <option value="pve">PVE</option>
-        <option value="anime">Anime</option>
-      </select>
-
-      <input type="number" id="yearInput" placeholder="Release Year (e.g. 2020)" />
-
-      <button id="randomBtn">Random Game</button>
+        <div id="gameContainer">
+            <div class="loading">loading first game...</div>
+        </div>
+        <hr>
+        <div style="font-size: 0.65rem; color: #aaa; text-align: right; margin-top: 0.5rem;">data: freetogame.com</div>
     </div>
 
-    <div class="game-card">
-      <h2 id="gameTitle">Click "Random Game"</h2>
-
-      <img id="thumbnail" class="thumbnail" />
-
-      <div class="slider">
-        <button id="prevBtn">‹</button>
-        <img id="screenshotImage">
-        <button id="nextBtn">›</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
