@@ -1,6 +1,7 @@
 // ----------------------------------------------------
-//  RANDOM GAME FETCHER — WORKS WITH CORS PROXY
-//  No API keys required, works locally
+//  GAME ROULETTE · RANDOM GAME PICKER
+//  FreeToGame API with CORS proxy + fallback
+//  FULLY FUNCTIONAL - ALL INTERACTIVE ELEMENTS FIXED
 // ----------------------------------------------------
 
 // DOM elements
@@ -9,7 +10,7 @@ const yearInput = document.getElementById('year');
 const fetchBtn = document.getElementById('fetchBtn');
 const gameContainer = document.getElementById('gameContainer');
 
-// Local fallback data (in case API fails)
+// Local fallback data
 const FALLBACK_GAMES = [
     {
         id: 540,
@@ -18,17 +19,17 @@ const FALLBACK_GAMES = [
         genre: "Shooter",
         platform: "PC",
         release_date: "2022-10-04",
-        short_description: "A team-based action game set in an optimistic future.",
+        short_description: "A team-based action game set in an optimistic future. Choose your hero and fight in fast-paced 5v5 battles.",
         game_url: "https://www.freetogame.com/open/overwatch-2"
     },
     {
         id: 516,
-        title: "PUBG: BATTLEGROUNDS",
+        title: "PUBG: Battlegrounds",
         thumbnail: "https://www.freetogame.com/g/516/thumbnail.jpg",
         genre: "Shooter",
         platform: "PC",
         release_date: "2022-01-12",
-        short_description: "Land on strategic locations, loot weapons, and survive.",
+        short_description: "Land on strategic locations, loot weapons and supplies, and survive to become the last team standing.",
         game_url: "https://www.freetogame.com/open/pubg"
     },
     {
@@ -38,7 +39,7 @@ const FALLBACK_GAMES = [
         genre: "RPG",
         platform: "PC",
         release_date: "2020-09-28",
-        short_description: "An open-world action RPG with elemental combat.",
+        short_description: "An open-world action RPG with elemental combat. Explore Teyvat, solve mysteries, and meet unforgettable characters.",
         game_url: "https://www.freetogame.com/open/genshin-impact"
     },
     {
@@ -48,7 +49,7 @@ const FALLBACK_GAMES = [
         genre: "Shooter",
         platform: "PC",
         release_date: "2019-10-01",
-        short_description: "A first-person shooter with MMO elements.",
+        short_description: "A first-person shooter with MMO elements. Guardian, the light calls. Defend humanity and reclaim our lost worlds.",
         game_url: "https://www.freetogame.com/open/destiny-2"
     },
     {
@@ -58,7 +59,7 @@ const FALLBACK_GAMES = [
         genre: "MMORPG",
         platform: "PC",
         release_date: "2022-02-11",
-        short_description: "A massive multiplayer action RPG.",
+        short_description: "A massive multiplayer action RPG. Embark on an epic adventure to find the Lost Ark and save Arkesia.",
         game_url: "https://www.freetogame.com/open/lost-ark"
     },
     {
@@ -68,7 +69,7 @@ const FALLBACK_GAMES = [
         genre: "Shooter",
         platform: "PC",
         release_date: "2019-02-04",
-        short_description: "A battle royale set in the Titanfall universe.",
+        short_description: "A battle royale set in the Titanfall universe. Master unique legends and fight for glory on the frontier.",
         game_url: "https://www.freetogame.com/open/apex-legends"
     },
     {
@@ -78,7 +79,7 @@ const FALLBACK_GAMES = [
         genre: "Shooter",
         platform: "PC",
         release_date: "2013-03-25",
-        short_description: "A cooperative third-person shooter.",
+        short_description: "A cooperative third-person shooter. Become a Tenno and unleash your Warframe's power.",
         game_url: "https://www.freetogame.com/open/warframe"
     },
     {
@@ -88,37 +89,16 @@ const FALLBACK_GAMES = [
         genre: "Shooter",
         platform: "PC",
         release_date: "2017-07-25",
-        short_description: "The battle royge phenomenon.",
+        short_description: "The battle royale phenomenon. Drop in, loot up, and be the last one standing.",
         game_url: "https://www.freetogame.com/open/fortnite"
-    },
-    {
-        id: 483,
-        title: "World of Tanks",
-        thumbnail: "https://www.freetogame.com/g/483/thumbnail.jpg",
-        genre: "Shooter",
-        platform: "PC",
-        release_date: "2011-04-12",
-        short_description: "Team-based tank combat.",
-        game_url: "https://www.freetogame.com/open/world-of-tanks"
-    },
-    {
-        id: 508,
-        title: "Roblox",
-        thumbnail: "https://www.freetogame.com/g/508/thumbnail.jpg",
-        genre: "Arcade",
-        platform: "PC",
-        release_date: "2006-09-01",
-        short_description: "A global platform for play and creation.",
-        game_url: "https://www.freetogame.com/open/roblox"
     }
 ];
 
-// Cache for all games
 let allGamesCache = null;
+let isLoading = false;
 
 // ---------- FETCH WITH CORS PROXY ----------
 async function fetchWithProxy(url) {
-    // Try multiple CORS proxies in order
     const proxies = [
         `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
         `https://corsproxy.io/?${encodeURIComponent(url)}`,
@@ -132,64 +112,87 @@ async function fetchWithProxy(url) {
                 return await response.json();
             }
         } catch (e) {
-            console.log('Proxy failed:', proxyUrl);
+            console.log('Proxy failed, trying next...');
         }
     }
     throw new Error('All proxies failed');
 }
 
-// ---------- FETCH ALL GAMES WITH FALLBACK ----------
+// ---------- LOAD GAMES ----------
 async function loadAllGames() {
-    // Try API first
+    // First try to load from API
     try {
-        gameContainer.innerHTML = `<div class="loading">loading games from API...</div>`;
         const data = await fetchWithProxy('https://www.freetogame.com/api/games');
-        allGamesCache = data;
-        return allGamesCache;
+        if (data && data.length > 0) {
+            allGamesCache = data;
+            updateGameCount(data.length, false);
+            return allGamesCache;
+        }
     } catch (error) {
-        console.error('API fetch failed, using fallback data:', error);
-        // Use fallback data
-        allGamesCache = FALLBACK_GAMES;
-        return allGamesCache;
+        console.error('API failed, using fallback:', error);
+    }
+    
+    // Fallback to local data
+    allGamesCache = FALLBACK_GAMES;
+    updateGameCount(FALLBACK_GAMES.length, true);
+    return allGamesCache;
+}
+
+// ---------- UPDATE GAME COUNT IN FOOTER ----------
+function updateGameCount(count, isFallback = false) {
+    const countEl = document.getElementById('gameCount');
+    if (countEl) {
+        countEl.textContent = isFallback 
+            ? `🎮 ${count} Games Loaded (Offline Mode)` 
+            : `🎮 Powered by FreeToGame.com · ${count}+ Games`;
     }
 }
 
-// ---------- GET RANDOM GAME WITH FILTERS ----------
+// ---------- FILTER AND RANDOMIZE ----------
 function getRandomGameFiltered(genre, minYear) {
     if (!allGamesCache || allGamesCache.length === 0) return null;
     
-    // filter by genre
-    let filtered = allGamesCache;
-    if (genre) {
+    let filtered = [...allGamesCache];
+    
+    // Filter by genre
+    if (genre && genre !== '') {
         filtered = filtered.filter(game => 
             game.genre && game.genre.toLowerCase().includes(genre.toLowerCase())
         );
     }
     
-    // filter by release year
-    if (minYear) {
-        filtered = filtered.filter(game => {
-            if (!game.release_date) return false;
-            const gameYear = new Date(game.release_date).getFullYear();
-            return gameYear >= parseInt(minYear);
-        });
+    // Filter by year
+    if (minYear && minYear !== '') {
+        const yearNum = parseInt(minYear);
+        if (!isNaN(yearNum)) {
+            filtered = filtered.filter(game => {
+                if (!game.release_date) return false;
+                const gameYear = new Date(game.release_date).getFullYear();
+                return !isNaN(gameYear) && gameYear >= yearNum;
+            });
+        }
     }
     
     if (filtered.length === 0) return null;
     
-    // pick random game
+    // Pick random game
     const randomIndex = Math.floor(Math.random() * filtered.length);
     return filtered[randomIndex];
 }
 
-// ---------- RENDER SINGLE GAME CARD ----------
+// ---------- RENDER GAME WITH IMPROVED HTML STRUCTURE ----------
 function renderGame(game) {
     if (!game) {
-        gameContainer.innerHTML = `<div class="empty">∅ no games match filters</div>`;
+        gameContainer.innerHTML = `
+            <div class="empty-state">
+                <span class="state-icon">🎲</span>
+                <h3 style="margin-bottom: 0.5rem; color: var(--blue-deep);">No Games Found</h3>
+                <p style="color: var(--gray-soft);">Try different filters or spin again</p>
+            </div>
+        `;
         return;
     }
 
-    // format release year
     let releaseYear = 'TBA';
     if (game.release_date) {
         const date = new Date(game.release_date);
@@ -198,31 +201,45 @@ function renderGame(game) {
         }
     }
 
-    // game thumbnail
     const thumbnail = game.thumbnail || '';
+    const platform = game.platform || 'PC';
+    const genre = game.genre || 'Unclassified';
+    const title = game.title || 'Untitled Game';
+    const description = game.short_description || 'No description available.';
+    const gameUrl = game.game_url || '#';
 
     const html = `
         <div class="game-card">
-            <div class="game-image">
+            <div class="game-image-wrapper">
                 ${thumbnail ? 
-                    `<img src="${thumbnail}" alt="${game.title || 'game cover'}" loading="lazy" onerror="this.parentElement.innerHTML='<span class=placeholder>no cover</span>'">` : 
-                    `<span class="placeholder">no cover</span>`
+                    `<img src="${thumbnail}" alt="${title}" class="game-image" loading="lazy" 
+                        onerror="this.onerror=null; this.parentElement.innerHTML='<div class=game-image-placeholder><span>🎮 No Cover</span></div>';">` : 
+                    `<div class="game-image-placeholder"><span>🎮 No Cover</span></div>`
                 }
+                <span class="game-badge">${platform}</span>
             </div>
             <div class="game-details">
-                <div class="game-title">${game.title || 'untitled'}</div>
+                <h2 class="game-title">${title}</h2>
                 <div class="game-meta">
-                    <span>${game.genre || 'genre unclassified'}</span>
-                    <span>${game.platform || 'PC'}</span>
-                    <span>${releaseYear}</span>
+                    <span class="meta-item">
+                        <span class="meta-icon">🏷️</span>
+                        <span class="meta-text"><strong>${genre}</strong></span>
+                    </span>
+                    <span class="meta-item">
+                        <span class="meta-icon">📅</span>
+                        <span class="meta-text">Released <strong>${releaseYear}</strong></span>
+                    </span>
+                    <span class="meta-item">
+                        <span class="meta-icon">💻</span>
+                        <span class="meta-text"><strong>${platform}</strong></span>
+                    </span>
                 </div>
-                <div class="game-description">
-                    ${game.short_description ? 
-                        game.short_description.slice(0, 120) + (game.short_description.length > 120 ? '…' : '') : 
-                        'No description available.'}
-                </div>
-                ${game.game_url ? 
-                    `<a href="${game.game_url}" target="_blank" rel="noopener" class="game-link">view game →</a>` : 
+                <p class="game-description">${description}</p>
+                ${gameUrl !== '#' ? 
+                    `<a href="${gameUrl}" target="_blank" rel="noopener" class="game-link">
+                        Play Game 
+                        <span class="link-icon">→</span>
+                    </a>` : 
                     ''
                 }
             </div>
@@ -232,31 +249,74 @@ function renderGame(game) {
     gameContainer.innerHTML = html;
 }
 
-// ---------- HANDLE RANDOM BUTTON ----------
-async function handleRandomClick() {
-    gameContainer.innerHTML = `<div class="loading">fetching random...</div>`;
+// ---------- HANDLE SPIN BUTTON ----------
+async function handleSpinClick(e) {
+    e.preventDefault();
+    
+    // Prevent multiple clicks while loading
+    if (isLoading) return;
+    isLoading = true;
+    
+    // Disable button and show loading state
+    fetchBtn.disabled = true;
+    fetchBtn.style.opacity = '0.8';
+    fetchBtn.style.cursor = 'wait';
+    
+    gameContainer.innerHTML = `
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p style="color: var(--blue-deep); font-weight: 500;">Spinning the wheel...</p>
+        </div>
+    `;
     
     const genre = genreSelect.value;
     const year = yearInput.value;
     
-    // ensure cache is loaded
+    // Ensure cache is loaded
     if (!allGamesCache) {
         await loadAllGames();
     }
     
-    const randomGame = getRandomGameFiltered(genre, year);
-    renderGame(randomGame);
+    // Add slight delay for better UX
+    setTimeout(() => {
+        const randomGame = getRandomGameFiltered(genre, year);
+        renderGame(randomGame);
+        
+        // Re-enable button
+        fetchBtn.disabled = false;
+        fetchBtn.style.opacity = '1';
+        fetchBtn.style.cursor = 'pointer';
+        isLoading = false;
+    }, 600);
 }
 
-// ---------- INITIAL LOAD ----------
+// ---------- INITIALIZE ----------
 async function init() {
+    // Show loading state
+    gameContainer.innerHTML = `
+        <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p style="color: var(--blue-deep); font-weight: 500;">Loading games...</p>
+        </div>
+    `;
+    
     await loadAllGames();
     const initialGame = getRandomGameFiltered(genreSelect.value, yearInput.value);
     renderGame(initialGame);
     
-    // event listener
-    fetchBtn.addEventListener('click', handleRandomClick);
+    // Add event listener to button
+    if (fetchBtn) {
+        fetchBtn.addEventListener('click', handleSpinClick);
+    }
+    
+    // Add keyboard support (Enter key on button)
+    fetchBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleSpinClick(e);
+        }
+    });
 }
 
-// start the app
-init();
+// Start the app when DOM is fully loaded
+document.addEventListener('DOMContentLoaded', init);

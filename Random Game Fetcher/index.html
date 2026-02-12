@@ -3,46 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>random game fetcher</title>
+    <title>Game Roulette · Random Game Picker</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="frame">
-        <h1>← RANDOM GAME</h1>
-        
-        <div class="filter-grid">
-            <div class="filter-item">
-                <label for="genre">genre</label>
-                <select id="genre">
-                    <option value="">any</option>
-                    <option value="mmorpg">MMORPG</option>
-                    <option value="shooter">shooter</option>
-                    <option value="strategy">strategy</option>
-                    <option value="racing">racing</option>
-                    <option value="sports">sports</option>
-                    <option value="rpg">RPG</option>
-                    <option value="fighting">fighting</option>
-                    <option value="battle-royale">battle royale</option>
-                    <option value="survival">survival</option>
-                    <option value="arcade">arcade</option>
-                </select>
+    <div class="gradient-bg">
+        <div class="container">
+            <!-- Header with playful icon -->
+            <div class="header">
+                <div class="logo">
+                    <span class="logo-icon">🎮</span>
+                    <h1>Game Roulette</h1>
+                </div>
+                <div class="header-subtitle">
+                    <span class="pill">Random Picker</span>
+                    <span class="pill">Free Games</span>
+                    <span class="pill">No Signup</span>
+                </div>
             </div>
-            
-            <div class="filter-item">
-                <label for="year">released after</label>
-                <input type="number" id="year" placeholder="2018" min="2000" max="2026" value="2018">
-            </div>
-            
-            <button class="random-button" id="fetchBtn">→ random game</button>
-        </div>
 
-        <div id="gameContainer">
-            <div class="loading">loading first game...</div>
+            <!-- Main card -->
+            <div class="card">
+                <!-- Filter section with improved layout -->
+                <div class="filter-section">
+                    <div class="filter-title">
+                        <span class="filter-icon">⚙️</span>
+                        <h2>Filter & Spin</h2>
+                    </div>
+                    
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label for="genre">
+                                <span class="label-icon">🏷️</span>
+                                Genre
+                            </label>
+                            <div class="select-wrapper">
+                                <select id="genre">
+                                    <option value="">🎲 Any Genre</option>
+                                    <option value="mmorpg">⚔️ MMORPG</option>
+                                    <option value="shooter">🔫 Shooter</option>
+                                    <option value="strategy">🧠 Strategy</option>
+                                    <option value="racing">🏎️ Racing</option>
+                                    <option value="sports">⚽ Sports</option>
+                                    <option value="rpg">🗡️ RPG</option>
+                                    <option value="fighting">🥊 Fighting</option>
+                                    <option value="battle-royale">🏆 Battle Royale</option>
+                                    <option value="survival">🌲 Survival</option>
+                                    <option value="arcade">👾 Arcade</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="year">
+                                <span class="label-icon">📅</span>
+                                Released After
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="number" id="year" placeholder="2018" min="2000" max="2026" value="2018">
+                                <span class="input-suffix">Year</span>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-group button-group">
+                            <label>&nbsp;</label>
+                            <button class="spin-button" id="fetchBtn">
+                                <span class="button-icon">🎲</span>
+                                Spin the Wheel
+                                <span class="button-shine"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game display area with improved card design -->
+                <div class="game-area">
+                    <div id="gameContainer"></div>
+                </div>
+
+                <!-- Footer with stats -->
+                <div class="game-footer">
+                    <div class="footer-left">
+                        <span class="footer-icon">📊</span>
+                        <span id="gameCount">Powered by FreeToGame.com</span>
+                    </div>
+                    <div class="footer-right">
+                        <span class="tooltip">✨ Click Spin for Random Game</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <hr>
-        <div style="font-size: 0.65rem; color: #aaa; text-align: right; margin-top: 0.5rem;">data: freetogame.com</div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
