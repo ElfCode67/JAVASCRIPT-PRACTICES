@@ -1,0 +1,75 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #0f0f0f;
+  color: white;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.container {
+  width: 800px;
+  max-width: 100%;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-weight: 300;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+select, input, button {
+  padding: 8px 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: white;
+}
+
+button {
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #333;
+}
+
+.game-card {
+  text-align: center;
+}
+
+.thumbnail {
+  width: 300px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.slider img {
+  width: 500px;
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.slider button {
+  font-size: 24px;
+  padding: 5px 10px;
+}

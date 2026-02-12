@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FreeToGame Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>FreeToGame Explorer</h1>
+
+    <div class="controls">
+      <select id="genreSelect">
+        <option value="">All Genres</option>
+        <option value="mmorpg">MMORPG</option>
+        <option value="shooter">Shooter</option>
+        <option value="strategy">Strategy</option>
+        <option value="moba">MOBA</option>
+        <option value="racing">Racing</option>
+        <option value="sports">Sports</option>
+        <option value="social">Social</option>
+        <option value="sandbox">Sandbox</option>
+        <option value="open-world">Open World</option>
+        <option value="survival">Survival</option>
+        <option value="pvp">PVP</option>
+        <option value="pve">PVE</option>
+        <option value="anime">Anime</option>
+      </select>
+
+      <input type="number" id="yearInput" placeholder="Release Year (e.g. 2020)" />
+
+      <button id="randomBtn">Random Game</button>
+    </div>
+
+    <div class="game-card">
+      <h2 id="gameTitle">Click "Random Game"</h2>
+
+      <img id="thumbnail" class="thumbnail" />
+
+      <div class="slider">
+        <button id="prevBtn">‹</button>
+        <img id="screenshotImage">
+        <button id="nextBtn">›</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
