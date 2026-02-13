@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallpaper Engine Clock - Enhanced Edition</title>
+    <title>Wallpaper Engine Clock - Interactive Desktop</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
@@ -19,6 +19,32 @@
     <div class="particles-container" id="particles"></div>
     <div class="mouse-trail" id="mouseTrail"></div>
     <div class="audio-visualizer" id="audioVisualizer"></div>
+    
+    <!-- Instruction Badge -->
+    <div class="instruction-badge" id="instructionBadge">
+        <i class="fas fa-info-circle"></i>
+        <span class="instruction-text">Click icons to customize</span>
+    </div>
+    
+    <!-- Feature Hints -->
+    <div class="feature-hints">
+        <div class="hint-item" data-hint="Live weather from your location">
+            <i class="fas fa-cloud-sun"></i>
+            <span>Weather</span>
+        </div>
+        <div class="hint-item" data-hint="Particles follow your mouse">
+            <i class="fas fa-mouse-pointer"></i>
+            <span>Interactive</span>
+        </div>
+        <div class="hint-item" data-hint="Colors change with time">
+            <i class="fas fa-sun"></i>
+            <span>Dynamic</span>
+        </div>
+        <div class="hint-item" data-hint="Switch between video and images">
+            <i class="fas fa-video"></i>
+            <span>Video</span>
+        </div>
+    </div>
     
     <!-- Main clock container -->
     <div class="container">
@@ -40,72 +66,118 @@
             </div>
             
             <div class="additional-info">
-                <div class="info-item">
+                <div class="info-item" id="sunriseInfo">
                     <i class="fas fa-sun"></i>
-                    <span id="sunrise">06:45 AM</span>
+                    <span class="info-label">Sunrise</span>
+                    <span class="info-value" id="sunrise">06:45 AM</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="timezoneInfo">
                     <i class="fas fa-clock"></i>
-                    <span id="timezone">UTC</span>
+                    <span class="info-label">Timezone</span>
+                    <span class="info-value" id="timezone">UTC</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="weatherInfo">
                     <i class="fas fa-temperature-high"></i>
-                    <span id="temperature">--°C</span>
+                    <span class="info-label">Weather</span>
+                    <span class="info-value" id="temperature">--°C</span>
                 </div>
-                <div class="info-item">
+                <div class="info-item" id="locationInfo">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span id="location">--</span>
+                    <span class="info-label">Location</span>
+                    <span class="info-value" id="location">--</span>
                 </div>
             </div>
         </div>
         
-        <!-- Control panel -->
+        <!-- Control panel with labels -->
         <div class="control-panel">
-            <button id="themeToggle" class="control-btn" title="Change theme">
-                <i class="fas fa-star"></i>
-            </button>
-            <button id="particleToggle" class="control-btn" title="Toggle particles">
-                <i class="fas fa-star"></i>
-            </button>
-            <button id="videoToggle" class="control-btn" title="Toggle video background">
-                <i class="fas fa-video"></i>
-            </button>
-            <button id="wallpaperToggle" class="control-btn" title="Change wallpaper">
-                <i class="fas fa-image"></i>
-            </button>
-            <button id="settingsToggle" class="control-btn" title="Settings">
-                <i class="fas fa-cog"></i>
-            </button>
-            <button id="fullscreenToggle" class="control-btn" title="Toggle fullscreen">
-                <i class="fas fa-expand"></i>
-            </button>
+            <div class="control-group">
+                <button id="themeToggle" class="control-btn" title="Switch color theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+                <span class="btn-label">Theme</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="particleToggle" class="control-btn" title="Toggle floating particles">
+                    <i class="fas fa-star"></i>
+                </button>
+                <span class="btn-label">Particles</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="videoToggle" class="control-btn" title="Switch to video background">
+                    <i class="fas fa-video"></i>
+                </button>
+                <span class="btn-label">Video</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="wallpaperToggle" class="control-btn" title="Choose wallpaper style">
+                    <i class="fas fa-image"></i>
+                </button>
+                <span class="btn-label">Wallpaper</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="settingsToggle" class="control-btn" title="Customize settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <span class="btn-label">Settings</span>
+            </div>
+            
+            <div class="control-group">
+                <button id="fullscreenToggle" class="control-btn" title="Toggle fullscreen mode">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <span class="btn-label">Fullscreen</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Tips Overlay -->
+    <div class="tips-overlay" id="tipsOverlay">
+        <div class="tips-content">
+            <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
+            <ul class="tips-list">
+                <li><i class="fas fa-mouse-pointer"></i> Move your mouse - particles will follow</li>
+                <li><i class="fas fa-video"></i> Toggle video mode for moving backgrounds</li>
+                <li><i class="fas fa-cloud-sun"></i> Weather updates from your location</li>
+                <li><i class="fas fa-palette"></i> Colors change with sunrise & sunset</li>
+                <li><i class="fas fa-sliders-h"></i> Adjust particle density in settings</li>
+                <li><i class="fas fa-clock"></i> Hover over icons for more info</li>
+            </ul>
+            <div class="tips-footer">
+                <button class="btn-secondary" id="hideTips">Got it</button>
+            </div>
         </div>
     </div>
     
     <!-- Wallpaper selection modal -->
     <div class="modal" id="wallpaperModal">
         <div class="modal-content">
-            <h2>Select Wallpaper</h2>
+            <h2><i class="fas fa-image"></i> Select Wallpaper</h2>
+            <p class="modal-subtitle">Choose a background style for your clock</p>
             <div class="wallpaper-grid">
                 <div class="wallpaper-option active" data-bg="nature">
                     <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Nature">
-                    <span>Nature</span>
+                    <span>Nature <small>Forest & lakes</small></span>
                 </div>
                 <div class="wallpaper-option" data-bg="space">
                     <img src="https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Space">
-                    <span>Space</span>
+                    <span>Space <small>Galaxy & stars</small></span>
                 </div>
                 <div class="wallpaper-option" data-bg="city">
                     <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="City">
-                    <span>City</span>
+                    <span>City <small>Urban skyline</small></span>
                 </div>
                 <div class="wallpaper-option" data-bg="abstract">
                     <img src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Abstract">
-                    <span>Abstract</span>
+                    <span>Abstract <small>Color gradients</small></span>
                 </div>
             </div>
             <div class="modal-actions">
-                <button id="closeModal" class="btn-secondary">Close</button>
+                <button id="closeModal" class="btn-secondary">Cancel</button>
             </div>
         </div>
     </div>
@@ -113,46 +185,73 @@
     <!-- Settings modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content settings-content">
-            <h2>Settings</h2>
+            <h2><i class="fas fa-sliders-h"></i> Settings</h2>
+            <p class="modal-subtitle">Customize your clock experience</p>
+            
             <div class="settings-grid">
                 <div class="setting-item">
-                    <label>Clock Format</label>
+                    <label><i class="fas fa-clock"></i> Clock Format</label>
                     <select id="clockFormat">
-                        <option value="24h">24 Hour</option>
-                        <option value="12h" selected>12 Hour</option>
+                        <option value="12h">12 Hour (AM/PM)</option>
+                        <option value="24h">24 Hour Military</option>
                     </select>
+                    <small>How time is displayed</small>
                 </div>
+                
                 <div class="setting-item">
-                    <label>Date Format</label>
+                    <label><i class="fas fa-calendar"></i> Date Format</label>
                     <select id="dateFormat">
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="YYYY-MM-DD" selected>YYYY-MM-DD</option>
+                        <option value="MM/DD/YYYY">Month/Day/Year (US)</option>
+                        <option value="DD/MM/YYYY">Day/Month/Year (EU)</option>
+                        <option value="YYYY-MM-DD">Year-Month-Day (ISO)</option>
                     </select>
+                    <small>Choose your preferred format</small>
                 </div>
+                
                 <div class="setting-item">
-                    <label>Particle Density</label>
+                    <label><i class="fas fa-sparkles"></i> Particle Density</label>
                     <input type="range" id="particleDensity" min="0" max="100" value="50">
+                    <div class="range-labels">
+                        <span>Less</span>
+                        <span id="densityValue">50%</span>
+                        <span>More</span>
+                    </div>
+                    <small>Number of floating particles</small>
                 </div>
+                
                 <div class="setting-item">
-                    <label>Animation Speed</label>
+                    <label><i class="fas fa-tachometer-alt"></i> Animation Speed</label>
                     <input type="range" id="animationSpeed" min="0.5" max="2" step="0.1" value="1">
+                    <div class="range-labels">
+                        <span>Slow</span>
+                        <span id="speedValue">1x</span>
+                        <span>Fast</span>
+                    </div>
+                    <small>How fast animations play</small>
                 </div>
+                
                 <div class="setting-item">
-                    <label>Weather Unit</label>
+                    <label><i class="fas fa-temperature-high"></i> Weather Unit</label>
                     <select id="weatherUnit">
-                        <option value="celsius" selected>Celsius</option>
-                        <option value="fahrenheit">Fahrenheit</option>
+                        <option value="celsius">Celsius (°C)</option>
+                        <option value="fahrenheit">Fahrenheit (°F)</option>
                     </select>
+                    <small>Temperature display</small>
                 </div>
+                
                 <div class="setting-item">
-                    <label>Auto Theme</label>
-                    <input type="checkbox" id="autoTheme" checked>
+                    <label><i class="fas fa-sun"></i> Auto Theme</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="autoTheme" checked>
+                        <span>Automatically adjust colors based on time</span>
+                    </div>
+                    <small>Changes with sunrise/sunset</small>
                 </div>
             </div>
+            
             <div class="modal-actions">
-                <button id="saveSettings" class="btn-primary">Save</button>
-                <button id="closeSettings" class="btn-secondary">Close</button>
+                <button id="saveSettings" class="btn-primary">Save Changes</button>
+                <button id="closeSettings" class="btn-secondary">Cancel</button>
             </div>
         </div>
     </div>

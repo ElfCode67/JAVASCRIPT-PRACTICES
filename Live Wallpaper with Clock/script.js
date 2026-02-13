@@ -19,6 +19,11 @@ const wallpaperToggle = document.getElementById('wallpaperToggle');
 const settingsToggle = document.getElementById('settingsToggle');
 const fullscreenToggle = document.getElementById('fullscreenToggle');
 
+// UI Elements
+const instructionBadge = document.getElementById('instructionBadge');
+const tipsOverlay = document.getElementById('tipsOverlay');
+const hideTips = document.getElementById('hideTips');
+
 // Modals
 const wallpaperModal = document.getElementById('wallpaperModal');
 const settingsModal = document.getElementById('settingsModal');
@@ -34,6 +39,8 @@ const particleDensity = document.getElementById('particleDensity');
 const animationSpeed = document.getElementById('animationSpeed');
 const weatherUnit = document.getElementById('weatherUnit');
 const autoTheme = document.getElementById('autoTheme');
+const densityValue = document.getElementById('densityValue');
+const speedValue = document.getElementById('speedValue');
 
 // State variables
 let particlesActive = true;
@@ -77,9 +84,49 @@ function init() {
     fetchWeather();
     setupEventListeners();
     
-    // Update based on time every minute
     setInterval(updateBasedOnTime, 60000);
     updateBasedOnTime();
+    
+    // Show welcome message on first visit
+    if (!localStorage.getItem('welcomeShown')) {
+        setTimeout(showWelcomeMessage, 500);
+        localStorage.setItem('welcomeShown', 'true');
+    }
+    
+    // Auto-hide tips after 8 seconds
+    setTimeout(() => {
+        if (tipsOverlay.classList.contains('show')) {
+            tipsOverlay.classList.remove('show');
+        }
+    }, 8000);
+    
+    // Update range displays
+    updateRangeDisplays();
+}
+
+// Show welcome message
+function showWelcomeMessage() {
+    const welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'welcome-message';
+    welcomeDiv.innerHTML = `
+        <h2><i class="fas fa-clock"></i> Wallpaper Clock</h2>
+        <p>Welcome! Your interactive desktop clock is ready.</p>
+        <ul class="features-list">
+            <li><i class="fas fa-check-circle"></i> Live weather from your location</li>
+            <li><i class="fas fa-check-circle"></i> Interactive particles that follow mouse</li>
+            <li><i class="fas fa-check-circle"></i> Video backgrounds for dynamic scenes</li>
+            <li><i class="fas fa-check-circle"></i> Auto day/night theme adjustment</li>
+            <li><i class="fas fa-check-circle"></i> Multiple wallpaper styles</li>
+        </ul>
+        <p class="small">Click any icon below to customize your experience</p>
+        <button id="closeWelcome">Get Started</button>
+    `;
+    document.body.appendChild(welcomeDiv);
+    
+    document.getElementById('closeWelcome').addEventListener('click', () => {
+        welcomeDiv.remove();
+        tipsOverlay.classList.add('show');
+    });
 }
 
 // Load settings from localStorage
@@ -106,6 +153,24 @@ function loadSettings() {
         document.documentElement.style.setProperty('--animation-speed', animationSpeedValue);
         document.documentElement.style.setProperty('--particle-density', particleDensityValue);
     }
+}
+
+// Update range display values
+function updateRangeDisplays() {
+    if (densityValue) {
+        densityValue.textContent = particleDensityValue + '%';
+    }
+    if (speedValue) {
+        speedValue.textContent = animationSpeedValue + 'x';
+    }
+    
+    particleDensity.addEventListener('input', (e) => {
+        densityValue.textContent = e.target.value + '%';
+    });
+    
+    animationSpeed.addEventListener('input', (e) => {
+        speedValue.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+    });
 }
 
 // Save settings to localStorage
@@ -216,6 +281,9 @@ function updateSunriseTime(currentHour) {
 
 // Fetch weather data
 async function fetchWeather() {
+    // Add loading state
+    temperatureElement.parentElement.classList.add('loading');
+    
     try {
         const position = await getCurrentPosition();
         const { latitude, longitude } = position.coords;
@@ -230,6 +298,7 @@ async function fetchWeather() {
             weatherData = data.current_weather;
             updateTemperature();
             updateWeatherIcon(data.current_weather.weathercode);
+            temperatureElement.parentElement.classList.remove('loading');
         }
         
         // Get location name using reverse geocoding
@@ -239,11 +308,12 @@ async function fetchWeather() {
         const locationData = await locationResponse.json();
         locationElement.textContent = locationData.address?.city || 
                                      locationData.address?.town || 
-                                     locationData.address?.village || '--';
+                                     locationData.address?.village || 'Unknown';
     } catch (error) {
         console.log('Weather fetch failed, using mock data');
         updateMockTemperature();
-        locationElement.textContent = '--';
+        locationElement.textContent = 'Unknown';
+        temperatureElement.parentElement.classList.remove('loading');
     }
 }
 
@@ -270,7 +340,7 @@ function updateMockTemperature() {
 }
 
 function updateWeatherIcon(code) {
-    const iconElement = document.querySelector('.info-item .fa-temperature-high').parentElement.querySelector('i');
+    const iconElement = document.querySelector('#weatherInfo i');
     // Map weather codes to icons
     if (code === 0) { // Clear sky
         iconElement.className = 'fas fa-sun';
@@ -378,7 +448,7 @@ function initAudioVisualizer() {
         visualizer.appendChild(bar);
     }
     
-    // Simulate audio input (in a real app, you'd use Web Audio API)
+    // Simulate audio input
     setInterval(() => {
         if (document.hasFocus()) {
             const bars = document.querySelectorAll('.audio-bar');
@@ -491,7 +561,7 @@ function changeWallpaper(wallpaper) {
     
     const wallpaperIcons = {
         'nature': 'fa-tree',
-        'space': 'fa-star-and-crescent',
+        'space': 'fa-star',
         'city': 'fa-building',
         'abstract': 'fa-shapes'
     };
@@ -515,6 +585,7 @@ function toggleFullscreen() {
 
 // Setup event listeners
 function setupEventListeners() {
+    // Control buttons
     themeToggle.addEventListener('click', changeTheme);
     particleToggle.addEventListener('click', toggleParticles);
     videoToggle.addEventListener('click', toggleVideo);
@@ -529,6 +600,26 @@ function setupEventListeners() {
     
     fullscreenToggle.addEventListener('click', toggleFullscreen);
     
+    // Instruction badge
+    instructionBadge.addEventListener('click', () => {
+        tipsOverlay.classList.toggle('show');
+    });
+    
+    // Hide tips
+    hideTips.addEventListener('click', () => {
+        tipsOverlay.classList.remove('show');
+    });
+    
+    // Close tips when clicking outside
+    document.addEventListener('click', (e) => {
+        if (tipsOverlay.classList.contains('show') && 
+            !tipsOverlay.contains(e.target) && 
+            !instructionBadge.contains(e.target)) {
+            tipsOverlay.classList.remove('show');
+        }
+    });
+    
+    // Modal close buttons
     closeModal.addEventListener('click', () => {
         wallpaperModal.classList.remove('active');
     });
@@ -537,6 +628,7 @@ function setupEventListeners() {
         settingsModal.classList.remove('active');
     });
     
+    // Save settings
     saveSettings.addEventListener('click', () => {
         use12Hour = clockFormat.value === '12h';
         currentDateFormat = dateFormat.value;
@@ -561,6 +653,7 @@ function setupEventListeners() {
         settingsModal.classList.remove('active');
     });
     
+    // Wallpaper selection
     wallpaperOptions.forEach(option => {
         option.addEventListener('click', () => {
             changeWallpaper(option.dataset.bg);
@@ -568,6 +661,7 @@ function setupEventListeners() {
         });
     });
     
+    // Close modals on background click
     [wallpaperModal, settingsModal].forEach(modal => {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -576,31 +670,20 @@ function setupEventListeners() {
         });
     });
     
+    // Window resize
     window.addEventListener('resize', () => {
         if (particlesActive) {
             createParticles();
         }
     });
     
+    // Fullscreen change
     document.addEventListener('fullscreenchange', () => {
         if (!document.fullscreenElement) {
             fullscreenToggle.innerHTML = '<i class="fas fa-expand"></i>';
         }
     });
 }
-
-// Add CSS animation for particles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes float {
-        0% { transform: translate(0, 0) rotate(0deg); opacity: 0.7; }
-        25% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px) rotate(90deg); }
-        50% { transform: translate(${Math.random() * 40 - 20}px, ${Math.random() * 40 - 20}px) rotate(180deg); opacity: 0.3; }
-        75% { transform: translate(${Math.random() * 20 - 10}px, ${Math.random() * 20 - 10}px) rotate(270deg); }
-        100% { transform: translate(0, 0) rotate(360deg); opacity: 0.7; }
-    }
-`;
-document.head.appendChild(style);
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
