@@ -3,248 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OVERLOAD — Workout Tracker</title>
+    <title>LIFT — Simple Weight Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ============================================
-         LANDING PAGE
-         ============================================ -->
-    <div id="landing-page" class="page active">
-        <div class="hero">
-            <div class="hero-content">
-                <h1 class="app-title">OVERLOAD</h1>
-                <p class="tagline">Track volume. Apply progressive overload. Stay consistent.</p>
-                <div class="hero-features">
-                    <span class="feature-tag">Progressive Overload</span>
-                    <span class="feature-tag">Volume Tracking</span>
-                    <span class="feature-tag">Data-Driven</span>
-                </div>
-                <button class="btn-primary" onclick="app.goToDashboard()">START TRACKING</button>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">LIFT</h1>
+            <div class="unit-toggle">
+                <button class="unit-btn active" data-unit="kg">KG</button>
+                <button class="unit-btn" data-unit="lb">LB</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Push Section -->
+            <section class="muscle-group">
+                <h2 class="group-title">PUSH</h2>
+                <div class="exercise-list" id="push-exercises"></div>
+            </section>
+
+            <!-- Pull Section -->
+            <section class="muscle-group">
+                <h2 class="group-title">PULL</h2>
+                <div class="exercise-list" id="pull-exercises"></div>
+            </section>
+
+            <!-- Legs Section -->
+            <section class="muscle-group">
+                <h2 class="group-title">LEGS</h2>
+                <div class="exercise-list" id="legs-exercises"></div>
+            </section>
+        </main>
+
+        <!-- Feedback Modal -->
+        <div class="modal" id="feedback-modal">
+            <div class="modal-content">
+                <div class="modal-icon" id="modal-icon">💪</div>
+                <div class="modal-title" id="modal-title">Good job!</div>
+                <div class="modal-message" id="modal-message"></div>
+                <button class="modal-btn" onclick="app.closeModal()">OK</button>
             </div>
         </div>
     </div>
-
-    <!-- ============================================
-         DASHBOARD
-         ============================================ -->
-    <div id="dashboard" class="page">
-        <nav class="navbar">
-            <div class="nav-brand">OVERLOAD</div>
-            <div class="nav-menu">
-                <a href="#" onclick="app.showPage('dashboard')" class="nav-link active">Dashboard</a>
-                <a href="#" onclick="app.showPage('workout')" class="nav-link">Workout</a>
-                <a href="#" onclick="app.showPage('progress')" class="nav-link">Progress</a>
-                <a href="#" onclick="app.showPage('exercises')" class="nav-link">Exercises</a>
-            </div>
-        </nav>
-
-        <div class="container">
-            <!-- Today's Workout Header -->
-            <div class="section-header">
-                <div>
-                    <h2 id="today-title">Today: Loading...</h2>
-                    <p class="subtitle" id="today-date"></p>
-                </div>
-                <div class="week-badge" id="week-badge">Week 1</div>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-value" id="weekly-volume-stat">0</div>
-                    <div class="stat-label">Weekly Volume (kg)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🏆</div>
-                    <div class="stat-value" id="prs-stat">0</div>
-                    <div class="stat-label">PRs This Week</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔥</div>
-                    <div class="stat-value" id="streak-stat">0</div>
-                    <div class="stat-label">Day Streak</div>
-                </div>
-            </div>
-
-            <!-- Start Workout Button -->
-            <button class="workout-cta" id="start-workout-cta" onclick="app.startTodayWorkout()">
-                <div class="cta-label">START WORKOUT</div>
-                <div class="cta-sublabel" id="cta-workout-type">Push Day</div>
-            </button>
-
-            <!-- Recent Workouts -->
-            <div class="section">
-                <h3>Recent Activity</h3>
-                <div id="recent-workouts-container">
-                    <p class="empty-message">No workouts logged yet</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================
-         WORKOUT PAGE
-         ============================================ -->
-    <div id="workout" class="page">
-        <nav class="navbar">
-            <div class="nav-brand">OVERLOAD</div>
-            <div class="nav-menu">
-                <a href="#" onclick="app.showPage('dashboard')" class="nav-link">Dashboard</a>
-                <a href="#" onclick="app.showPage('workout')" class="nav-link active">Workout</a>
-                <a href="#" onclick="app.showPage('progress')" class="nav-link">Progress</a>
-                <a href="#" onclick="app.showPage('exercises')" class="nav-link">Exercises</a>
-            </div>
-        </nav>
-
-        <div class="container">
-            <!-- Workout Selection -->
-            <div id="workout-selection" class="workout-selection">
-                <h2>Select Workout</h2>
-                <div class="workout-buttons">
-                    <button class="workout-btn" onclick="app.startWorkout('push')">
-                        <div class="btn-title">PUSH</div>
-                        <div class="btn-schedule">Sun / Thu</div>
-                    </button>
-                    <button class="workout-btn" onclick="app.startWorkout('pull')">
-                        <div class="btn-title">PULL</div>
-                        <div class="btn-schedule">Mon / Fri</div>
-                    </button>
-                    <button class="workout-btn" onclick="app.startWorkout('legs')">
-                        <div class="btn-title">LEGS</div>
-                        <div class="btn-schedule">Wed / Sat</div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Active Workout -->
-            <div id="active-workout-container" class="active-workout" style="display: none;">
-                <div class="workout-header">
-                    <div>
-                        <h2 id="workout-title">PUSH WORKOUT</h2>
-                        <div class="workout-timer" id="workout-duration">00:00</div>
-                    </div>
-                    <div class="workout-actions">
-                        <button class="btn-secondary" onclick="app.finishWorkout()">Finish</button>
-                        <button class="btn-ghost" onclick="app.cancelWorkout()">Cancel</button>
-                    </div>
-                </div>
-
-                <!-- Rest Timer -->
-                <div class="rest-timer" id="rest-timer" style="display: none;">
-                    <div class="timer-display" id="rest-time">01:30</div>
-                    <div class="timer-controls">
-                        <button class="btn-timer" onclick="app.pauseRestTimer()">⏸ Pause</button>
-                        <button class="btn-timer" onclick="app.skipRestTimer()">⏭ Skip</button>
-                    </div>
-                </div>
-
-                <!-- Exercise List -->
-                <div id="exercise-list-container"></div>
-            </div>
-
-            <!-- Workout Summary -->
-            <div id="workout-summary-container" class="workout-summary" style="display: none;">
-                <div class="summary-icon">✅</div>
-                <h2>Workout Complete!</h2>
-                <div class="summary-stats">
-                    <div class="summary-item">
-                        <div class="summary-value" id="summary-volume">0 kg</div>
-                        <div class="summary-label">Total Volume</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value" id="summary-duration">0:00</div>
-                        <div class="summary-label">Duration</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value" id="summary-exercises">0</div>
-                        <div class="summary-label">Exercises</div>
-                    </div>
-                </div>
-                <button class="btn-primary" onclick="app.showPage('dashboard')">Back to Dashboard</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================
-         PROGRESS PAGE
-         ============================================ -->
-    <div id="progress" class="page">
-        <nav class="navbar">
-            <div class="nav-brand">OVERLOAD</div>
-            <div class="nav-menu">
-                <a href="#" onclick="app.showPage('dashboard')" class="nav-link">Dashboard</a>
-                <a href="#" onclick="app.showPage('workout')" class="nav-link">Workout</a>
-                <a href="#" onclick="app.showPage('progress')" class="nav-link active">Progress</a>
-                <a href="#" onclick="app.showPage('exercises')" class="nav-link">Exercises</a>
-            </div>
-        </nav>
-
-        <div class="container">
-            <h2>Progress Tracking</h2>
-
-            <!-- Chart Controls -->
-            <div class="chart-controls">
-                <select id="exercise-chart-select" onchange="app.updateChart()">
-                    <option value="">Select Exercise</option>
-                </select>
-                <select id="time-range-select" onchange="app.updateChart()">
-                    <option value="30">Last 30 Days</option>
-                    <option value="90">Last 90 Days</option>
-                    <option value="180">Last 6 Months</option>
-                    <option value="365">Last Year</option>
-                </select>
-            </div>
-
-            <!-- Progress Chart -->
-            <div class="chart-wrapper">
-                <canvas id="progress-canvas"></canvas>
-            </div>
-
-            <!-- Volume by Muscle Group -->
-            <div class="section">
-                <h3>Volume by Muscle Group (Last 30 Days)</h3>
-                <div id="muscle-volume-bars"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================
-         EXERCISES PAGE
-         ============================================ -->
-    <div id="exercises" class="page">
-        <nav class="navbar">
-            <div class="nav-brand">OVERLOAD</div>
-            <div class="nav-menu">
-                <a href="#" onclick="app.showPage('dashboard')" class="nav-link">Dashboard</a>
-                <a href="#" onclick="app.showPage('workout')" class="nav-link">Workout</a>
-                <a href="#" onclick="app.showPage('progress')" class="nav-link">Progress</a>
-                <a href="#" onclick="app.showPage('exercises')" class="nav-link active">Exercises</a>
-            </div>
-        </nav>
-
-        <div class="container">
-            <h2>Exercise Library</h2>
-
-            <!-- Filters -->
-            <div class="exercise-filters">
-                <input type="text" id="exercise-search-input" placeholder="Search exercises..." oninput="app.filterExerciseLibrary()">
-                <select id="muscle-group-filter" onchange="app.filterExerciseLibrary()">
-                    <option value="">All Muscle Groups</option>
-                    <option value="Push">Push</option>
-                    <option value="Pull">Pull</option>
-                    <option value="Legs">Legs</option>
-                    <option value="Abs">Abs</option>
-                    <option value="Cardio">Cardio</option>
-                </select>
-            </div>
-
-            <!-- Exercise Library Grid -->
-            <div id="exercise-library-grid"></div>
-        </div>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,515 +1,339 @@
-// script.js - Main Application Entry Point
-import { WorkoutService } from './services/WorkoutService.js';
-import { StorageService } from './services/StorageService.js';
-import { UIService } from './services/UIService.js';
-import { NotificationService } from './services/NotificationService.js';
-import { ExerciseLibrary } from './data/exercises.js';
-import { workoutPrograms, workoutSchedule } from './data/workoutPrograms.js';
+/**
+ * LIFT - Simple Weight Tracker
+ * One page, button-based weight progression
+ */
 
-class OverloadApp {
-    // Private fields
-    #workoutService;
-    #storageService;
-    #uiService;
-    #notificationService;
-    #currentUser = null;
-    #currentWorkout = null;
-    #timerInterval = null;
-    #restTimerInterval = null;
-    #isLoading = true;
+const app = {
+    // =============================================
+    // STATE
+    // =============================================
+    currentUnit: 'kg', // 'kg' or 'lb'
+    
+    // Exercise data structure
+    exercises: {
+        push: [
+            { id: 'push1', name: 'Bench Press', weight: 60, unit: 'kg' },
+            { id: 'push2', name: 'Shoulder Press', weight: 40, unit: 'kg' },
+            { id: 'push3', name: 'Incline Dumbbell Press', weight: 24, unit: 'kg' },
+            { id: 'push4', name: 'Dips', weight: 15, unit: 'kg' },
+            { id: 'push5', name: 'Tricep Pushdown', weight: 35, unit: 'kg' },
+            { id: 'push6', name: 'Lateral Raises', weight: 12, unit: 'kg' }
+        ],
+        pull: [
+            { id: 'pull1', name: 'Deadlift', weight: 100, unit: 'kg' },
+            { id: 'pull2', name: 'Pull-Ups', weight: 10, unit: 'kg' },
+            { id: 'pull3', name: 'Barbell Row', weight: 70, unit: 'kg' },
+            { id: 'pull4', name: 'Lat Pulldown', weight: 55, unit: 'kg' },
+            { id: 'pull5', name: 'Face Pulls', weight: 25, unit: 'kg' },
+            { id: 'pull6', name: 'Bicep Curls', weight: 15, unit: 'kg' }
+        ],
+        legs: [
+            { id: 'legs1', name: 'Squat', weight: 80, unit: 'kg' },
+            { id: 'legs2', name: 'Romanian Deadlift', weight: 70, unit: 'kg' },
+            { id: 'legs3', name: 'Leg Press', weight: 140, unit: 'kg' },
+            { id: 'legs4', name: 'Leg Extensions', weight: 50, unit: 'kg' },
+            { id: 'legs5', name: 'Leg Curls', weight: 45, unit: 'kg' },
+            { id: 'legs6', name: 'Calf Raises', weight: 80, unit: 'kg' }
+        ]
+    },
 
-    constructor() {
-        this.#initializeServices();
-        this.#setupEventListeners();
-        this.#initializeApp();
-    }
+    // =============================================
+    // INITIALIZATION
+    // =============================================
+    init() {
+        console.log('💪 LIFT initialized');
+        this.loadFromStorage();
+        this.renderAllExercises();
+        this.setupEventListeners();
+    },
 
-    // Destructuring in method parameters
-    #initializeServices() {
-        const config = {
-            apiUrl: window.location.origin,
-            version: '1.0.0',
-            theme: 'dark'
-        };
+    setupEventListeners() {
+        // Unit toggle buttons
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const unit = e.target.dataset.unit;
+                this.switchUnit(unit);
+            });
+        });
+    },
 
-        // Destructuring assignment
-        const { apiUrl, version, theme } = config;
+    // =============================================
+    // RENDERING
+    // =============================================
+    renderAllExercises() {
+        this.renderMuscleGroup('push', this.exercises.push);
+        this.renderMuscleGroup('pull', this.exercises.pull);
+        this.renderMuscleGroup('legs', this.exercises.legs);
+    },
+
+    renderMuscleGroup(groupId, exercises) {
+        const container = document.getElementById(`${groupId}-exercises`);
+        if (!container) return;
+
+        container.innerHTML = exercises.map(exercise => this.renderExerciseCard(exercise)).join('');
         
-        console.log(`🚀 Initializing Overload v${version}`, { apiUrl, theme });
-
-        this.#storageService = new StorageService();
-        this.#notificationService = new NotificationService();
-        this.#workoutService = new WorkoutService(this.#storageService);
-        this.#uiService = new UIService(this.#notificationService);
-    }
-
-    async #initializeApp() {
-        try {
-            // Show loading state
-            this.#uiService.showLoading();
-            
-            // Async/await with Promise
-            const userData = await this.#fetchUserData();
-            
-            // Optional chaining and nullish coalescing
-            this.#currentUser = {
-                name: userData?.name ?? 'Athlete',
-                streak: userData?.streak ?? 0,
-                lastWorkout: userData?.lastWorkout ?? null,
-                preferences: userData?.preferences ?? { restTimer: 90 }
-            };
-
-            // Spread operator - copy and merge
-            const defaultSettings = { theme: 'dark', notifications: true, restTimer: 90 };
-            const userSettings = { ...defaultSettings, ...this.#currentUser.preferences };
-            
-            this.#uiService.applySettings(userSettings);
-            this.#renderApp();
-            
-        } catch (error) {
-            this.#notificationService.show('Failed to initialize app', 'error');
-            console.error('Initialization error:', error);
-        } finally {
-            this.#isLoading = false;
-            this.#uiService.hideLoading();
-        }
-    }
-
-    async #fetchUserData() {
-        // Simulate API call with Promise
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const stored = this.#storageService.get('user_profile');
-                resolve(stored ?? null);
-            }, 1000);
+        // Attach event listeners to the newly created buttons
+        exercises.forEach(exercise => {
+            this.attachExerciseListeners(exercise.id);
         });
-    }
+    },
 
-    #setupEventListeners() {
-        // Event delegation for better performance
-        document.addEventListener('click', (e) => {
-            const { target } = e;
-            
-            // Use optional chaining and logical AND
-            const action = target?.dataset?.action;
-            action && this.#handleActions(action, target);
-        });
-
-        // Handle offline/online events
-        window.addEventListener('online', () => {
-            this.#notificationService.show('Back online! Syncing data...', 'success');
-            this.#syncData();
-        });
-
-        window.addEventListener('offline', () => {
-            this.#notificationService.show('You are offline. Changes will sync when connection returns.', 'warning');
-        });
-    }
-
-    #handleActions(action, target) {
-        // Object literal as action map (better than switch)
-        const actions = {
-            'navigate': () => this.#navigateTo(target.dataset.page),
-            'start-workout': () => this.#startWorkout(target.dataset.type),
-            'finish-workout': () => this.#finishWorkout(),
-            'cancel-workout': () => this.#cancelWorkout(),
-            'add-set': () => this.#addSet(target.dataset.exerciseIndex),
-            'toggle-exercise': () => this.#toggleExercise(target.dataset.exerciseIndex),
-            'save-settings': () => this.#saveSettings(),
-            'export-data': () => this.#exportData(),
-            'import-data': () => this.#importData()
-        };
-
-        // Optional chaining and nullish coalescing
-        const handler = actions[action] ?? (() => console.log('Unknown action:', action));
-        handler();
-    }
-
-    #navigateTo(page) {
-        // Array methods - filter and map
-        const validPages = ['dashboard', 'workout', 'progress', 'exercises', 'settings'];
-        const isValid = validPages.includes(page);
+    renderExerciseCard(exercise) {
+        const displayWeight = this.currentUnit === 'kg' ? exercise.weight : this.convertKgToLb(exercise.weight);
+        const weightUnit = this.currentUnit;
         
-        if (!isValid) {
-            this.#notificationService.show('Invalid page', 'error');
-            return;
+        return `
+            <div class="exercise-card" id="exercise-${exercise.id}">
+                <div class="exercise-header">
+                    <span class="exercise-name">${exercise.name}</span>
+                    <span class="exercise-weight">${displayWeight} ${weightUnit}</span>
+                </div>
+                <div class="exercise-controls">
+                    <button class="control-btn decrement" data-exercise="${exercise.id}" data-action="decrement">− ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}</button>
+                    <button class="control-btn increment" data-exercise="${exercise.id}" data-action="increment">+ ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}</button>
+                </div>
+                <div class="reps-section">
+                    <div class="reps-label">How many reps did you do?</div>
+                    <div class="reps-buttons">
+                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="2-4">2-4 reps</button>
+                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="5-9">5-9 reps</button>
+                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="10+">10+ reps</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    attachExerciseListeners(exerciseId) {
+        const exercise = this.findExerciseById(exerciseId);
+        if (!exercise) return;
+
+        // Weight control buttons
+        const decrementBtn = document.querySelector(`[data-exercise="${exerciseId}"][data-action="decrement"]`);
+        const incrementBtn = document.querySelector(`[data-exercise="${exerciseId}"][data-action="increment"]`);
+
+        if (decrementBtn) {
+            decrementBtn.addEventListener('click', () => this.adjustWeight(exerciseId, 'decrement'));
         }
 
-        this.#uiService.renderPage(page, {
-            // Pass data using spread
-            ...this.#getPageData(page),
-            user: this.#currentUser,
-            isLoading: this.#isLoading
+        if (incrementBtn) {
+            incrementBtn.addEventListener('click', () => this.adjustWeight(exerciseId, 'increment'));
+        }
+
+        // Reps buttons
+        document.querySelectorAll(`[data-exercise="${exerciseId}"][data-reps]`).forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const reps = e.target.dataset.reps;
+                this.handleRepsFeedback(exerciseId, reps);
+            });
         });
+    },
 
-        // Update URL without reload
-        history.pushState({ page }, '', `#${page}`);
-    }
+    // =============================================
+    // WEIGHT ADJUSTMENT
+    // =============================================
+    adjustWeight(exerciseId, action) {
+        const exercise = this.findExerciseById(exerciseId);
+        if (!exercise) return;
 
-    #getPageData(page) {
-        // Object with computed properties
-        const dataGetters = {
-            dashboard: () => ({
-                stats: this.#workoutService.getStats(),
-                todayWorkout: workoutSchedule[new Date().getDay()],
-                recentWorkouts: this.#workoutService.getRecentWorkouts(5)
-            }),
-            workout: () => ({
-                programs: workoutPrograms,
-                activeWorkout: this.#currentWorkout
-            }),
-            progress: () => ({
-                history: this.#workoutService.getWorkoutHistory(),
-                exercises: ExerciseLibrary
-            }),
-            exercises: () => ({
-                exercises: ExerciseLibrary,
-                categories: [...new Set(ExerciseLibrary.map(ex => ex.muscleGroup))] // Spread with Set
-            })
-        };
-
-        // Optional chaining
-        return dataGetters[page]?.() ?? {};
-    }
-
-    async #startWorkout(type) {
-        // Guard clause with logical AND
-        const isValidWorkout = workoutPrograms[type] && !this.#currentWorkout;
-        if (!isValidWorkout) {
-            this.#notificationService.show('Cannot start workout', 'error');
-            return;
-        }
-
-        try {
-            // Destructure workout program
-            const program = workoutPrograms[type];
-            
-            // Map to create workout structure
-            this.#currentWorkout = {
-                id: crypto.randomUUID(),
-                type,
-                startTime: Date.now(),
-                // Array map method
-                exercises: program.map(exercise => ({
-                    ...exercise, // Spread operator
-                    sets: Array.from({ length: exercise.sets }, (_, i) => ({
-                        setNumber: i + 1,
-                        weight: exercise.targetWeight,
-                        reps: exercise.targetReps,
-                        completed: false,
-                        unit: exercise.unit
-                    }))
-                }))
-            };
-
-            this.#startTimer();
-            this.#uiService.renderActiveWorkout(this.#currentWorkout);
-            
-            // Async operation example
-            await this.#workoutService.logWorkoutStart(this.#currentWorkout);
-            
-            this.#notificationService.show(`${type.toUpperCase()} workout started!`, 'success');
-            
-        } catch (error) {
-            this.#notificationService.show('Failed to start workout', 'error');
-            console.error('Workout start error:', error);
-        }
-    }
-
-    #startTimer() {
-        // Clear existing interval
-        this.#timerInterval?.(); // Optional chaining with function call
+        const increment = this.currentUnit === 'kg' ? 2.5 : 5;
         
-        let seconds = 0;
-        this.#timerInterval = setInterval(() => {
-            seconds++;
-            this.#uiService.updateWorkoutTimer(seconds);
-        }, 1000);
-    }
-
-    #startRestTimer() {
-        // Stop existing rest timer
-        if (this.#restTimerInterval) {
-            clearInterval(this.#restTimerInterval);
+        if (action === 'increment') {
+            exercise.weight += increment;
+        } else {
+            exercise.weight = Math.max(0, exercise.weight - increment);
         }
 
-        const restDuration = this.#currentWorkout?.preferences?.restTimer ?? 90;
-        let timeLeft = restDuration;
+        // Update display
+        this.updateExerciseDisplay(exerciseId);
+        
+        // Save to localStorage
+        this.saveToStorage();
+    },
 
-        this.#uiService.showRestTimer(timeLeft);
+    // =============================================
+    // REPS FEEDBACK
+    // =============================================
+    handleRepsFeedback(exerciseId, repsRange) {
+        const exercise = this.findExerciseById(exerciseId);
+        if (!exercise) return;
 
-        this.#restTimerInterval = setInterval(() => {
-            timeLeft--;
-            
-            // Ternary operator for display
-            this.#uiService.updateRestTimer(timeLeft);
-            
-            // Logical AND for timer end
-            timeLeft <= 0 && this.#stopRestTimer(true);
-            
-        }, 1000);
-    }
+        let message = '';
+        let icon = '💪';
+        let title = '';
 
-    #stopRestTimer(playSound = false) {
-        if (this.#restTimerInterval) {
-            clearInterval(this.#restTimerInterval);
-            this.#restTimerInterval = null;
-            this.#uiService.hideRestTimer();
-            
-            // Play sound if timer completed
-            playSound && this.#playTimerSound();
+        switch(repsRange) {
+            case '2-4':
+                title = 'Too Heavy';
+                message = `Lower the weight! ${this.currentUnit === 'kg' ? '2.5kg' : '5lb'} is too much for now. Try decreasing next time.`;
+                icon = '🏋️‍♂️';
+                break;
+            case '5-9':
+                title = 'Perfect Range';
+                message = `Stay at this weight! You're in the ideal hypertrophy range. Focus on form.`;
+                icon = '🎯';
+                break;
+            case '10+':
+                title = 'Time to Progress';
+                message = `Increase the weight! You're ready for ${this.currentUnit === 'kg' ? '2.5kg' : '5lb'} more. Great work!`;
+                icon = '🚀';
+                break;
         }
-    }
 
-    #playTimerSound() {
-        // Optional chaining with Audio API
-        const audio = new Audio('/sounds/timer.mp3');
-        audio?.play().catch(() => {
-            // Fallback if audio fails
-            this.#notificationService.show('Rest complete!', 'info');
+        this.showFeedback(title, message, icon);
+    },
+
+    // =============================================
+    // UNIT CONVERSION
+    // =============================================
+    switchUnit(unit) {
+        if (unit === this.currentUnit) return;
+
+        // Update active button
+        document.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.unit === unit);
         });
-    }
 
-    async #finishWorkout() {
-        if (!this.#currentWorkout) return;
+        // Convert all weights
+        this.convertAllWeights(unit);
+        
+        // Update current unit
+        this.currentUnit = unit;
+        
+        // Re-render displays
+        this.updateAllDisplays();
+    },
 
-        try {
-            // Stop timers
-            clearInterval(this.#timerInterval);
-            this.#stopRestTimer();
+    convertAllWeights(targetUnit) {
+        const convertFn = targetUnit === 'kg' 
+            ? (weight) => this.convertLbToKg(weight)
+            : (weight) => this.convertKgToLb(weight);
 
-            // Calculate workout stats using array methods
-            const workoutData = {
-                ...this.#currentWorkout,
-                endTime: Date.now(),
-                duration: Math.floor((Date.now() - this.#currentWorkout.startTime) / 1000),
-                // Array reduce method for total volume
-                totalVolume: this.#currentWorkout.exercises.reduce((total, exercise) => {
-                    return total + exercise.sets.reduce((exTotal, set) => {
-                        return exTotal + (set.completed ? (set.weight * set.reps) : 0);
-                    }, 0);
-                }, 0),
-                // Array filter method for completed sets
-                completedSets: this.#currentWorkout.exercises.reduce((total, ex) => {
-                    return total + ex.sets.filter(s => s.completed).length;
-                }, 0)
-            };
-
-            // Save workout
-            await this.#workoutService.saveWorkout(workoutData);
-            
-            // Update personal records (array find method)
-            workoutData.exercises.forEach(exercise => {
-                const exerciseData = ExerciseLibrary.find(e => e.id === exercise.exerciseId);
-                const maxWeight = Math.max(...exercise.sets.map(s => s.weight));
-                
-                if (maxWeight > (exerciseData?.personalRecord ?? 0)) {
-                    this.#notificationService.show(`New PR on ${exerciseData?.name}! 🏆`, 'success');
+        // Convert each exercise
+        ['push', 'pull', 'legs'].forEach(group => {
+            this.exercises[group].forEach(exercise => {
+                if (exercise.unit !== targetUnit) {
+                    exercise.weight = convertFn(exercise.weight);
+                    exercise.unit = targetUnit;
                 }
             });
-
-            // Clear current workout
-            this.#currentWorkout = null;
-            
-            // Show summary
-            this.#uiService.showWorkoutSummary(workoutData);
-            
-            // Update streak
-            this.#updateStreak();
-            
-        } catch (error) {
-            this.#notificationService.show('Failed to save workout', 'error');
-            console.error('Workout save error:', error);
-        }
-    }
-
-    #updateStreak() {
-        // Complex streak calculation using array methods
-        const workouts = this.#storageService.get('workouts') ?? [];
-        const today = new Date().setHours(0, 0, 0, 0);
-        
-        // Find if worked out today
-        const workedOutToday = workouts.some(w => {
-            const workoutDate = new Date(w.date).setHours(0, 0, 0, 0);
-            return workoutDate === today;
         });
+    },
 
-        if (workedOutToday) {
-            // Calculate streak using filter
-            let streak = 1;
-            let checkDate = today - 86400000; // Yesterday
-            
-            while (true) {
-                const hasWorkout = workouts.some(w => {
-                    const workoutDate = new Date(w.date).setHours(0, 0, 0, 0);
-                    return workoutDate === checkDate;
-                });
-                
-                if (!hasWorkout) break;
-                
-                streak++;
-                checkDate -= 86400000;
-            }
-            
-            this.#currentUser.streak = streak;
-            this.#storageService.set('user_profile', this.#currentUser);
-            this.#uiService.updateStreak(streak);
+    convertKgToLb(kg) {
+        return Math.round(kg * 2.20462);
+    },
+
+    convertLbToKg(lb) {
+        return Math.round(lb / 2.20462);
+    },
+
+    // =============================================
+    // UI UPDATES
+    // =============================================
+    updateAllDisplays() {
+        ['push', 'pull', 'legs'].forEach(group => {
+            this.exercises[group].forEach(exercise => {
+                this.updateExerciseDisplay(exercise.id);
+            });
+        });
+    },
+
+    updateExerciseDisplay(exerciseId) {
+        const exercise = this.findExerciseById(exerciseId);
+        if (!exercise) return;
+
+        const card = document.getElementById(`exercise-${exerciseId}`);
+        if (!card) return;
+
+        const weightSpan = card.querySelector('.exercise-weight');
+        const displayWeight = this.currentUnit === 'kg' ? exercise.weight : this.convertKgToLb(exercise.weight);
+        
+        weightSpan.textContent = `${displayWeight} ${this.currentUnit}`;
+        
+        // Update button labels
+        const decrementBtn = card.querySelector('[data-action="decrement"]');
+        const incrementBtn = card.querySelector('[data-action="increment"]');
+        
+        if (decrementBtn) {
+            decrementBtn.textContent = `− ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}`;
         }
-    }
-
-    #cancelWorkout() {
-        // Ternary with confirmation
-        const confirmed = confirm('Are you sure you want to cancel this workout?');
-        confirmed && this.#resetWorkout();
-    }
-
-    #resetWorkout() {
-        clearInterval(this.#timerInterval);
-        this.#stopRestTimer();
-        this.#currentWorkout = null;
-        this.#uiService.resetWorkoutView();
-        this.#notificationService.show('Workout cancelled', 'info');
-    }
-
-    #addSet(exerciseIndex) {
-        // Guard clause
-        if (!this.#currentWorkout?.exercises[exerciseIndex]) return;
-
-        const exercise = this.#currentWorkout.exercises[exerciseIndex];
-        const lastSet = exercise.sets[exercise.sets.length - 1];
         
-        // Create new set with spread
-        const newSet = {
-            ...lastSet,
-            setNumber: exercise.sets.length + 1,
-            completed: false
-        };
-
-        // Push with immutability (spread)
-        exercise.sets = [...exercise.sets, newSet];
-        
-        // Re-render
-        this.#uiService.updateExerciseSets(exerciseIndex, exercise.sets);
-    }
-
-    #toggleExercise(exerciseIndex) {
-        // Toggle using logical NOT
-        this.#uiService.toggleExerciseBody(exerciseIndex);
-    }
-
-    async #syncData() {
-        try {
-            // Get unsynced data
-            const unsynced = this.#storageService.get('unsynced_workouts') ?? [];
-            
-            if (unsynced.length === 0) return;
-            
-            this.#uiService.showSyncStatus('syncing');
-            
-            // Promise.all for parallel sync
-            await Promise.all(unsynced.map(workout => 
-                this.#workoutService.syncWorkout(workout)
-            ));
-            
-            this.#storageService.remove('unsynced_workouts');
-            this.#uiService.showSyncStatus('complete');
-            this.#notificationService.show('All data synced!', 'success');
-            
-        } catch (error) {
-            this.#uiService.showSyncStatus('error');
-            this.#notificationService.show('Sync failed, will retry later', 'warning');
+        if (incrementBtn) {
+            incrementBtn.textContent = `+ ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}`;
         }
-    }
+    },
 
-    #exportData() {
-        // Get all user data
-        const userData = {
-            profile: this.#currentUser,
-            workouts: this.#storageService.get('workouts') ?? [],
-            preferences: this.#storageService.get('preferences') ?? {},
-            exportDate: new Date().toISOString(),
-            version: '1.0.0'
+    // =============================================
+    // FEEDBACK MODAL
+    // =============================================
+    showFeedback(title, message, icon = '💪') {
+        const modal = document.getElementById('feedback-modal');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+
+        modalIcon.textContent = icon;
+        modalTitle.textContent = title;
+        modalMessage.textContent = message;
+
+        modal.classList.add('active');
+        
+        // Auto close after 3 seconds
+        setTimeout(() => {
+            this.closeModal();
+        }, 3000);
+    },
+
+    closeModal() {
+        const modal = document.getElementById('feedback-modal');
+        modal.classList.remove('active');
+    },
+
+    // =============================================
+    // HELPER FUNCTIONS
+    // =============================================
+    findExerciseById(id) {
+        for (const group of ['push', 'pull', 'legs']) {
+            const exercise = this.exercises[group].find(ex => ex.id === id);
+            if (exercise) return exercise;
+        }
+        return null;
+    },
+
+    // =============================================
+    // STORAGE
+    // =============================================
+    saveToStorage() {
+        const data = {
+            exercises: this.exercises,
+            currentUnit: this.currentUnit
         };
+        localStorage.setItem('lift_data', JSON.stringify(data));
+    },
 
-        // Create and download file
-        const blob = new Blob([JSON.stringify(userData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `overload-export-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        
-        // Cleanup
-        URL.revokeObjectURL(url);
-        
-        this.#notificationService.show('Data exported successfully', 'success');
-    }
-
-    async #importData() {
-        // Create file input
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            
+    loadFromStorage() {
+        const saved = localStorage.getItem('lift_data');
+        if (saved) {
             try {
-                const text = await file.text();
-                const importedData = JSON.parse(text);
+                const data = JSON.parse(saved);
+                this.exercises = data.exercises;
+                this.currentUnit = data.currentUnit || 'kg';
                 
-                // Validate imported data
-                const isValid = importedData?.version && importedData?.workouts;
-                
-                if (!isValid) {
-                    throw new Error('Invalid import file');
-                }
-                
-                // Merge with existing data
-                const existingWorkouts = this.#storageService.get('workouts') ?? [];
-                const mergedWorkouts = [...existingWorkouts, ...importedData.workouts];
-                
-                this.#storageService.set('workouts', mergedWorkouts);
-                this.#notificationService.show(`Imported ${importedData.workouts.length} workouts`, 'success');
-                
-                // Refresh current view
-                this.#renderApp();
-                
-            } catch (error) {
-                this.#notificationService.show('Failed to import data', 'error');
-                console.error('Import error:', error);
+                // Update unit toggle UI
+                document.querySelectorAll('.unit-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.unit === this.currentUnit);
+                });
+            } catch (e) {
+                console.error('Failed to load saved data');
             }
-        };
-        
-        input.click();
+        }
     }
+};
 
-    #saveSettings() {
-        // Get settings from UI
-        const settings = this.#uiService.getSettings();
-        
-        // Save with spread
-        this.#currentUser = {
-            ...this.#currentUser,
-            preferences: settings
-        };
-        
-        this.#storageService.set('user_profile', this.#currentUser);
-        this.#notificationService.show('Settings saved', 'success');
-    }
-
-    #renderApp() {
-        const currentPage = window.location.hash.slice(1) || 'dashboard';
-        this.#navigateTo(currentPage);
-    }
-}
-
-// Initialize app
-const app = new OverloadApp();
-
-// Handle browser back/forward
-window.addEventListener('popstate', (e) => {
-    const page = e.state?.page || 'dashboard';
-    app.#navigateTo(page);
+// =============================================
+// INITIALIZE
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+    app.init();
 });
