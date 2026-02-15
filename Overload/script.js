@@ -1,15 +1,14 @@
 /**
- * LIFT - Simple Weight Tracker
- * One page, button-based weight progression
+ * LIFT - Enhanced Version
+ * More interactive and user-friendly
  */
 
 const app = {
     // =============================================
     // STATE
     // =============================================
-    currentUnit: 'kg', // 'kg' or 'lb'
+    currentUnit: 'kg',
     
-    // Exercise data structure
     exercises: {
         push: [
             { id: 'push1', name: 'Bench Press', weight: 60, unit: 'kg' },
@@ -41,14 +40,13 @@ const app = {
     // INITIALIZATION
     // =============================================
     init() {
-        console.log('💪 LIFT initialized');
+        console.log('💪 LIFT enhanced version initialized');
         this.loadFromStorage();
         this.renderAllExercises();
         this.setupEventListeners();
     },
 
     setupEventListeners() {
-        // Unit toggle buttons
         document.querySelectorAll('.unit-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const unit = e.target.dataset.unit;
@@ -72,7 +70,6 @@ const app = {
 
         container.innerHTML = exercises.map(exercise => this.renderExerciseCard(exercise)).join('');
         
-        // Attach event listeners to the newly created buttons
         exercises.forEach(exercise => {
             this.attachExerciseListeners(exercise.id);
         });
@@ -81,23 +78,37 @@ const app = {
     renderExerciseCard(exercise) {
         const displayWeight = this.currentUnit === 'kg' ? exercise.weight : this.convertKgToLb(exercise.weight);
         const weightUnit = this.currentUnit;
+        const increment = this.currentUnit === 'kg' ? '2.5' : '5';
         
         return `
             <div class="exercise-card" id="exercise-${exercise.id}">
                 <div class="exercise-header">
                     <span class="exercise-name">${exercise.name}</span>
-                    <span class="exercise-weight">${displayWeight} ${weightUnit}</span>
+                    <span class="exercise-weight weight-display" id="weight-${exercise.id}">${displayWeight} ${weightUnit}</span>
                 </div>
                 <div class="exercise-controls">
-                    <button class="control-btn decrement" data-exercise="${exercise.id}" data-action="decrement">− ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}</button>
-                    <button class="control-btn increment" data-exercise="${exercise.id}" data-action="increment">+ ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}</button>
+                    <button class="control-btn decrement" data-exercise="${exercise.id}" data-action="decrement">
+                        − ${increment}${weightUnit} <span>⬇️</span>
+                    </button>
+                    <button class="control-btn increment" data-exercise="${exercise.id}" data-action="increment">
+                        + ${increment}${weightUnit} <span>⬆️</span>
+                    </button>
                 </div>
                 <div class="reps-section">
-                    <div class="reps-label">How many reps did you do?</div>
+                    <div class="reps-label">How many reps did you complete?</div>
                     <div class="reps-buttons">
-                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="2-4">2-4 reps</button>
-                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="5-9">5-9 reps</button>
-                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="10+">10+ reps</button>
+                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="2-4">
+                            <span class="reps-range">2-4</span>
+                            <span class="reps-desc">too heavy</span>
+                        </button>
+                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="5-9">
+                            <span class="reps-range">5-9</span>
+                            <span class="reps-desc">perfect</span>
+                        </button>
+                        <button class="reps-btn" data-exercise="${exercise.id}" data-reps="10+">
+                            <span class="reps-range">10+</span>
+                            <span class="reps-desc">increase</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -125,6 +136,12 @@ const app = {
             btn.addEventListener('click', (e) => {
                 const reps = e.target.dataset.reps;
                 this.handleRepsFeedback(exerciseId, reps);
+                
+                // Add visual feedback to button
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 200);
             });
         });
     },
@@ -140,15 +157,36 @@ const app = {
         
         if (action === 'increment') {
             exercise.weight += increment;
+            this.showWeightFeedback(exerciseId, 'up');
         } else {
             exercise.weight = Math.max(0, exercise.weight - increment);
+            this.showWeightFeedback(exerciseId, 'down');
         }
 
-        // Update display
-        this.updateExerciseDisplay(exerciseId);
+        // Update display with animation
+        this.updateExerciseDisplay(exerciseId, true);
         
         // Save to localStorage
         this.saveToStorage();
+    },
+
+    showWeightFeedback(exerciseId, direction) {
+        const weightElement = document.getElementById(`weight-${exerciseId}`);
+        if (!weightElement) return;
+
+        weightElement.classList.add('weight-update');
+        
+        // Add color feedback
+        if (direction === 'up') {
+            weightElement.style.color = 'var(--success)';
+        } else {
+            weightElement.style.color = 'var(--danger)';
+        }
+
+        setTimeout(() => {
+            weightElement.classList.remove('weight-update');
+            weightElement.style.color = '';
+        }, 300);
     },
 
     // =============================================
@@ -159,24 +197,24 @@ const app = {
         if (!exercise) return;
 
         let message = '';
-        let icon = '💪';
+        let icon = '';
         let title = '';
 
         switch(repsRange) {
             case '2-4':
-                title = 'Too Heavy';
-                message = `Lower the weight! ${this.currentUnit === 'kg' ? '2.5kg' : '5lb'} is too much for now. Try decreasing next time.`;
-                icon = '🏋️‍♂️';
+                title = '⬇️ TOO HEAVY';
+                message = `Decrease the weight! ${this.currentUnit === 'kg' ? '2.5kg' : '5lb'} is too much for now. Focus on form with lighter weight.`;
+                icon = '🏋️';
                 break;
             case '5-9':
-                title = 'Perfect Range';
-                message = `Stay at this weight! You're in the ideal hypertrophy range. Focus on form.`;
-                icon = '🎯';
+                title = '🎯 PERFECT RANGE';
+                message = `Stay at this weight! You're in the ideal range for muscle growth. Keep up the great form!`;
+                icon = '💪';
                 break;
             case '10+':
-                title = 'Time to Progress';
-                message = `Increase the weight! You're ready for ${this.currentUnit === 'kg' ? '2.5kg' : '5lb'} more. Great work!`;
-                icon = '🚀';
+                title = '🚀 TIME TO PROGRESS';
+                message = `Increase the weight! You're ready for ${this.currentUnit === 'kg' ? '2.5kg' : '5lb'} more. Great work pushing yourself!`;
+                icon = '⚡';
                 break;
         }
 
@@ -189,9 +227,16 @@ const app = {
     switchUnit(unit) {
         if (unit === this.currentUnit) return;
 
-        // Update active button
+        // Update active button with animation
         document.querySelectorAll('.unit-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.unit === unit);
+            
+            if (btn.dataset.unit === unit) {
+                btn.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 200);
+            }
         });
 
         // Convert all weights
@@ -200,7 +245,7 @@ const app = {
         // Update current unit
         this.currentUnit = unit;
         
-        // Re-render displays
+        // Re-render displays with animation
         this.updateAllDisplays();
     },
 
@@ -209,7 +254,6 @@ const app = {
             ? (weight) => this.convertLbToKg(weight)
             : (weight) => this.convertKgToLb(weight);
 
-        // Convert each exercise
         ['push', 'pull', 'legs'].forEach(group => {
             this.exercises[group].forEach(exercise => {
                 if (exercise.unit !== targetUnit) {
@@ -234,33 +278,43 @@ const app = {
     updateAllDisplays() {
         ['push', 'pull', 'legs'].forEach(group => {
             this.exercises[group].forEach(exercise => {
-                this.updateExerciseDisplay(exercise.id);
+                this.updateExerciseDisplay(exercise.id, false);
             });
         });
     },
 
-    updateExerciseDisplay(exerciseId) {
+    updateExerciseDisplay(exerciseId, animate = false) {
         const exercise = this.findExerciseById(exerciseId);
         if (!exercise) return;
 
-        const card = document.getElementById(`exercise-${exerciseId}`);
-        if (!card) return;
+        const weightElement = document.getElementById(`weight-${exerciseId}`);
+        if (!weightElement) return;
 
-        const weightSpan = card.querySelector('.exercise-weight');
         const displayWeight = this.currentUnit === 'kg' ? exercise.weight : this.convertKgToLb(exercise.weight);
         
-        weightSpan.textContent = `${displayWeight} ${this.currentUnit}`;
-        
-        // Update button labels
-        const decrementBtn = card.querySelector('[data-action="decrement"]');
-        const incrementBtn = card.querySelector('[data-action="increment"]');
-        
-        if (decrementBtn) {
-            decrementBtn.textContent = `− ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}`;
+        if (animate) {
+            weightElement.classList.add('weight-update');
+            setTimeout(() => {
+                weightElement.classList.remove('weight-update');
+            }, 300);
         }
         
-        if (incrementBtn) {
-            incrementBtn.textContent = `+ ${this.currentUnit === 'kg' ? '2.5' : '5'}${this.currentUnit}`;
+        weightElement.textContent = `${displayWeight} ${this.currentUnit}`;
+        
+        // Update button labels
+        const card = document.getElementById(`exercise-${exerciseId}`);
+        if (card) {
+            const decrementBtn = card.querySelector('[data-action="decrement"]');
+            const incrementBtn = card.querySelector('[data-action="increment"]');
+            const increment = this.currentUnit === 'kg' ? '2.5' : '5';
+            
+            if (decrementBtn) {
+                decrementBtn.innerHTML = `− ${increment}${this.currentUnit} <span>⬇️</span>`;
+            }
+            
+            if (incrementBtn) {
+                incrementBtn.innerHTML = `+ ${increment}${this.currentUnit} <span>⬆️</span>`;
+            }
         }
     },
 
@@ -279,10 +333,10 @@ const app = {
 
         modal.classList.add('active');
         
-        // Auto close after 3 seconds
+        // Auto close after 4 seconds
         setTimeout(() => {
             this.closeModal();
-        }, 3000);
+        }, 4000);
     },
 
     closeModal() {
@@ -320,7 +374,6 @@ const app = {
                 this.exercises = data.exercises;
                 this.currentUnit = data.currentUnit || 'kg';
                 
-                // Update unit toggle UI
                 document.querySelectorAll('.unit-btn').forEach(btn => {
                     btn.classList.toggle('active', btn.dataset.unit === this.currentUnit);
                 });
