@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS 321 · programming languages · reviewer</title>
+    <!-- external stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reviewer">
+    <h1>CS 321 · programming languages</h1>
+    <div class="subhead">design criteria · history · paradigms · syntax & semantics</div>
+
+    <!-- ============== PART 1: HISTORY & INTRODUCTION (Pt1 + Pt2) ============= -->
+    <section>
+        <h2>📜 origins & evolution</h2>
+        <div class="card-grid">
+            <div class="card"><span class="tag">1940s</span><p><strong>hardwired</strong> – operators set switches, no stored program.</p></div>
+            <div class="card"><span class="tag">von Neumann</span><p>stored-program concept (late 1940s): instructions in memory, flip switches to enter machine code.</p></div>
+            <div class="card"><span class="tag">assembly</span><p>symbolic codes + assembler, loader, keypunch. Example: <code>LD R1, FIRST</code></p></div>
+            <div class="card"><span class="tag">FORTRAN</span><p>1950s (Backus): formula translation, algebraic notation, scientists.</p></div>
+            <div class="card"><span class="tag">ALGOL‑60</span><p>structured, blocks, if/for, machine independence. Committee design.</p></div>
+        </div>
+
+        <h3>abstractions: data & control</h3>
+        <div class="code-compare">
+            <div><pre>basic data:
+int x;   (hides twos-complement)</pre></div>
+            <div><pre>structure:
+int a[10];  (array)</pre></div>
+            <div><pre>unit abstraction:
+module, package, class</pre></div>
+        </div>
+        <div class="code-compare">
+            <div><pre>control basic:
+sum = first + second
+(syntactic sugar: x += 10)</pre></div>
+            <div><pre>structure:
+procedure, function,
+iterator</pre></div>
+            <div><pre>unit abstraction:
+threads, tasks, packages</pre></div>
+        </div>
+
+        <h3>computational paradigms</h3>
+        <ul class="obj-list">
+            <li><strong>imperative</strong> – variables, assignment, sequential (C, Pascal)</li>
+            <li><strong>functional</strong> – λ-calculus, no side effects (Haskell, Lisp)</li>
+            <li><strong>logic</strong> – symbolic logic (Prolog)</li>
+            <li><strong>object‑oriented</strong> – objects, classes, reuse (Simula, Smalltalk, Java)</li>
+        </ul>
+
+        <div class="note">
+            <strong>machine language example (16‑bit):</strong> <code>0010001000000100</code> (opcode 0010 = copy, reg 001, offset). Last lines: data 5,6,0.
+        </div>
+
+        <h3>language definition</h3>
+        <p><strong>syntax</strong> – grammar, tokens (if, else). Example C if‑rule:<br> 
+        <code>if-statement → if ( expression ) statement [ else statement ]</code></p>
+        <p><strong>semantics</strong> – meaning: operational, denotational, axiomatic. e.g. “if expression ≠ 0 then execute first statement”.</p>
+
+        <h3>translation: interpreter vs compiler</h3>
+        <ul>
+            <li><strong>interpreter</strong> – directly executes (simulates virtual machine).</li>
+            <li><strong>compiler</strong> – source → target (assembly/bytecode). Bytecode + JVM = machine independent.</li>
+        </ul>
+        <p class="tag" style="margin-left:0;">2022 trends (TIOBE, PYPL): Python, C, Java, C++, C# …</p>
+    </section>
+
+    <hr>
+
+    <!-- ============== PART 2: LANGUAGE DESIGN CRITERIA ============= -->
+    <section>
+        <h2>⚙️ design criteria & regularity</h2>
+
+        <div class="card-grid">
+            <div class="card"><span class="tag">success</span> goals achieved / widespread / model for others</div>
+            <div class="card"><span class="tag">Wirth</span> simplicity paramount</div>
+            <div class="card"><span class="tag">Hoare</span> individual constructs matter</div>
+            <div class="card"><span class="tag">Stroustrup</span> not just "neat" features</div>
+            <div class="card"><span class="tag">Brooks</span> design = like building architecture</div>
+        </div>
+
+        <h3>⏳ historical efficiency focus</h3>
+        <ul>
+            <li><strong>early days</strong> – execution speed & memory (programmer efficiency ignored).</li>
+            <li><strong>1960s</strong> – Algol: readability, writability.</li>
+            <li><strong>1970‑80s</strong> – simplicity, abstraction (Pascal, Modula‑2, Ada), reliability.</li>
+            <li><strong>1980‑90s</strong> – logic/functional revival, OO (C++, Java, Python).</li>
+            <li><strong>last 25y</strong> – object abstraction, libraries, modeling.</li>
+        </ul>
+
+        <h3>efficiency: two views</h3>
+        <div class="code-compare">
+            <div><pre>// Java
+int i = 10;
+String s = "info";</pre></div>
+            <div><pre># Python
+i = 10
+s = "info"</pre></div>
+        </div>
+        <p><strong>programmer efficiency</strong> – expressiveness, mapping design → code.</p>
+
+        <h3>if‑statement comparison (C vs Python)</h3>
+        <div class="code-compare">
+            <div><pre>if (x > 0) {
+    numSoln = 2;
+    r1 = sqrt(x);
+} else if (x == 0) {
+    numSoln = 1;
+}</pre></div>
+            <div><pre>if x > 0.0:
+    numSoln = 2
+    r1 = sqrt(x)
+elif x == 0.0:
+    numSoln = 1</pre></div>
+        </div>
+
+        <h3>regularity: generality · orthogonality · uniformity</h3>
+
+        <div class="card" style="grid-column: span 3;">
+            <h4 style="margin-top:0;">🔹 generality (avoid special cases)</h4>
+            <ul>
+                <li><strong>procedures/functions</strong>: Pascal nested, C pointers to function but no nesting → less general.</li>
+                <li><strong>operators</strong>: C cannot compare arrays with == (lacks generality).</li>
+                <li><strong>constants</strong>: Pascal constant = fixed value; Ada allows computed constants (general).</li>
+            </ul>
+        </div>
+
+        <div class="card" style="grid-column: span 3;">
+            <h4 style="margin-top:0;">🔸 orthogonality (features combine without context restrictions)</h4>
+            <ul>
+                <li><strong>Pascal</strong> function return only scalar/pointer → not orthogonal.</li>
+                <li><strong>C/C++</strong> can return any type except array (array treated differently).</li>
+                <li><strong>Ada, Python, functional</strong> – no such restriction.</li>
+                <li><strong>var placement</strong>: C only at block start; C++ anywhere.</li>
+                <li><strong>Java</strong>: primitive vs reference (value vs reference semantics). Smalltalk/Python: all objects → orthogonal.</li>
+            </ul>
+        </div>
+
+        <div class="card" style="grid-column: span 3;">
+            <h4 style="margin-top:0;">🔹 uniformity (similar things look/behave similar)</h4>
+            <ul>
+                <li><strong>C++ extra semicolon</strong>: <code>class A {…};</code> required, but <code>int f() {…}</code> semicolon forbidden.</li>
+                <li><strong>Pascal function return</strong> <code>f := true;</code> looks like assignment but is return – confusing.</li>
+                <li>most languages use explicit <code>return</code> statement.</li>
+            </ul>
+        </div>
+
+        <h3>causes of irregularity</h3>
+        <p>Design trade‑offs, legacy, or reasonable compromise? If removal hurts design goals, irregularity may be justified; otherwise it’s a flaw.</p>
+
+        <h3>🔒 security & extensibility</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+            <div style="flex: 2;">
+                <p><strong>security</strong> – type checking, variable declarations, strong typing (static/dynamic). Semantically safe: Python, Lisp, Java (avoid many errors).</p>
+                <p><strong>extensibility</strong> – new data types, operations, packages. Modern releases backward compatible (deprecation possible).</p>
+            </div>
+            <div style="flex: 1; background: #f0f5ff; border-radius: 24px; padding: 1.2rem;">
+                <strong>Lisp macro (extend syntax)</strong>
+                <div class="fig-lisp">
+(defmacro while (condition &rest body)
+  `(do ()
+       ((not ,condition))
+     ,@body))
+                </div>
+                <p>while → do translation. Adds new keyword.</p>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <!-- ============== LISP GCD examples ============= -->
+    <section>
+        <h2>🧩 Lisp examples (from design criteria)</h2>
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+            <div style="background: #e9eff9; border-radius: 24px; padding: 1.5rem; flex:1;">
+                <strong>do loop (GCD)</strong>
+                <pre>(do ()  
+    ((= 0 b))  
+    (let ((temp b))  
+      (setf b (mod a b))  
+      (setf a temp)))</pre>
+            </div>
+            <div style="background: #e9eff9; border-radius: 24px; padding: 1.5rem; flex:1;">
+                <strong>while loop (GCD)</strong>
+                <pre>(while (> b 0)
+    (let ((temp b))
+      (setf b (mod a b))
+      (setf a temp)))</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============== thank you snippet ============= -->
+    <section style="margin-top: 2rem;">
+        <pre style="background: #0d2840; color: #bbd9ff; border-radius: 28px; padding: 1.5rem; max-width: 500px; margin: 1rem auto;">#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    bool question;
+    cout << "Thank you for listening" << endl;
+    cout << "Any Questions? (1/0)";
+    cin >> question;
+    if (question)
+        cout << "Raise hand; Ask question." << endl;
+    else
+        cout << "May all the Gods bless your examinations." << endl;
+    return 0;
+}</pre>
+        <p style="text-align: center; color: #1e3c63;">— page 25, language design criteria</p>
+    </section>
+
+    <!-- ============== FUTURE & ASSESSMENT (from Pt2) ============= -->
+    <section class="footer-questions">
+        <h2 style="border: none; margin-top: 0;">🔮 future & assessment</h2>
+        <ul>
+            <li>1960s dream: <strong>universal language</strong> → failed.</li>
+            <li>1980s dream: <strong>specification languages</strong> replace programming → didn't happen.</li>
+            <li>Winograd (1979): shift from imperative to <strong>declarative</strong> descriptions of packages/objects.</li>
+            <li>Higher level ≠ single top language; multiple levels coexist.</li>
+        </ul>
+
+        <h3>sample assessment questions</h3>
+        <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="card"><strong>1. syntax error</strong><br><code>int 1x = 5;</code> (C++) or missing semicolon.</div>
+            <div class="card"><strong>2. semantic error</strong><br><code>int a[5]; a[10] = 3;</code> (undefined behavior)</div>
+            <div class="card"><strong>3. recursive factorial</strong><pre>def fact(n):
+    return 1 if n==0 else n*fact(n-1)</pre></div>
+            <div class="card"><strong>4. bytecode vs machine</strong><br>portability (JVM) vs performance (C++ native)</div>
+        </div>
+        <p class="note" style="margin: 2rem 0 0 0;"><strong>favorite language?</strong> (slide page 18) — think about expressiveness, community, paradigm.</p>
+    </section>
+
+    <!-- ============== quick ref ============= -->
+    <footer style="margin-top: 2.5rem; text-align: right; color: #6b7f9f; border-top: 2px solid #b7d0f0; padding-top: 1rem;">
+        compiled from CS 321 notes · design criteria + history · all extracts included
+    </footer>
+</div>
+<!-- external javascript -->
+<script src="script.js"></script>
+</body>
+</html>
